@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CrudTemplate.Api</RootNamespace>
+    <!-- 產生 XML 文件供 Swagger 讀取端點/型別註解 -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- 1591 = 未寫註解的公開成員（範本容許，不視為錯誤） -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <!-- Mapperly 映射警告（RMGxxx）視同錯誤：漏映射欄位在編譯期就擋下 -->
+    <WarningsAsErrors>$(WarningsAsErrors);RMG001;RMG002;RMG003;RMG004;RMG005;RMG006;RMG007;RMG008;RMG009;RMG010;RMG011;RMG012;RMG013;RMG014;RMG015;RMG016;RMG017;RMG018;RMG019;RMG020</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <!-- Mapperly：source generator 映射（MIT），未映射目標欄位於編譯期警告（本範本設為錯誤） -->
+    <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+  </ItemGroup>
+
+</Project>

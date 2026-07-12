@@ -1,0 +1,6 @@
+# 讓 sample-app 自成 pnpm workspace root：
+# 存在此檔即讓 pnpm 以本目錄為根解析依賴，不會往上層目錄尋找/併入其他 workspace。
+# （沿用主專案 frontend 的 allowBuilds 設定，抑制 esbuild / @parcel/watcher 的 postinstall 建置提示）
+allowBuilds:
+  '@parcel/watcher': false
+  esbuild: false

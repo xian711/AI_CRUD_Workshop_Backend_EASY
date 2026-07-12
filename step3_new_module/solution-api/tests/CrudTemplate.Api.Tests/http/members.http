@@ -1,0 +1,67 @@
+### 人員 CRUD 手動驗證腳本（原單位範本慣例）
+### 用法：VS / Rider / VS Code REST Client 直接送出；port 見 SETUP.md（預設 5080）
+@host = http://localhost:5080
+@base = {{host}}/api/template/members
+
+### I1 取得全量清單（200，至少 24 筆，camelCase，id 升冪）
+GET {{base}}
+Accept: application/json
+
+### I2 取得單筆（200）
+GET {{base}}/M-001
+Accept: application/json
+
+### I3 取得單筆不存在（404 + 繁中訊息）
+GET {{base}}/M-999
+Accept: application/json
+
+### I4 新增合法（201 + Location + 後端自產 id / 今天 updatedAt）
+POST {{base}}
+Content-Type: application/json
+
+{
+  "name": "新人員", "gender": "女", "birthDate": "1990-01-01", "idType": "身分證",
+  "nationalId": "A223456789", "phone": "0911222333", "email": "",
+  "residenceCounty": "臺東縣", "residenceTownship": "臺東市", "residenceAddress": "某路1號",
+  "groupName": "搶救組", "positionCode": "member", "qualifications": ["防災士"],
+  "status": "在職", "note": ""
+}
+
+### I5 新增電話格式錯（400 + errors.phone 繁中）
+POST {{base}}
+Content-Type: application/json
+
+{
+  "name": "新人員", "gender": "女", "birthDate": "1990-01-01", "idType": "身分證",
+  "nationalId": "A223456789", "phone": "12345", "email": "",
+  "residenceCounty": "臺東縣", "residenceTownship": "臺東市", "residenceAddress": "某路1號",
+  "groupName": "搶救組", "positionCode": "member", "qualifications": ["防災士"],
+  "status": "在職", "note": ""
+}
+
+### I6 新增身分證證號錯（400 + errors.nationalId）
+POST {{base}}
+Content-Type: application/json
+
+{
+  "name": "新人員", "gender": "男", "birthDate": "1990-01-01", "idType": "身分證",
+  "nationalId": "A12345678", "phone": "0912345678", "email": "",
+  "residenceCounty": "臺東縣", "residenceTownship": "臺東市", "residenceAddress": "某路1號",
+  "groupName": "搶救組", "positionCode": "member", "qualifications": [],
+  "status": "在職", "note": ""
+}
+
+### I8 全量更新（200 + updatedAt 刷新）— 先跑 I4 取得新 id，替換下方
+PUT {{base}}/M-025
+Content-Type: application/json
+
+{
+  "name": "已更新姓名", "gender": "男", "birthDate": "1985-05-05", "idType": "身分證",
+  "nationalId": "A123456789", "phone": "0900000000", "email": "updated@example.tw",
+  "residenceCounty": "花蓮縣", "residenceTownship": "花蓮市", "residenceAddress": "新路9號",
+  "groupName": "後勤組", "positionCode": "leader", "qualifications": ["TCERT", "防災士"],
+  "status": "停用", "note": "已更新"
+}
+
+### I10 刪除（204）
+DELETE {{base}}/M-025

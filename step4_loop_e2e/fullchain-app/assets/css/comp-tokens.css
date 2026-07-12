@@ -1,0 +1,1041 @@
+/*
+ * ============================================================
+ * COMP Layer — Component Tokens
+ * Naming: --ui-comp-{component}-{property}-{variant}-{state}
+ * Rule:   所有值必須引用 SYS 層 var(--ui-sys-...) ，禁止硬編碼
+ *
+ * 依賴檔案：design-token.css（REF + SYS 層）
+ * ============================================================
+ *
+ * SYS 色彩快速索引（供閱讀參考；2026-07-11 依 design-token.css 實檔校正）
+ *  --ui-sys-color-primary            品牌紅 #C8232C
+ *  --ui-sys-color-primary-hover      #A01D24
+ *  --ui-sys-color-primary-container  #FFF0F0
+ *  --ui-sys-color-on-primary         #FFFFFF  (text on primary bg)
+ *  --ui-sys-color-on-primary-container #6B0C10
+ *  --ui-sys-color-secondary          neutral-300
+ *  --ui-sys-color-secondary-hover    neutral-400
+ *  --ui-sys-color-secondary-container neutral-200
+ *  --ui-sys-color-on-secondary       neutral-700
+ *  --ui-sys-color-error              red-500
+ *  --ui-sys-color-error-container    red-50
+ *  --ui-sys-color-on-error           white
+ *  --ui-sys-color-success            green-500
+ *  --ui-sys-color-success-container  green-50
+ *  --ui-sys-color-on-success         white
+ *  --ui-sys-color-warning            amber-400
+ *  --ui-sys-color-warning-container  amber-50
+ *  --ui-sys-color-on-warning         white
+ *  --ui-sys-color-info               pink-400
+ *  --ui-sys-color-info-container     pink-50
+ *  --ui-sys-color-on-info            pink-50
+ *  --ui-sys-color-surface            white
+ *  --ui-sys-color-surface-variant    neutral-50
+ *  --ui-sys-color-on-surface         neutral-950
+ *  --ui-sys-color-on-surface-variant neutral-700
+ *  --ui-sys-color-outline            neutral-500
+ *  --ui-sys-color-outline-variant    neutral-200
+ *  --ui-sys-color-disabled           neutral-300
+ *  --ui-sys-color-on-disabled        neutral-400
+ *  SYS spacing: none=0 / extra-small=4px / small=8px / medium=16px / large=24px / extra-large=40px
+ *  SYS shape:   none=0 / extra-small=2px / small=4px / medium=8px / large=16px / full=999px
+ *
+ *  SYS font-family: default=Noto Sans TC / code=Fira Code (mono)
+ *  SYS font-weight: default=400 / emphasis=500 / strong=600 / heavy=700
+ *  SYS font-size (typescale):
+ *    display-large=48px   display-medium=32px
+ *    headline-large=24px  headline-medium=20px
+ *    body-large=20px      body-medium=18px    body-small=14px
+ *    label-large=18px     label-medium=16px   label-small=14px
+ */
+
+:root {
+
+  /* ============================================================ */
+  /* === COMP: Button ============================================ */
+  /* ============================================================ */
+
+  /* -- Button: Size tokens -- */
+  --ui-comp-button-padding-x-sm: var(--ui-sys-spacing-small);        /* 8px */
+  --ui-comp-button-padding-y-sm: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-button-font-size-sm:      var(--ui-sys-font-size-label-small);   /* 12px */
+  --ui-comp-button-line-height-sm:    var(--ui-sys-font-line-height-label-small);
+  --ui-comp-button-letter-spacing-sm: var(--ui-sys-font-letter-spacing-label-small);
+  --ui-comp-button-font-weight-sm:    var(--ui-sys-font-weight-strong);       /* 600 */
+
+  --ui-comp-button-padding-x-md: var(--ui-sys-spacing-medium);       /* 16px */
+  --ui-comp-button-padding-y-md: var(--ui-sys-spacing-small);        /* 8px */
+  --ui-comp-button-font-size-md:      var(--ui-sys-font-size-label-medium);  /* 14px */
+  --ui-comp-button-line-height-md:    var(--ui-sys-font-line-height-label-medium);
+  --ui-comp-button-letter-spacing-md: var(--ui-sys-font-letter-spacing-label-medium);
+  --ui-comp-button-font-weight-md:    var(--ui-sys-font-weight-strong);       /* 600 */
+
+  --ui-comp-button-padding-x-lg: var(--ui-sys-spacing-large);        /* 24px */
+  --ui-comp-button-padding-y-lg: var(--ui-sys-spacing-medium);       /* 16px */
+  --ui-comp-button-font-size-lg:      var(--ui-sys-font-size-body-large);    /* 16px */
+  --ui-comp-button-line-height-lg:    var(--ui-sys-font-line-height-body-large);
+  --ui-comp-button-letter-spacing-lg: var(--ui-sys-font-letter-spacing-body-large);
+  --ui-comp-button-font-weight-lg:    var(--ui-sys-font-weight-strong);       /* 600 */
+
+  /* 共用 radius */
+  --ui-comp-button-radius: var(--ui-sys-shape-corner-medium);
+
+  /* -- Button: Primary -- */
+  --ui-comp-button-bg-primary-default:  var(--ui-sys-color-primary);
+  --ui-comp-button-bg-primary-hover:    var(--ui-sys-color-primary-hover);
+  --ui-comp-button-bg-primary-focus:    var(--ui-sys-color-primary);
+  --ui-comp-button-bg-primary-active:   var(--ui-sys-color-primary-hover);
+  --ui-comp-button-bg-primary-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-primary-default:  var(--ui-sys-color-on-primary);
+  --ui-comp-button-text-primary-hover:    var(--ui-sys-color-on-primary);
+  --ui-comp-button-text-primary-focus:    var(--ui-sys-color-on-primary);
+  --ui-comp-button-text-primary-active:   var(--ui-sys-color-on-primary);
+  --ui-comp-button-text-primary-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-primary-default:  var(--ui-comp-button-bg-primary-default);
+  --ui-comp-button-border-primary-hover:    var(--ui-comp-button-bg-primary-hover);
+  --ui-comp-button-border-primary-focus:    var(--ui-comp-button-bg-primary-focus);
+  --ui-comp-button-border-primary-active:   var(--ui-comp-button-bg-primary-active);
+  --ui-comp-button-border-primary-disabled: var(--ui-comp-button-bg-primary-disabled);
+
+  --ui-comp-button-shadow-focus-primary: 0 0 0 3px var(--ui-sys-color-primary-container);
+
+  /* -- Button: Secondary -- */
+  --ui-comp-button-bg-secondary-default:  var(--ui-sys-color-secondary);
+  --ui-comp-button-bg-secondary-hover:    var(--ui-sys-color-secondary-hover);
+  --ui-comp-button-bg-secondary-focus:    var(--ui-sys-color-secondary);
+  --ui-comp-button-bg-secondary-active:   var(--ui-sys-color-secondary-hover);
+  --ui-comp-button-bg-secondary-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-secondary-default:  var(--ui-sys-color-on-secondary);
+  --ui-comp-button-text-secondary-hover:    var(--ui-sys-color-on-secondary);
+  --ui-comp-button-text-secondary-focus:    var(--ui-sys-color-on-secondary);
+  --ui-comp-button-text-secondary-active:   var(--ui-sys-color-on-secondary);
+  --ui-comp-button-text-secondary-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-secondary-default:  var(--ui-comp-button-bg-secondary-default);
+  --ui-comp-button-border-secondary-hover:    var(--ui-comp-button-bg-secondary-hover);
+  --ui-comp-button-border-secondary-focus:    var(--ui-comp-button-bg-secondary-focus);
+  --ui-comp-button-border-secondary-active:   var(--ui-comp-button-bg-secondary-active);
+  --ui-comp-button-border-secondary-disabled: var(--ui-comp-button-bg-secondary-disabled);
+
+  --ui-comp-button-shadow-focus-secondary: 0 0 0 3px var(--ui-sys-color-secondary-container);
+
+  /* -- Button: Ghost -- */
+  --ui-comp-button-bg-ghost-default:  transparent;
+  --ui-comp-button-bg-ghost-hover:    var(--ui-sys-color-surface-variant);
+  --ui-comp-button-bg-ghost-focus:    transparent;
+  --ui-comp-button-bg-ghost-active:   var(--ui-sys-color-secondary-container);
+  --ui-comp-button-bg-ghost-disabled: transparent;
+
+  --ui-comp-button-text-ghost-default:  var(--ui-sys-color-primary);
+  --ui-comp-button-text-ghost-hover:    var(--ui-sys-color-primary-hover);
+  --ui-comp-button-text-ghost-focus:    var(--ui-sys-color-primary);
+  --ui-comp-button-text-ghost-active:   var(--ui-sys-color-primary-hover);
+  --ui-comp-button-text-ghost-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-ghost-default:  var(--ui-sys-color-outline-variant);
+  --ui-comp-button-border-ghost-hover:    var(--ui-sys-color-primary);
+  --ui-comp-button-border-ghost-focus:    var(--ui-sys-color-primary);
+  --ui-comp-button-border-ghost-active:   var(--ui-sys-color-primary-hover);
+  --ui-comp-button-border-ghost-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-shadow-focus-ghost: 0 0 0 3px var(--ui-sys-color-primary-container);
+
+  /* -- Button: error (Error) -- */
+  --ui-comp-button-bg-error-default:  var(--ui-sys-color-error);
+  --ui-comp-button-bg-error-hover:    var(--ui-sys-color-error-hover);
+  --ui-comp-button-bg-error-focus:    var(--ui-sys-color-error);
+  --ui-comp-button-bg-error-active:   var(--ui-sys-color-error-hover);
+  --ui-comp-button-bg-error-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-error-default:  var(--ui-sys-color-on-error);
+  --ui-comp-button-text-error-hover:    var(--ui-sys-color-on-error);
+  --ui-comp-button-text-error-focus:    var(--ui-sys-color-on-error);
+  --ui-comp-button-text-error-active:   var(--ui-sys-color-on-error);
+  --ui-comp-button-text-error-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-error-default:  var(--ui-comp-button-bg-error-default);
+  --ui-comp-button-border-error-hover:    var(--ui-comp-button-bg-error-hover);
+  --ui-comp-button-border-error-focus:    var(--ui-comp-button-bg-error-focus);
+  --ui-comp-button-border-error-active:   var(--ui-comp-button-bg-error-active);
+  --ui-comp-button-border-error-disabled: var(--ui-comp-button-bg-error-disabled);
+
+  --ui-comp-button-shadow-focus-error: 0 0 0 3px var(--ui-sys-color-error-container);
+
+  /* -- Button: Success -- */
+  --ui-comp-button-bg-success-default:  var(--ui-sys-color-success);
+  --ui-comp-button-bg-success-hover:    var(--ui-sys-color-success-hover);
+  --ui-comp-button-bg-success-focus:    var(--ui-sys-color-success);
+  --ui-comp-button-bg-success-active:   var(--ui-sys-color-success-hover);
+  --ui-comp-button-bg-success-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-success-default:  var(--ui-sys-color-on-success);
+  --ui-comp-button-text-success-hover:    var(--ui-sys-color-on-success);
+  --ui-comp-button-text-success-focus:    var(--ui-sys-color-on-success);
+  --ui-comp-button-text-success-active:   var(--ui-sys-color-on-success);
+  --ui-comp-button-text-success-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-success-default:  var(--ui-comp-button-bg-success-default);
+  --ui-comp-button-border-success-hover:    var(--ui-comp-button-bg-success-hover);
+  --ui-comp-button-border-success-focus:    var(--ui-comp-button-bg-success-focus);
+  --ui-comp-button-border-success-active:   var(--ui-comp-button-bg-success-active);
+  --ui-comp-button-border-success-disabled: var(--ui-comp-button-bg-success-disabled);
+
+  --ui-comp-button-shadow-focus-success: 0 0 0 3px var(--ui-sys-color-success-container);
+
+  /* -- Button: Warning -- */
+  --ui-comp-button-bg-warning-default:  var(--ui-sys-color-warning);
+  --ui-comp-button-bg-warning-hover:    var(--ui-sys-color-warning-hover);
+  --ui-comp-button-bg-warning-focus:    var(--ui-sys-color-warning);
+  --ui-comp-button-bg-warning-active:   var(--ui-sys-color-warning-hover);
+  --ui-comp-button-bg-warning-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-warning-default:  var(--ui-sys-color-on-warning);
+  --ui-comp-button-text-warning-hover:    var(--ui-sys-color-on-warning);
+  --ui-comp-button-text-warning-focus:    var(--ui-sys-color-on-warning);
+  --ui-comp-button-text-warning-active:   var(--ui-sys-color-on-warning);
+  --ui-comp-button-text-warning-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-warning-default:  var(--ui-comp-button-bg-warning-default);
+  --ui-comp-button-border-warning-hover:    var(--ui-comp-button-bg-warning-hover);
+  --ui-comp-button-border-warning-focus:    var(--ui-comp-button-bg-warning-focus);
+  --ui-comp-button-border-warning-active:   var(--ui-comp-button-bg-warning-active);
+  --ui-comp-button-border-warning-disabled: var(--ui-comp-button-bg-warning-disabled);
+
+  --ui-comp-button-shadow-focus-warning: 0 0 0 3px var(--ui-sys-color-warning-container);
+
+  /* -- Button: Info -- */
+  --ui-comp-button-bg-info-default:  var(--ui-sys-color-info);
+  --ui-comp-button-bg-info-hover:    var(--ui-sys-color-info-hover);
+  --ui-comp-button-bg-info-focus:    var(--ui-sys-color-info);
+  --ui-comp-button-bg-info-active:   var(--ui-sys-color-info-hover);
+  --ui-comp-button-bg-info-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-button-text-info-default:  var(--ui-sys-color-on-info);
+  --ui-comp-button-text-info-hover:    var(--ui-sys-color-on-info);
+  --ui-comp-button-text-info-focus:    var(--ui-sys-color-on-info);
+  --ui-comp-button-text-info-active:   var(--ui-sys-color-on-info);
+  --ui-comp-button-text-info-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-button-border-info-default:  var(--ui-comp-button-bg-info-default);
+  --ui-comp-button-border-info-hover:    var(--ui-comp-button-bg-info-hover);
+  --ui-comp-button-border-info-focus:    var(--ui-comp-button-bg-info-focus);
+  --ui-comp-button-border-info-active:   var(--ui-comp-button-bg-info-active);
+  --ui-comp-button-border-info-disabled: var(--ui-comp-button-bg-info-disabled);
+
+  --ui-comp-button-shadow-focus-info: 0 0 0 3px var(--ui-sys-color-info-container);
+
+  /* -- Button: Icon Size -- */
+  --ui-comp-button-icon-size-sm: var(--ui-sys-icon-size-small);    /* 16px */
+  --ui-comp-button-icon-size-md: var(--ui-sys-icon-size-medium);   /* 20px */
+  --ui-comp-button-icon-size-lg: var(--ui-sys-icon-size-large);    /* 24px */
+
+  /* -- Button: Icon 與文字間距 -- */
+  --ui-comp-button-icon-gap-sm: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-button-icon-gap-md: var(--ui-sys-spacing-small);        /* 8px */
+  --ui-comp-button-icon-gap-lg: var(--ui-sys-spacing-small);        /* 8px */
+
+
+  /* ============================================================ */
+  /* === COMP: Input ============================================= */
+  /* ============================================================ */
+
+  /* -- Input: Color -- */
+  --ui-comp-input-bg-default:   var(--ui-sys-color-surface-variant);
+  --ui-comp-input-bg-focus:     var(--ui-sys-color-surface);
+  --ui-comp-input-bg-error:     var(--ui-sys-color-error-container);
+  --ui-comp-input-bg-success:   var(--ui-sys-color-success-container);
+  --ui-comp-input-bg-disabled:  var(--ui-sys-color-disabled);
+
+  --ui-comp-input-border-default:  var(--ui-sys-color-outline-variant);
+  --ui-comp-input-border-focus:    var(--ui-sys-color-primary);
+  --ui-comp-input-border-error:    var(--ui-sys-color-error);
+  --ui-comp-input-border-success:  var(--ui-sys-color-success);
+  --ui-comp-input-border-disabled: var(--ui-sys-color-disabled);
+
+  --ui-comp-input-text-default:  var(--ui-sys-color-on-surface);
+  --ui-comp-input-text-focus:    var(--ui-sys-color-on-surface);
+  --ui-comp-input-text-error:    var(--ui-sys-color-on-surface);
+  --ui-comp-input-text-success:  var(--ui-sys-color-on-surface);
+  --ui-comp-input-text-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-input-placeholder-default:  var(--ui-sys-color-outline);
+  --ui-comp-input-placeholder-focus:    var(--ui-sys-color-outline-variant);
+  --ui-comp-input-placeholder-error:    var(--ui-sys-color-outline);
+  --ui-comp-input-placeholder-success:  var(--ui-sys-color-outline);
+  --ui-comp-input-placeholder-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-input-label-default:  var(--ui-sys-color-on-surface-variant);
+  --ui-comp-input-label-focus:    var(--ui-sys-color-primary);
+  --ui-comp-input-label-error:    var(--ui-sys-color-error);
+  --ui-comp-input-label-success:  var(--ui-sys-color-success);
+  --ui-comp-input-label-disabled: var(--ui-sys-color-on-disabled);
+
+  --ui-comp-input-helper-text-default:  var(--ui-sys-color-on-surface-variant);
+  --ui-comp-input-helper-text-focus:    var(--ui-sys-color-on-surface-variant);
+  --ui-comp-input-helper-text-error:    var(--ui-sys-color-error);
+  --ui-comp-input-helper-text-success:  var(--ui-sys-color-success);
+  --ui-comp-input-helper-text-disabled: var(--ui-sys-color-on-disabled);
+
+  /* -- Input: Size — Small -- */
+  --ui-comp-input-padding-x-sm: var(--ui-sys-spacing-small);         /* 8px */
+  --ui-comp-input-padding-y-sm: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-input-font-size-sm: var(--ui-sys-font-size-label-medium);  /* 14px */
+  --ui-comp-input-line-height-sm: var(--ui-sys-font-line-height-label-medium);
+  --ui-comp-input-letter-spacing-sm: var(--ui-sys-font-letter-spacing-label-medium);
+
+  /* -- Input: Size — Medium (default) -- */
+  --ui-comp-input-padding-x-md: var(--ui-sys-spacing-medium);    /* 16px */
+  --ui-comp-input-padding-y-md: var(--ui-sys-spacing-small);     /* 8px */
+  --ui-comp-input-font-size-md: var(--ui-sys-font-size-body-medium);  /* 14px */
+  --ui-comp-input-line-height-md: var(--ui-sys-font-line-height-body-medium);
+  --ui-comp-input-letter-spacing-md: var(--ui-sys-font-letter-spacing-body-medium);
+
+  /* -- Input: Size — Large -- */
+  --ui-comp-input-padding-x-lg: var(--ui-sys-spacing-medium);    /* 16px */
+  --ui-comp-input-padding-y-lg: var(--ui-sys-spacing-medium);    /* 16px */
+  --ui-comp-input-font-size-lg: var(--ui-sys-font-size-body-large);   /* 16px */
+  --ui-comp-input-line-height-lg: var(--ui-sys-font-line-height-body-large);
+  --ui-comp-input-letter-spacing-lg: var(--ui-sys-font-letter-spacing-body-large);
+
+  /* -- Input: Typography (shared) -- */
+  --ui-comp-input-font-weight: var(--ui-sys-font-weight-default);  /* 400 */
+
+  /* -- Input: Label Typography -- */
+  --ui-comp-input-label-font-size-sm: var(--ui-sys-font-size-label-small);   /* 12px */
+  --ui-comp-input-label-font-size-md: var(--ui-sys-font-size-label-medium);  /* 14px */
+  --ui-comp-input-label-font-size-lg: var(--ui-sys-font-size-body-medium);   /* 14px */
+  --ui-comp-input-label-font-weight: var(--ui-sys-font-weight-emphasis);     /* 500 */
+
+  /* -- Input: Helper Text Typography -- */
+  --ui-comp-input-helper-font-size: var(--ui-sys-font-size-label-small);    /* 12px */
+  --ui-comp-input-helper-font-weight: var(--ui-sys-font-weight-default);    /* 400 */
+
+  /* -- Input: Shape & Shadow -- */
+  --ui-comp-input-radius: var(--ui-sys-shape-corner-medium);
+  --ui-comp-input-shadow-focus: 0 0 0 3px var(--ui-sys-color-primary-container);
+  --ui-comp-input-shadow-error:  0 0 0 3px var(--ui-sys-color-error-container);
+
+
+  /* ============================================================ */
+  /* === COMP:  ============================================== */
+  /* ============================================================ */
+
+  /* -- Card: default -- */
+  --ui-comp-card-bg-default:      var(--ui-sys-color-surface);
+  --ui-comp-card-border-default:  transparent;
+  --ui-comp-card-surface-default: var(--ui-sys-color-surface-variant);
+  --ui-comp-card-shadow-default:  none;
+
+  /* -- Card: elevated -- */
+  --ui-comp-card-bg-elevated:      var(--ui-sys-color-surface);
+  --ui-comp-card-border-elevated:  transparent;
+  --ui-comp-card-surface-elevated: var(--ui-sys-color-surface-variant);
+  --ui-comp-card-shadow-elevated:  var(--ui-sys-elevation-large);  /* 0 8px 16px rgba(0, 0, 0, 0.10) */
+
+  /* -- Card: outlined -- */
+  --ui-comp-card-bg-outlined:      var(--ui-sys-color-surface);
+  --ui-comp-card-border-outlined:  var(--ui-sys-color-outline-variant);
+  --ui-comp-card-surface-outlined: var(--ui-sys-color-surface-variant);
+  --ui-comp-card-shadow-outlined:  none;
+
+  /* -- Card: Spacing -- */
+  --ui-comp-card-padding: var(--ui-sys-spacing-large);   /* 24px */
+  --ui-comp-card-gap:     var(--ui-sys-spacing-medium);  /* 16px */
+
+  /* -- Card: Typography -- */
+  --ui-comp-card-title-font-size:      var(--ui-sys-font-size-headline-medium); /* 20px */
+  --ui-comp-card-title-font-weight:    var(--ui-sys-font-weight-heavy);         /* 700 */
+  --ui-comp-card-title-line-height:    var(--ui-sys-font-line-height-headline-medium);
+  --ui-comp-card-title-letter-spacing: var(--ui-sys-font-letter-spacing-headline-medium);
+  --ui-comp-card-body-font-size:       var(--ui-sys-font-size-body-medium);     /* 16px */
+  --ui-comp-card-body-font-weight:     var(--ui-sys-font-weight-default);       /* 400 */
+  --ui-comp-card-body-line-height:     var(--ui-sys-font-line-height-body-medium);
+
+  /* -- Card: Shape -- */
+  --ui-comp-card-radius: var(--ui-sys-shape-corner-large);
+
+  /* -- Card: underlined（mnd.gov.tw 風格：底線強調卡片） -- */
+  --ui-comp-card-bg-underlined:           var(--ui-sys-color-surface);
+  --ui-comp-card-border-underlined:       transparent;
+  --ui-comp-card-border-bottom-underlined: var(--ui-sys-color-primary);
+  --ui-comp-card-border-bottom-width-underlined: 2px;
+  --ui-comp-card-shadow-underlined:       none;
+
+
+  /* ============================================================ */
+  /* === COMP: Badge / Tag ======================================= */
+  /* ============================================================ */
+
+  /* -- Badge: primary -- */
+  --ui-comp-badge-bg-primary:     var(--ui-sys-color-primary-container);
+  --ui-comp-badge-text-primary:   var(--ui-sys-color-on-primary-container);
+  --ui-comp-badge-border-primary: transparent;
+
+  /* -- Badge: secondary -- */
+  --ui-comp-badge-bg-secondary:     var(--ui-sys-color-secondary-container);
+  --ui-comp-badge-text-secondary:   var(--ui-sys-color-on-secondary-container);
+  --ui-comp-badge-border-secondary: transparent;
+
+  /* -- Badge: success -- */
+  --ui-comp-badge-bg-success:     var(--ui-sys-color-success-container);
+  --ui-comp-badge-text-success:   var(--ui-sys-color-success);
+  --ui-comp-badge-border-success: transparent;
+
+  /* -- Badge: warning -- */
+  --ui-comp-badge-bg-warning:     var(--ui-sys-color-warning-container);
+  --ui-comp-badge-text-warning:   var(--ui-sys-color-warning);
+  --ui-comp-badge-border-warning: transparent;
+
+  /* -- Badge: error -- */
+  --ui-comp-badge-bg-error:     var(--ui-sys-color-error-container);
+  --ui-comp-badge-text-error:   var(--ui-sys-color-error);
+  --ui-comp-badge-border-error: transparent;
+
+  /* -- Badge: neutral -- */
+  --ui-comp-badge-bg-neutral:     var(--ui-sys-color-surface-variant);
+  --ui-comp-badge-text-neutral:   var(--ui-sys-color-on-surface-variant);
+  --ui-comp-badge-border-neutral: transparent;
+
+  /* -- Badge: Size — Small -- */
+  --ui-comp-badge-padding-x-sm: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-badge-padding-y-sm: var(--ui-sys-spacing-xxs);  /*  2px  */
+  --ui-comp-badge-font-size-sm:      var(--ui-sys-font-size-label-small);       /* 12px */
+  --ui-comp-badge-line-height-sm:    var(--ui-sys-font-line-height-label-small);
+  --ui-comp-badge-letter-spacing-sm: var(--ui-sys-font-letter-spacing-label-small);
+  --ui-comp-badge-font-weight-sm:    var(--ui-sys-font-weight-strong);          /* 600 */
+
+  /* -- Badge: Size — Medium (預設) -- */
+  --ui-comp-badge-padding-x-md: var(--ui-sys-spacing-small);        /* 8px */
+  --ui-comp-badge-padding-y-md: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-badge-font-size-md:      var(--ui-sys-font-size-label-medium);      /* 14px */
+  --ui-comp-badge-line-height-md:    var(--ui-sys-font-line-height-label-medium);
+  --ui-comp-badge-letter-spacing-md: var(--ui-sys-font-letter-spacing-label-medium);
+  --ui-comp-badge-font-weight-md:    var(--ui-sys-font-weight-strong);          /* 600 */
+
+  /* -- Badge: Size — Large -- */
+  --ui-comp-badge-padding-x-lg: var(--ui-sys-spacing-medium);       /* 16px */
+  --ui-comp-badge-padding-y-lg: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-badge-font-size-lg:      var(--ui-sys-font-size-body-medium);       /* 16px */
+  --ui-comp-badge-line-height-lg:    var(--ui-sys-font-line-height-body-medium);
+  --ui-comp-badge-letter-spacing-lg: var(--ui-sys-font-letter-spacing-body-medium);
+  --ui-comp-badge-font-weight-lg:    var(--ui-sys-font-weight-strong);          /* 600 */
+
+  /* -- Badge: Shape -- */
+  --ui-comp-badge-radius: var(--ui-sys-shape-corner-full);
+
+  /* -- Badge: 舊版相容 (向下相容,建議使用 -md 版本) -- */
+  --ui-comp-badge-padding-x: var(--ui-comp-badge-padding-x-md);
+  --ui-comp-badge-padding-y: var(--ui-comp-badge-padding-y-md);
+  --ui-comp-badge-font-size: var(--ui-comp-badge-font-size-md);
+  --ui-comp-badge-line-height: var(--ui-comp-badge-line-height-md);
+  --ui-comp-badge-letter-spacing: var(--ui-comp-badge-letter-spacing-md);
+  --ui-comp-badge-font-weight: var(--ui-comp-badge-font-weight-md);
+
+
+  /* ============================================================ */
+  /* === COMP: Modal / Dialog ==================================== */
+  /* ============================================================ */
+
+  /* -- Modal: Color -- */
+  --ui-comp-modal-bg:      var(--ui-sys-color-surface);
+  --ui-comp-modal-overlay: rgba(0, 0, 0, 0.48);
+  --ui-comp-modal-border:  var(--ui-sys-color-outline-variant);
+
+  /* -- Modal: Spacing -- */
+  --ui-comp-modal-padding: var(--ui-sys-spacing-large);   /* 24px */
+  --ui-comp-modal-gap:     var(--ui-sys-spacing-medium);  /* 16px */
+
+  /* -- Modal: Typography -- */
+  --ui-comp-modal-title-font-size:      var(--ui-sys-font-size-headline-large);  /* 24px */
+  --ui-comp-modal-title-font-weight:    var(--ui-sys-font-weight-heavy);         /* 700 */
+  --ui-comp-modal-title-line-height:    var(--ui-sys-font-line-height-headline-large);
+  --ui-comp-modal-title-letter-spacing: var(--ui-sys-font-letter-spacing-headline-large);
+  --ui-comp-modal-body-font-size:       var(--ui-sys-font-size-body-medium);     /* 16px */
+  --ui-comp-modal-body-font-weight:     var(--ui-sys-font-weight-default);       /* 400 */
+  --ui-comp-modal-body-line-height:     var(--ui-sys-font-line-height-body-medium);
+
+  /* -- Modal: Shape -- */
+  --ui-comp-modal-radius: var(--ui-sys-shape-corner-large);
+
+  /* -- Modal: Shadow -- */
+  --ui-comp-modal-shadow: var(--ui-sys-elevation-modal);  /* 0 20px 60px rgba(0, 0, 0, 0.18) */
+
+  /* -- Modal: Elevation (z-index) -- */
+  /* SYS 層尚未定義 elevation token；以原始數值透過 SYS 命名引用，後續補完 SYS 後可替換 */
+  --ui-comp-modal-z-index: var(--ui-sys-elevation-modal, 300);
+
+
+  /* ============================================================ */
+  /* === COMP: Drawer (Side Panel) ============================== */
+  /* ============================================================ */
+
+  /* -- Drawer: Color -- */
+  --ui-comp-drawer-bg:      var(--ui-sys-color-surface);
+  --ui-comp-drawer-overlay: rgba(0, 0, 0, 0.40);
+  --ui-comp-drawer-border:  var(--ui-sys-color-outline-variant);
+
+  /* -- Drawer: Sizing -- */
+  --ui-comp-drawer-size-sm:  400px;
+  --ui-comp-drawer-size-md:  560px;
+  --ui-comp-drawer-size-lg:  720px;
+  --ui-comp-drawer-size-xl:  960px;
+
+  /* -- Drawer: Spacing -- */
+  --ui-comp-drawer-padding:        var(--ui-sys-spacing-large);
+  --ui-comp-drawer-header-padding: var(--ui-sys-spacing-large);
+  --ui-comp-drawer-footer-padding: var(--ui-sys-spacing-large);
+  --ui-comp-drawer-gap:            var(--ui-sys-spacing-medium);
+
+  /* -- Drawer: Typography -- */
+  --ui-comp-drawer-title-font-size:   var(--ui-sys-font-size-headline-medium);
+  --ui-comp-drawer-title-font-weight: var(--ui-sys-font-weight-heavy);
+  --ui-comp-drawer-body-font-size:    var(--ui-sys-font-size-body-medium);
+
+  /* -- Drawer: Shape -- */
+  --ui-comp-drawer-radius: 0;
+
+  /* -- Drawer: Shadow -- */
+  --ui-comp-drawer-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+
+  /* -- Drawer: Elevation -- */
+  --ui-comp-drawer-z-index: var(--ui-sys-elevation-modal, 300);
+
+
+  /* ============================================================ */
+  /* === COMP: Dropdown / Select ================================= */
+  /* ============================================================ */
+
+  /* -- Dropdown: Trigger -- */
+  --ui-comp-dropdown-trigger-bg-default:   var(--ui-sys-color-surface-variant);
+  --ui-comp-dropdown-trigger-bg-hover:     var(--ui-sys-color-surface-variant);
+  --ui-comp-dropdown-trigger-bg-focus:     var(--ui-sys-color-surface);
+  --ui-comp-dropdown-trigger-bg-open:      var(--ui-sys-color-surface);
+  --ui-comp-dropdown-trigger-bg-disabled:  var(--ui-sys-color-disabled);
+
+  --ui-comp-dropdown-trigger-border-default:   var(--ui-sys-color-outline-variant);
+  --ui-comp-dropdown-trigger-border-hover:     var(--ui-sys-color-outline);
+  --ui-comp-dropdown-trigger-border-focus:     var(--ui-sys-color-primary);
+  --ui-comp-dropdown-trigger-border-open:      var(--ui-sys-color-primary);
+  --ui-comp-dropdown-trigger-border-disabled:  var(--ui-sys-color-disabled);
+
+  --ui-comp-dropdown-trigger-text-default:   var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-trigger-text-hover:     var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-trigger-text-focus:     var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-trigger-text-open:      var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-trigger-text-disabled:  var(--ui-sys-color-on-disabled);
+
+  --ui-comp-dropdown-trigger-icon-default:   var(--ui-sys-color-on-surface-variant);
+  --ui-comp-dropdown-trigger-icon-hover:     var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-trigger-icon-focus:     var(--ui-sys-color-primary);
+  --ui-comp-dropdown-trigger-icon-open:      var(--ui-sys-color-primary);
+  --ui-comp-dropdown-trigger-icon-disabled:  var(--ui-sys-color-on-disabled);
+
+  /* -- Dropdown: Trigger Size (對齊 Input 三段尺寸) -- */
+  --ui-comp-dropdown-trigger-padding-x-sm: var(--ui-comp-input-padding-x-sm);  /* 8px */
+  --ui-comp-dropdown-trigger-padding-y-sm: var(--ui-comp-input-padding-y-sm);  /* 4px */
+  --ui-comp-dropdown-trigger-font-size-sm: var(--ui-comp-input-font-size-sm);  /* label-medium */
+  --ui-comp-dropdown-trigger-line-height-sm: var(--ui-comp-input-line-height-sm);
+
+  --ui-comp-dropdown-trigger-padding-x-md: var(--ui-comp-input-padding-x-md);  /* 16px */
+  --ui-comp-dropdown-trigger-padding-y-md: var(--ui-comp-input-padding-y-md);  /* 8px */
+  --ui-comp-dropdown-trigger-font-size-md: var(--ui-comp-input-font-size-md);  /* body-medium */
+  --ui-comp-dropdown-trigger-line-height-md: var(--ui-comp-input-line-height-md);
+
+  --ui-comp-dropdown-trigger-padding-x-lg: var(--ui-comp-input-padding-x-lg);  /* 16px */
+  --ui-comp-dropdown-trigger-padding-y-lg: var(--ui-comp-input-padding-y-lg);  /* 16px */
+  --ui-comp-dropdown-trigger-font-size-lg: var(--ui-comp-input-font-size-lg);  /* body-large */
+  --ui-comp-dropdown-trigger-line-height-lg: var(--ui-comp-input-line-height-lg);
+
+  /* 向下相容（保留舊名，指向 md） */
+  --ui-comp-dropdown-trigger-padding-x: var(--ui-comp-dropdown-trigger-padding-x-md);
+  --ui-comp-dropdown-trigger-padding-y: var(--ui-comp-dropdown-trigger-padding-y-md);
+  --ui-comp-dropdown-trigger-radius:    var(--ui-sys-shape-corner-medium);
+
+  --ui-comp-dropdown-trigger-shadow-focus: 0 0 0 3px var(--ui-sys-color-primary-container);
+
+  /* -- Dropdown: Menu -- */
+  --ui-comp-dropdown-menu-bg:     var(--ui-sys-color-surface);
+  --ui-comp-dropdown-menu-border: var(--ui-sys-color-outline-variant);
+  --ui-comp-dropdown-menu-shadow: var(--ui-sys-elevation-extra-large);  /* 0 12px 24px rgba(0, 0, 0, 0.12) */
+  --ui-comp-dropdown-menu-padding-y: var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-dropdown-menu-radius:    var(--ui-sys-shape-corner-medium);
+  --ui-comp-dropdown-menu-z-index:   var(--ui-sys-elevation-dropdown, 200);
+
+  /* -- Dropdown: Option -- */
+  --ui-comp-dropdown-option-bg-default:     transparent;
+  --ui-comp-dropdown-option-bg-hover:       var(--ui-sys-color-surface-variant);
+  --ui-comp-dropdown-option-bg-selected:    var(--ui-sys-color-primary-container);
+  --ui-comp-dropdown-option-bg-highlighted: var(--ui-sys-color-surface-variant);
+  --ui-comp-dropdown-option-bg-disabled:    transparent;
+
+  --ui-comp-dropdown-option-text-default:     var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-option-text-hover:       var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-option-text-selected:    var(--ui-sys-color-on-primary-container);
+  --ui-comp-dropdown-option-text-highlighted: var(--ui-sys-color-on-surface);
+  --ui-comp-dropdown-option-text-disabled:    var(--ui-sys-color-on-disabled);
+
+  --ui-comp-dropdown-option-padding-x: var(--ui-sys-spacing-medium);  /* 16px */
+  --ui-comp-dropdown-option-padding-y: var(--ui-sys-spacing-small);   /* 8px */
+
+  /* -- Dropdown: Typography -- */
+  --ui-comp-dropdown-font-size:            var(--ui-sys-font-size-body-medium);            /* 16px */
+  --ui-comp-dropdown-line-height:          var(--ui-sys-font-line-height-body-medium);
+  --ui-comp-dropdown-letter-spacing:       var(--ui-sys-font-letter-spacing-body-medium);
+  --ui-comp-dropdown-font-weight:          var(--ui-sys-font-weight-default);               /* 400 */
+  --ui-comp-dropdown-option-font-weight-selected: var(--ui-sys-font-weight-emphasis);      /* 500，已選項目加粗 */
+
+
+  /* ============================================================ */
+  /* === COMP: Table ============================================= */
+  /* ============================================================ */
+
+  /* -- Table: Header -- */
+  --ui-comp-table-header-bg:          var(--ui-sys-color-surface-variant);
+  --ui-comp-table-header-text:        var(--ui-sys-color-on-surface-variant);
+  --ui-comp-table-header-border-bottom: var(--ui-sys-color-outline-variant);
+
+  --ui-comp-table-header-cell-padding-x: var(--ui-sys-spacing-medium);  /* 16px */
+  --ui-comp-table-header-cell-padding-y: var(--ui-sys-spacing-small);   /* 8px */
+
+  --ui-comp-table-header-font-size:      var(--ui-sys-font-size-label-medium);   /* 16px */
+  --ui-comp-table-header-font-weight:    var(--ui-sys-font-weight-strong);      /* 600 */
+  --ui-comp-table-header-line-height:    var(--ui-sys-font-line-height-label-small);
+  --ui-comp-table-header-letter-spacing: var(--ui-sys-font-letter-spacing-label-small);
+
+  /* -- Table: Row -- */
+  --ui-comp-table-row-bg-default:   var(--ui-sys-color-surface);
+  --ui-comp-table-row-bg-hover:     var(--ui-sys-color-surface-variant);
+  --ui-comp-table-row-bg-striped:   var(--ui-sys-color-secondary-container);
+  --ui-comp-table-row-bg-selected:  var(--ui-sys-color-primary-container);
+  --ui-comp-table-row-bg-disabled:  var(--ui-sys-color-surface-variant);
+
+  /* -- Table: Cell -- */
+  --ui-comp-table-cell-text:   var(--ui-sys-color-on-surface);
+  --ui-comp-table-cell-border: var(--ui-sys-color-outline-variant);
+
+  --ui-comp-table-cell-padding-x: var(--ui-sys-spacing-medium);  /* 16px */
+  --ui-comp-table-cell-padding-y: var(--ui-sys-spacing-small);   /* 8px */
+
+  --ui-comp-table-cell-font-size:      var(--ui-sys-font-size-label-medium);    /* 16px */
+  --ui-comp-table-cell-font-weight:    var(--ui-sys-font-weight-default);       /* 400 */
+  --ui-comp-table-cell-line-height:    var(--ui-sys-font-line-height-body-medium);
+  --ui-comp-table-cell-letter-spacing: var(--ui-sys-font-letter-spacing-body-medium);
+
+  /* -- Table: Footer -- */
+  --ui-comp-table-footer-bg:         var(--ui-sys-color-surface-variant);
+  --ui-comp-table-footer-text:       var(--ui-sys-color-on-surface-variant);
+  --ui-comp-table-footer-border-top: var(--ui-sys-color-outline-variant);
+
+  /* -- Table: Border -- */
+  --ui-comp-table-border-width: 1px;
+  --ui-comp-table-border-color: var(--ui-sys-color-outline-variant);
+  --ui-comp-table-border-style: solid;
+
+  /* -- Table: Shape -- */
+  --ui-comp-table-radius: var(--ui-sys-shape-corner-medium);
+
+
+  /* ============================================================ */
+  /* === COMP: Stepper =========================================== */
+  /* ============================================================ */
+
+  /* -- Stepper: Circle Size -- */
+  --ui-comp-stepper-circle-size: 36px;
+
+  /* -- Stepper: Circle — done -- */
+  --ui-comp-stepper-circle-bg-done:     var(--ui-sys-color-success);
+  --ui-comp-stepper-circle-border-done: var(--ui-sys-color-success);
+  --ui-comp-stepper-circle-text-done:   var(--ui-sys-color-on-success);
+
+  /* -- Stepper: Circle — active -- */
+  --ui-comp-stepper-circle-bg-active:     var(--ui-sys-color-primary);
+  --ui-comp-stepper-circle-border-active: var(--ui-sys-color-primary);
+  --ui-comp-stepper-circle-text-active:   var(--ui-sys-color-on-primary);
+  --ui-comp-stepper-circle-shadow-active: 0 0 0 4px var(--ui-sys-color-primary-container);
+
+  /* -- Stepper: Circle — pending -- */
+  --ui-comp-stepper-circle-bg-pending:     var(--ui-sys-color-surface-variant);
+  --ui-comp-stepper-circle-border-pending: var(--ui-sys-color-outline-variant);
+  --ui-comp-stepper-circle-text-pending:   var(--ui-sys-color-on-surface-variant);
+
+  /* -- Stepper: Connector -- */
+  --ui-comp-stepper-connector-color-done:    var(--ui-sys-color-success);
+  --ui-comp-stepper-connector-color-active:  var(--ui-sys-color-primary);
+  --ui-comp-stepper-connector-color-pending: var(--ui-sys-color-outline-variant);
+
+  /* -- Stepper: Label -- */
+  --ui-comp-stepper-label-font-size:      var(--ui-sys-font-size-label-large);   /* 18px */
+  --ui-comp-stepper-label-font-weight:    var(--ui-sys-font-weight-strong);       /* 600 */
+  --ui-comp-stepper-label-line-height:    var(--ui-sys-font-line-height-label-medium);
+  --ui-comp-stepper-label-text-done:      var(--ui-sys-color-success);
+  --ui-comp-stepper-label-text-active:    var(--ui-sys-color-primary);
+  --ui-comp-stepper-label-text-pending:   var(--ui-sys-color-on-surface-variant);
+
+  /* -- Stepper: Sub-label -- */
+  --ui-comp-stepper-sublabel-font-size:   var(--ui-sys-font-size-label-medium);   /* 16px */
+  --ui-comp-stepper-sublabel-text:        var(--ui-sys-color-on-surface-variant);
+
+
+  /* ============================================================ */
+  /* === COMP: Tab Bar =========================================== */
+  /* ============================================================ */
+
+  /* -- Tab: Container -- */
+  --ui-comp-tab-bar-bg:            var(--ui-sys-color-surface);
+  --ui-comp-tab-bar-border-color:  var(--ui-sys-color-outline-variant);
+  --ui-comp-tab-bar-radius:        var(--ui-sys-shape-corner-large);
+
+  /* -- Tab: Item — default -- */
+  --ui-comp-tab-bg-default:   transparent;
+  --ui-comp-tab-text-default: var(--ui-sys-color-on-surface-variant);
+
+  /* -- Tab: Item — active -- */
+  --ui-comp-tab-bg-active:    var(--ui-sys-color-primary-container);
+  --ui-comp-tab-text-active:  var(--ui-sys-color-primary);
+
+  /* -- Tab: Item — done -- */
+  --ui-comp-tab-text-done:    var(--ui-sys-color-success);
+
+  /* -- Tab: Item — warn -- */
+  --ui-comp-tab-text-warn:    var(--ui-sys-color-warning);
+
+  /* -- Tab: Typography -- */
+  --ui-comp-tab-font-size:    var(--ui-sys-font-size-label-large);   /* 18px */
+  --ui-comp-tab-font-weight:  var(--ui-sys-font-weight-strong);       /* 600 */
+  --ui-comp-tab-line-height:  var(--ui-sys-font-line-height-label-medium);
+
+  /* -- Tab: Spacing -- */
+  --ui-comp-tab-padding-x: var(--ui-sys-spacing-small);   /* 8px */
+  --ui-comp-tab-padding-y: var(--ui-sys-spacing-small);   /* 8px */
+
+  /* -- Tab: Pill Variant -- */
+  --ui-comp-tab-pill-list-bg:       var(--ui-sys-color-surface-variant);
+  --ui-comp-tab-pill-list-radius:   var(--ui-sys-shape-corner-medium);
+  --ui-comp-tab-pill-list-padding:  var(--ui-sys-spacing-extra-small);  /* 4px */
+  --ui-comp-tab-pill-marker-bg:     var(--ui-sys-color-surface);
+  --ui-comp-tab-pill-marker-radius: var(--ui-sys-shape-corner-small);   /* 4px */
+  --ui-comp-tab-pill-tab-height:    50px;
+
+
+  /* ============================================================ */
+  /* === COMP: Sidebar Nav ======================================= */
+  /* ============================================================ */
+
+  /* -- Sidebar: Background (use local dark navy for non-SYS dark bg) -- */
+  /* Note: SYS 層無深色模式 token；sidebar-bg 以 local-navy 管理，僅在 COMP 定義佔位 */
+
+  /* -- Sidebar: Section Label -- */
+  --ui-comp-sidebar-section-label-font-size:   var(--ui-sys-font-size-label-medium);  /* 16px */
+  --ui-comp-sidebar-section-label-font-weight: var(--ui-sys-font-weight-heavy);       /* 700 */
+
+  /* -- Sidebar: Nav Item — default -- */
+  --ui-comp-sidebar-nav-item-bg-default:   transparent;
+  --ui-comp-sidebar-nav-item-text-default: var(--ui-sys-color-on-surface-variant);
+
+  /* -- Sidebar: Nav Item — hover -- */
+  --ui-comp-sidebar-nav-item-bg-hover:   var(--ui-sys-color-surface-variant);
+  --ui-comp-sidebar-nav-item-text-hover: var(--ui-sys-color-on-surface);
+
+  /* -- Sidebar: Nav Item — active -- */
+  --ui-comp-sidebar-nav-item-bg-active:     var(--ui-sys-color-primary-container);
+  --ui-comp-sidebar-nav-item-text-active:   var(--ui-sys-color-primary);
+  --ui-comp-sidebar-nav-item-border-active: var(--ui-sys-color-primary);
+
+  /* -- Sidebar: Nav Item — Typography -- */
+  --ui-comp-sidebar-nav-item-font-size:   var(--ui-sys-font-size-label-medium);   /* 16px */
+  --ui-comp-sidebar-nav-item-font-weight-default: var(--ui-sys-font-weight-emphasis); /* 500 */
+  --ui-comp-sidebar-nav-item-font-weight-active:  var(--ui-sys-font-weight-heavy);    /* 700 */
+
+  /* -- Sidebar: Badge -- */
+  --ui-comp-sidebar-badge-bg:   var(--ui-sys-color-error);
+  --ui-comp-sidebar-badge-text: var(--ui-sys-color-on-error);
+  --ui-comp-sidebar-badge-radius: var(--ui-comp-badge-radius);
+  --ui-comp-sidebar-badge-font-size: var(--ui-sys-font-size-label-medium);
+  --ui-comp-sidebar-badge-font-weight: var(--ui-sys-font-weight-heavy);
+
+  /* -- Sidebar: Spacing -- */
+  --ui-comp-sidebar-nav-item-padding-x: var(--ui-sys-spacing-small);   /* 8px */
+  --ui-comp-sidebar-nav-item-padding-y: var(--ui-sys-spacing-small);   /* 8px */
+  --ui-comp-sidebar-nav-item-radius:    var(--ui-sys-shape-corner-medium);
+
+
+  /* ============================================================ */
+  /* === COMP: Pagination ======================================== */
+  /* ============================================================ */
+
+  /* -- Pagination: Button — default -- */
+  --ui-comp-pagination-btn-bg-default:     var(--ui-sys-color-surface);
+  --ui-comp-pagination-btn-border-default: var(--ui-sys-color-outline-variant);
+  --ui-comp-pagination-btn-text-default:   var(--ui-sys-color-on-surface-variant);
+
+  /* -- Pagination: Button — hover -- */
+  --ui-comp-pagination-btn-bg-hover:     var(--ui-sys-color-primary-container);
+  --ui-comp-pagination-btn-border-hover: var(--ui-sys-color-primary);
+  --ui-comp-pagination-btn-text-hover:   var(--ui-sys-color-primary);
+
+  /* -- Pagination: Button — active (current page) -- */
+  --ui-comp-pagination-btn-bg-active:       var(--ui-sys-color-primary);
+  --ui-comp-pagination-btn-bg-active-hover: var(--ui-sys-color-primary-hover);
+  --ui-comp-pagination-btn-border-active:   var(--ui-sys-color-primary);
+  --ui-comp-pagination-btn-text-active:     var(--ui-sys-color-on-primary);
+
+  /* -- Pagination: Button — disabled -- */
+  --ui-comp-pagination-btn-text-disabled: var(--ui-sys-color-on-disabled);
+
+  /* -- Pagination: Shape -- */
+  --ui-comp-pagination-btn-radius: var(--ui-sys-shape-corner-medium);
+
+  /* -- Pagination: Size -- */
+  --ui-comp-pagination-btn-size: 32px;
+
+  /* ============================================================
+     Checkbox
+     ============================================================ */
+
+  /* -- Checkbox: Size & Shape -- */
+  --ui-comp-checkbox-size:        var(--ui-sys-font-size-body-medium);
+  --ui-comp-checkbox-radius:      var(--ui-sys-shape-corner-small);   /* 4px */
+  --ui-comp-checkbox-padding-top: var(--ui-sys-spacing-extra-small);
+
+  /* -- Checkbox: Default state -- */
+  --ui-comp-checkbox-bg-default:     var(--ui-sys-color-surface);
+  --ui-comp-checkbox-border-default: var(--ui-sys-color-outline-variant);
+
+  /* -- Checkbox: Checked state -- */
+  --ui-comp-checkbox-bg-checked:     var(--ui-sys-color-primary);
+  --ui-comp-checkbox-border-checked: var(--ui-sys-color-primary);
+  --ui-comp-checkbox-check-color:    var(--ui-sys-color-on-primary);
+
+  /* -- Checkbox: Disabled state -- */
+  --ui-comp-checkbox-bg-disabled:     var(--ui-sys-color-disabled);
+  --ui-comp-checkbox-border-disabled: var(--ui-sys-color-disabled);
+
+  /* -- Checkbox: Label -- */
+  --ui-comp-checkbox-label-font-size:   var(--ui-sys-font-size-body-medium);
+  --ui-comp-checkbox-label-font-weight: var(--ui-sys-font-weight-default);
+  --ui-comp-checkbox-label-color:       var(--ui-sys-color-on-surface);
+
+  /* -- Checkbox: Group -- */
+  --ui-comp-checkbox-label-gap:   var(--ui-sys-spacing-small); 
+  --ui-comp-checkbox-group-gap-x: var(--ui-sys-spacing-medium);      /* 16px 水平排列 */
+  --ui-comp-checkbox-group-gap-y: var(--ui-sys-spacing-small);       /* 8px 垂直排列 */
+
+  /* ============================================================
+     Radio
+     ============================================================ */
+
+  /* -- Radio: Size -- */
+  --ui-comp-radio-size:        var(--ui-sys-font-size-body-medium);
+  --ui-comp-radio-padding-top: var(--ui-sys-spacing-extra-small);
+
+  /* -- Radio: Default state -- */
+  --ui-comp-radio-bg-default:     var(--ui-sys-color-surface);
+  --ui-comp-radio-border-default: var(--ui-sys-color-outline-variant);
+
+  /* -- Radio: Checked state -- */
+  --ui-comp-radio-bg-checked:     var(--ui-sys-color-primary);
+  --ui-comp-radio-border-checked: var(--ui-sys-color-primary);
+
+  /* -- Radio: Disabled state -- */
+  --ui-comp-radio-bg-disabled:     var(--ui-sys-color-disabled);
+  --ui-comp-radio-border-disabled: var(--ui-sys-color-disabled);
+
+  /* -- Radio: Label -- */
+  --ui-comp-radio-label-font-size:   var(--ui-sys-font-size-body-medium);
+  --ui-comp-radio-label-font-weight: var(--ui-sys-font-weight-default);
+  --ui-comp-radio-label-color:       var(--ui-sys-color-on-surface);
+
+  /* -- Radio: Group -- */
+  --ui-comp-radio-label-gap:   var(--ui-sys-spacing-extra-small); /* 8px icon ↔ label */
+  --ui-comp-radio-group-gap-x: var(--ui-sys-spacing-medium);      /* 16px 水平排列 */
+  --ui-comp-radio-group-gap-y: var(--ui-sys-spacing-small);       /* 8px 垂直排列 */
+
+  /* ============================================================
+     Accordion
+     ============================================================ */
+
+  /* -- Accordion: Container -- */
+  --ui-comp-accordion-bg:              var(--ui-sys-color-surface);
+  --ui-comp-accordion-border:          var(--ui-sys-color-outline-variant);
+  --ui-comp-accordion-radius:          var(--ui-sys-shape-corner-medium);    /* 8px */
+
+  /* -- Accordion: Header -- */
+  --ui-comp-accordion-header-bg-default: var(--ui-sys-color-surface);
+  --ui-comp-accordion-header-bg-hover:   var(--ui-sys-color-surface-variant);
+  --ui-comp-accordion-header-bg-active:  var(--ui-sys-color-primary-container);
+  --ui-comp-accordion-header-text:       var(--ui-sys-color-on-surface);
+  --ui-comp-accordion-header-font-size:  var(--ui-sys-font-size-body-medium);  /* 14px */
+  --ui-comp-accordion-header-font-weight: var(--ui-sys-font-weight-emphasis);  /* 500 */
+  --ui-comp-accordion-header-padding-x:  var(--ui-sys-spacing-medium);         /* 16px */
+  --ui-comp-accordion-header-padding-y:  var(--ui-sys-spacing-small);          /* 8px */
+
+  /* -- Accordion: Content -- */
+  --ui-comp-accordion-content-bg:        var(--ui-sys-color-surface);
+  --ui-comp-accordion-content-text:      var(--ui-sys-color-on-surface-variant);
+  --ui-comp-accordion-content-font-size: var(--ui-sys-font-size-body-medium);
+  --ui-comp-accordion-content-padding-x: var(--ui-sys-spacing-medium);
+  --ui-comp-accordion-content-padding-y: var(--ui-sys-spacing-small);
+
+  /* ============================================================
+     Progress Tab (管考分類 Tab)
+     ============================================================ */
+
+  /* -- ProgressTab: Container -- */
+  --ui-comp-progress-tab-gap:        var(--ui-sys-spacing-small);    /* 8px */
+
+  /* -- ProgressTab: Item default -- */
+  --ui-comp-progress-tab-bg-default:     var(--ui-sys-color-surface);
+  --ui-comp-progress-tab-border-default: var(--ui-sys-color-outline-variant);
+  --ui-comp-progress-tab-text-default:   var(--ui-sys-color-on-surface);
+
+  /* -- ProgressTab: Item active (in-progress) -- */
+  --ui-comp-progress-tab-bg-active:     var(--ui-sys-color-primary-container);
+  --ui-comp-progress-tab-border-active: var(--ui-sys-color-primary);
+  --ui-comp-progress-tab-text-active:   var(--ui-sys-color-primary);
+
+  /* -- ProgressTab: Item complete (gold highlight) -- */
+  --ui-comp-progress-tab-bg-complete:     var(--ui-ref-color-amber-50, #fffbeb);
+  --ui-comp-progress-tab-border-complete: var(--ui-ref-color-amber-400, #fbbf24);
+  --ui-comp-progress-tab-text-complete:   var(--ui-ref-color-amber-700, #b45309);
+
+  /* -- ProgressTab: Typography -- */
+  --ui-comp-progress-tab-font-size-label:    var(--ui-sys-font-size-label-small);   /* 12px */
+  --ui-comp-progress-tab-font-size-name:     var(--ui-sys-font-size-body-medium);   /* 14px */
+  --ui-comp-progress-tab-font-weight-active: var(--ui-sys-font-weight-heavy);       /* 700 */
+  --ui-comp-progress-tab-font-weight-normal: var(--ui-sys-font-weight-emphasis);    /* 500 */
+
+  /* ============================================================
+     Item List Panel (管考左面板項目清單)
+     ============================================================ */
+
+  /* -- ItemList: Container -- */
+  --ui-comp-item-list-bg:     var(--ui-sys-color-surface);
+  --ui-comp-item-list-border: var(--ui-sys-color-outline-variant);
+  --ui-comp-item-list-radius: var(--ui-sys-shape-corner-medium);
+
+  /* -- ItemList: Item default -- */
+  --ui-comp-item-list-item-bg-default:   var(--ui-sys-color-surface);
+  --ui-comp-item-list-item-bg-hover:     var(--ui-sys-color-surface-variant);
+  --ui-comp-item-list-item-text-default: var(--ui-sys-color-on-surface);
+
+  /* -- ItemList: Item active -- */
+  --ui-comp-item-list-item-bg-active:     var(--ui-sys-color-primary-container);
+  --ui-comp-item-list-item-border-active: var(--ui-sys-color-primary);
+  --ui-comp-item-list-item-text-active:   var(--ui-sys-color-primary);
+
+  /* -- ItemList: Typography -- */
+  --ui-comp-item-list-font-size:        var(--ui-sys-font-size-body-medium);   /* 14px */
+  --ui-comp-item-list-font-weight:      var(--ui-sys-font-weight-default);     /* 400 */
+  --ui-comp-item-list-font-weight-active: var(--ui-sys-font-weight-emphasis);  /* 500 */
+  --ui-comp-item-list-padding-x:        var(--ui-sys-spacing-medium);
+  --ui-comp-item-list-padding-y:        var(--ui-sys-spacing-small);
+
+  /* ============================================================
+     Textarea
+     ============================================================ */
+
+  /* -- Textarea: Geometry -- */
+  --ui-comp-textarea-radius:     var(--ui-sys-shape-corner-medium);   /* 8px */
+  --ui-comp-textarea-min-height: 96px;
+  --ui-comp-textarea-padding-x:  var(--ui-comp-input-padding-x-md);
+  --ui-comp-textarea-padding-y:  var(--ui-comp-input-padding-y-md);
+
+  /* -- Textarea: Default state (繼承 input token) -- */
+  --ui-comp-textarea-bg-default:          var(--ui-comp-input-bg-default);
+  --ui-comp-textarea-border-default:      var(--ui-comp-input-border-default);
+  --ui-comp-textarea-text-default:        var(--ui-comp-input-text-default);
+  --ui-comp-textarea-placeholder-default: var(--ui-comp-input-placeholder-default);
+  --ui-comp-textarea-font-size:           var(--ui-sys-font-size-body-medium);
+
+  /* -- Textarea: Focus state -- */
+  --ui-comp-textarea-border-focus: var(--ui-comp-input-border-focus);
+
+  /* -- Textarea: Error state -- */
+  --ui-comp-textarea-border-error: var(--ui-comp-input-border-error);
+
+  /* -- Textarea: Disabled state -- */
+  --ui-comp-textarea-bg-disabled:     var(--ui-comp-input-bg-disabled);
+  --ui-comp-textarea-border-disabled: var(--ui-comp-input-border-disabled);
+  --ui-comp-textarea-text-disabled:   var(--ui-comp-input-text-disabled);
+
+  /* ── Supply Status Badge（物資庫存狀態標籤）──────────────────
+   * 對應 FR-SUP-010 / BR-SUP-003
+   * 正常(normal) / 低庫存(low) / 近效期(expiring) / 已過期(expired)
+   */
+  --ui-comp-supply-status-normal-bg:       var(--ui-sys-color-success-container);
+  --ui-comp-supply-status-normal-text:     var(--ui-sys-color-on-success-container, #14532d);
+  --ui-comp-supply-status-normal:          var(--ui-sys-color-success);
+
+  --ui-comp-supply-status-low-bg:          var(--ui-sys-color-warning-container);
+  --ui-comp-supply-status-low-text:        #7c2d12;
+  --ui-comp-supply-status-low:             var(--ui-sys-color-warning);
+
+  --ui-comp-supply-status-expiring-bg:     #fef9c3;
+  --ui-comp-supply-status-expiring-text:   #713f12;
+  --ui-comp-supply-status-expiring:        #ca8a04;
+
+  --ui-comp-supply-status-expired-bg:      var(--ui-sys-color-error-container);
+  --ui-comp-supply-status-expired-text:    var(--ui-sys-color-error);
+  --ui-comp-supply-status-expired:         var(--ui-sys-color-error);
+
+  /* ─── Map Marker（UIUX 方案 B + 強化：形狀分型 + 動態 + 金邊） ─── */
+  /* shelter 開設中（案件已啟用）— 淚滴 pin、3 倍尺寸對比、脈動光環、金色警示環 */
+  --ui-comp-marker-shelter-size-active:    56px;
+  --ui-comp-marker-shelter-size-active-h:  64px;     /* 淚滴 height ≠ width */
+  --ui-comp-marker-shelter-size-idle:      18px;     /* 比 active 小 3.1 倍，反差最大化 */
+  --ui-comp-marker-shelter-tilt-active:    var(--ui-sys-elevation-marker-active);
+  --ui-comp-marker-shelter-tilt-idle:      var(--ui-sys-elevation-marker-idle);
+  --ui-comp-marker-shelter-opacity-idle:   0.55;
+  --ui-comp-marker-shelter-shadow-active:  var(--ui-sys-shadow-marker-active);
+  --ui-comp-marker-shelter-shadow-idle:    var(--ui-sys-shadow-marker-idle);
+  --ui-comp-marker-shelter-zindex-active:  1001;
+  --ui-comp-marker-shelter-zindex-idle:    999;
+  /* 脈動光環 SVG <animate> 用 */
+  --ui-comp-marker-shelter-pulse-r-from:    28;
+  --ui-comp-marker-shelter-pulse-r-to:      44;
+  --ui-comp-marker-shelter-pulse-opacity:   0.55;
+  /* 金色警示環（顯示「動員中」狀態語意，僅 active shelter 用） */
+  --ui-comp-marker-shelter-warning-ring:    var(--ui-sys-color-warning);
+  --ui-comp-marker-shelter-warning-ring-w:  2px;
+  /* 地面投影（pin 尖下方獨立 ellipse） */
+  --ui-comp-marker-shelter-ground-shadow:   rgba(0, 0, 0, 0.28);
+
+  /* 通用 pin（eoc / rescue / task / staff）— 一律維持 active 樣式 */
+  --ui-comp-marker-pin-size-default:       40px;
+  --ui-comp-marker-pin-size-selected:      56px;
+  --ui-comp-marker-pin-tilt-default:       var(--ui-sys-elevation-marker-active);
+  --ui-comp-marker-pin-shadow-default:     var(--ui-sys-shadow-marker-active);
+
+  /* debris（三角形專用，傾斜小避免變形） */
+  --ui-comp-marker-debris-tilt:            var(--ui-sys-elevation-marker-debris);
+  --ui-comp-marker-debris-shadow:          var(--ui-sys-shadow-marker-active);
+
+  /* ─── Equipment Category Chip（中心裝備物資 9 大類分類色） ─── */
+  /* 每類 *-bg = 淡背景、*-text = 主文字色；chip 邊框用 currentColor + opacity */
+  --ui-comp-equipment-cat-ict-bg:            #E3F2FD;
+  --ui-comp-equipment-cat-ict-text:          #1565C0;
+  --ui-comp-equipment-cat-power-bg:          #FFF8E1;
+  --ui-comp-equipment-cat-power-text:        #E65100;
+  --ui-comp-equipment-cat-storage-bg:        #E8F5E9;
+  --ui-comp-equipment-cat-storage-text:      #2E7D32;
+  --ui-comp-equipment-cat-office-bg:         #EDE7F6;
+  --ui-comp-equipment-cat-office-text:       #4527A0;
+  --ui-comp-equipment-cat-ppe-bg:            #FCE4EC;
+  --ui-comp-equipment-cat-ppe-text:          #880E4F;
+  --ui-comp-equipment-cat-shelter-bg:        #FFEBEE;
+  --ui-comp-equipment-cat-shelter-text:      #B71C1C;
+  --ui-comp-equipment-cat-emfood-bg:         #FFFDE7;
+  --ui-comp-equipment-cat-emfood-text:       #F57F17;
+  --ui-comp-equipment-cat-medical-bg:        #F3E5F5;
+  --ui-comp-equipment-cat-medical-text:      #6A1B9A;
+  --ui-comp-equipment-cat-decon-bg:          #E0F7FA;
+  --ui-comp-equipment-cat-decon-text:        #006064;
+}
+
+/* Table 內的 Checkbox 不套用 padding-top */
+table .flex.items-start {
+  padding-top: 0;
+}

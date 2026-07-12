@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: TODO API
+  version: 0.1.0
+paths:
+  /api/TODO:
+    get:
+      summary: TODO
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Validation error
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found

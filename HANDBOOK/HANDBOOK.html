@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CRUD 工作坊 Backend EASY 版 — Step-by-Step 學習手冊</title>
+<style>
+  :root{
+    --brand:#C8232C;
+    --brand-dark:#9E1B22;
+    --brand-soft:#FBEDED;
+    --ink:#1c1d21;
+    --ink-soft:#54565e;
+    --line:#e7e3e3;
+    --bg:#f6f4f3;
+    --card:#ffffff;
+    --ok:#1a8a4a;
+    --warn:#b8860b;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(30,20,20,.06),0 10px 30px rgba(30,20,20,.05);
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* top nav */
+  header.topnav{
+    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
+    backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:var(--maxw);margin:0 auto;padding:10px 20px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .topnav .brand{font-weight:800;color:var(--brand);letter-spacing:.3px;white-space:nowrap;font-size:15px;}
+  .topnav nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+  .topnav nav a{
+    text-decoration:none;color:var(--ink-soft);font-size:13px;font-weight:600;
+    padding:5px 11px;border-radius:999px;border:1px solid transparent;transition:.15s;
+  }
+  .topnav nav a:hover{color:var(--brand);background:var(--brand-soft);}
+
+  /* hero */
+  .hero{max-width:var(--maxw);margin:34px auto 10px;padding:0 20px;}
+  .hero-card{
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);
+    color:#fff;border-radius:20px;padding:38px 34px;box-shadow:var(--shadow);
+  }
+  .hero-card .eyebrow{opacity:.9;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+  .hero-card h1{margin:10px 0 14px;font-size:30px;line-height:1.3;font-weight:800;}
+  .hero-card p{margin:0;font-size:16px;opacity:.96;max-width:60ch;}
+  .hero-meta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 13px;font-size:13px;font-weight:600;}
+
+  main{max-width:var(--maxw);margin:0 auto;padding:0 20px 80px;}
+
+  .outline{margin:26px 0;}
+  .outline h2{font-size:18px;margin:0 0 12px;color:var(--ink);}
+
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--brand-soft);color:var(--brand-dark);font-weight:700;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  td code,p code,li code{background:#f0edec;color:var(--brand-dark);padding:1.5px 6px;border-radius:5px;font-size:.9em;font-family:"Cascadia Code",Consolas,monospace;}
+
+  section.step{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    margin:26px 0;padding:0;overflow:hidden;scroll-margin-top:70px;border:1px solid var(--line);
+  }
+  .step-head{
+    display:flex;align-items:center;gap:15px;padding:22px 28px;
+    border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--brand-soft),transparent);
+  }
+  .step-num{
+    flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:0 4px 10px rgba(200,35,44,.3);
+  }
+  .step-head h2{margin:0;font-size:21px;font-weight:800;}
+  .step-head .t{margin-left:auto;font-size:12.5px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;}
+  .star{display:inline-block;background:var(--brand);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
+  .step-body{padding:8px 28px 26px;}
+
+  .block-title{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;margin:22px 0 6px;}
+  .block-title .ico{font-size:19px;}
+  .goal{background:var(--brand-soft);border-left:4px solid var(--brand);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .goal ol,.goal ul{margin:6px 0 0;padding-left:22px;}
+  .goal .block-title{margin-top:0;}
+  .why{background:#f3f6f4;border-left:4px solid var(--ok);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .why .block-title{color:#166b3c;margin-top:0;}
+  .warnbox{background:#fbf5ea;border-left:4px solid var(--warn);border-radius:8px;padding:14px 18px;margin:18px 0;}
+  .warnbox .block-title{color:#8a6400;margin-top:0;}
+  .warnbox ul{margin:6px 0 0;}
+
+  h3{font-size:16px;margin:22px 0 8px;color:var(--brand-dark);}
+  p{margin:10px 0;}
+  ol,ul{padding-left:24px;margin:10px 0;}
+  li{margin:5px 0;}
+
+  blockquote{
+    margin:16px 0;padding:12px 18px;background:#fbf9f8;border-left:4px solid var(--brand);
+    border-radius:8px;color:var(--ink-soft);font-size:14.5px;
+  }
+  blockquote strong{color:var(--brand-dark);}
+
+  pre{
+    background:#1e1f26;color:#e6e6ea;border-radius:10px;padding:16px 18px;overflow-x:auto;
+    font-family:"Cascadia Code",Consolas,monospace;font-size:13.5px;line-height:1.65;margin:14px 0;
+  }
+  pre code{background:none;color:inherit;padding:0;}
+
+  figure{margin:20px 0;}
+  figure img{
+    width:100%;max-width:100%;height:auto;display:block;border-radius:12px;
+    box-shadow:0 3px 14px rgba(30,20,20,.14);border:1px solid var(--line);
+  }
+  figcaption{margin-top:9px;font-size:13.5px;color:var(--ink-soft);text-align:center;font-style:italic;}
+  figcaption .hl{color:var(--brand-dark);font-weight:700;font-style:normal;}
+
+  .flow{background:#1e1f26;color:#d7d7dd;border-radius:10px;padding:18px 20px;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.85;overflow-x:auto;margin:16px 0;white-space:pre;}
+  .flow b{color:#ffb3b8;}
+
+  .soul{background:linear-gradient(135deg,#2b1f20,#1e1f26);color:#f3eceb;border-radius:var(--radius);padding:24px 28px;margin:22px 0;box-shadow:var(--shadow);}
+  .soul h2{margin:0 0 12px;font-size:20px;color:#ff9ba1;}
+  .soul table{background:transparent;box-shadow:none;color:#f3eceb;font-size:14px;}
+  .soul th{background:rgba(255,255,255,.08);color:#ffb3b8;}
+  .soul td{border-bottom:1px solid rgba(255,255,255,.12);}
+  .soul code{background:rgba(255,255,255,.12);color:#ffd0d3;}
+  .soul .note{margin:14px 0 0;padding-left:20px;}
+  .soul .note li{margin:6px 0;}
+
+  .checklist{list-style:none;padding:0;margin:14px 0;}
+  .checklist li{position:relative;padding:9px 12px 9px 40px;border-bottom:1px dashed var(--line);}
+  .checklist li::before{content:"";position:absolute;left:10px;top:12px;width:19px;height:19px;border:2px solid var(--brand);border-radius:5px;}
+
+  .footer{max-width:var(--maxw);margin:0 auto;padding:26px 20px 50px;color:var(--ink-soft);font-size:13.5px;text-align:center;}
+
+  @media (max-width:680px){
+    body{font-size:15px;}
+    .hero-card{padding:26px 22px;}
+    .hero-card h1{font-size:22px;}
+    .step-body{padding:6px 18px 22px;}
+    .step-head{padding:18px 18px;}
+    .step-head h2{font-size:18px;}
+    .step-head .t{display:none;}
+    .topnav .brand{font-size:13px;}
+    th,td{padding:9px 10px;font-size:13.5px;}
+  }
+
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
+      --brand-soft:#2b1f20;--shadow:0 2px 10px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
+    }
+    header.topnav{background:rgba(28,24,23,.92);}
+    .topnav nav a:hover{color:#ff9ba1;}
+    td code,p code,li code{background:#2c2827;color:#ff9ba1;}
+    blockquote{background:#241f1e;}
+    .why{background:#1b241d;}
+    .goal{background:#2b1f20;}
+    .warnbox{background:#2a2318;}
+    figure img{border-color:#33302f;}
+  }
+  :root[data-theme="dark"]{
+    --ink:#e9e7e6;--ink-soft:#a9a6a4;--line:#33302f;--bg:#151312;--card:#201d1c;
+    --brand-soft:#2b1f20;--shadow:0 2px 10px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);
+  }
+  :root[data-theme="dark"] header.topnav{background:rgba(28,24,23,.92);}
+  :root[data-theme="dark"] td code,:root[data-theme="dark"] p code,:root[data-theme="dark"] li code{background:#2c2827;color:#ff9ba1;}
+  :root[data-theme="dark"] blockquote{background:#241f1e;}
+  :root[data-theme="dark"] .why{background:#1b241d;}
+  :root[data-theme="dark"] .goal{background:#2b1f20;}
+  :root[data-theme="dark"] .warnbox{background:#2a2318;}
+  :root[data-theme="light"]{
+    --ink:#1c1d21;--ink-soft:#54565e;--line:#e7e3e3;--bg:#f6f4f3;--card:#ffffff;--brand-soft:#FBEDED;
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="topnav-inner">
+    <span class="brand">AI CRUD 工作坊 · Backend EASY</span>
+    <nav>
+      <a href="#soul">靈魂</a>
+      <a href="#life">請求的一生</a>
+      <a href="#step0">Step 0</a>
+      <a href="#step1">Step 1</a>
+      <a href="#step2">Step 2</a>
+      <a href="#step3">Step 3</a>
+      <a href="#step4">Step 4</a>
+      <a href="#step5">Step 5</a>
+      <a href="#done">完課檢核</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-card">
+    <div class="eyebrow">Step-by-Step 學習手冊</div>
+    <h1>把假資料變真的<br>——讓裝備物資模組落地 PostgreSQL</h1>
+    <p>用「.NET CRUD 範本 + AI harness + AI」把上一堂前端課的裝備物資模組接上真後端。這份手冊帶你把整堂課從頭走一遍：每一步都有「要做到什麼、怎麼做、會看到什麼、常見坑」，課後照著走也能自己重現。課程目標：讓新模組的後端骨架（API + 資料表 + 測試）在一小時內長出來。</p>
+    <div class="hero-meta">
+      <span class="chip">⏱ 約 120 分鐘</span>
+      <span class="chip">🛠 全程動手做</span>
+      <span class="chip">🗄 資料真的進 PostgreSQL</span>
+      <span class="chip">🧭 step0 → step5</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- SOUL -->
+  <div class="soul" id="soul">
+    <h2>這堂課的靈魂：持久化</h2>
+    <p>前端課的裝備物資模組是<strong>記憶體 mock</strong>——按 F5 重整，剛新增的資料就消失了。這堂課要把它<strong>變成真的</strong>：資料寫進 PostgreSQL，<strong>F5 之後還在、換一台電腦也還在</strong>。</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th></th><th>前端 mock（上一課）</th><th>本課：真後端</th></tr></thead>
+      <tbody>
+        <tr><td>資料放哪</td><td>瀏覽器記憶體</td><td>PostgreSQL 資料表 <code>equipment_item</code></td></tr>
+        <tr><td>按 F5（reload）後</td><td>改動消失、重置回 24 筆種子</td><td><b>改動仍在</b>（真的落庫）</td></tr>
+        <tr><td>編碼 <code>PW-GEN-003</code> 誰算</td><td>前端算</td><td><b>後端</b>在交易內算（前端只做預覽）</td></tr>
+        <tr><td>怎麼證明</td><td>看畫面就夠</td><td>看畫面 ＋ 直接打 API 拿 JSON ＋ psql 查表</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <ul class="note">
+      <li>後端課的靈魂是<strong>持久化</strong>——F5 還在，才叫真的。</li>
+      <li>每一盞綠燈都必須來自<strong>你自己的作品</strong>（<code>my-equipment-api</code>），不是官方參考解偷跑。</li>
+    </ul>
+  </div>
+
+  <div class="outline">
+    <h2>課程大綱</h2>
+    <p>照順序走、不要跳步——後面會用到前面的產出。這門課給<strong>會寫程式、想學「用 AI 快速生出一支有規矩的後端 API」</strong>的工程師；需要會用 PowerShell、對 REST API 有基本概念、看得懂 C# 大意，<strong>不需要</strong> .NET／EF Core／PostgreSQL 實作經驗，也不需要提示詞經驗。</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Step</th><th>這一章在做什麼</th><th>時間</th></tr></thead>
+      <tbody>
+        <tr><td><b>step0</b></td><td>課程說明、前置檢查（11 項）</td><td>10 分</td></tr>
+        <tr><td><b>step1</b></td><td>為什麼要 harness（同一句後端需求，有／沒有 harness 的產出對比）</td><td>10 分</td></tr>
+        <tr><td><b>step2</b></td><td>後端快速完工秘笈（玩範本 API → 系統文件 → harness 四件 → 分層架構＋DB → 範本程式）</td><td>35 分</td></tr>
+        <tr><td><b>step3</b></td><td>複製範本開發新模組（真實 PRD → AI 釐清選擇題 → 生成 SRS/SDD-delta／API／Migration／測試）<span class="star">重頭戲</span></td><td>40 分</td></tr>
+        <tr><td><b>step4</b></td><td>後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E</td><td>20 分</td></tr>
+        <tr><td><b>step5</b></td><td>課程總結、評量量表、回去怎麼用</td><td>5 分</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- REQUEST LIFE -->
+  <section class="step" id="life">
+    <div class="step-head">
+      <div class="step-num" style="font-size:22px;">🚚</div>
+      <h2>請求的一生（先建立整體感）</h2>
+    </div>
+    <div class="step-body">
+      <p>動手前先記住這條動線。這堂課做的每一件事，都是在這條線上補齊某一段：</p>
+      <div class="flow">瀏覽器（前端頁面）
+   │  useFetch('/api/equipment/items')
+   ▼
+<b>Nuxt devProxy</b>（前端轉呼叫，避開跨網域）
+   │  HTTP GET/POST/PUT/DELETE
+   ▼
+<b>Controller</b>（薄委派，只做「呼叫 Service → 對映狀態碼」）
+   │
+   ▼
+<b>Service</b>（商業邏輯全在這：產 id、算 code 編碼、查無回失敗）
+   │
+   ▼
+<b>EF Core</b>（把物件翻成 SQL，參數化、防注入）
+   │
+   ▼
+<b>PostgreSQL</b>（資料表 equipment_item，真正落地的地方）
+   │  一筆一筆存著，F5 不會消失
+   ▼
+   原路回來 → JSON → 前端畫面</div>
+      <p>前端課只做到「瀏覽器」那一格（資料在記憶體）；這堂課把 <strong>devProxy → Controller → Service → EF → PostgreSQL</strong> 這一整段接起來。<strong>資料在 PostgreSQL 裡查得到，才叫真的持久化。</strong></p>
+    </div>
+  </section>
+
+  <!-- STEP 0 -->
+  <section class="step" id="step0">
+    <div class="step-head">
+      <div class="step-num">0</div>
+      <h2>課程說明與前置檢查</h2>
+      <span class="t">10 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>知道這門課要教什麼、怎麼進行（把假資料變真的）。</li>
+          <li>確認你的機器準備好了：.NET SDK、PostgreSQL、埠號、磁碟等 <strong>11 項</strong>全過。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <ol>
+        <li>讀一遍 <code>step0_course_intro/START_HERE.md</code>，確認上完課要帶走三件能力：看得出有無 harness 的後端差別、能用 AI 生成一個新模組的 API＋資料表＋測試、能設計並執行一輪後端 LOOP 驗證。</li>
+        <li>每個 step 都有自己的資料夾與 <code>README.md</code>，照 step0 → step5 順序走。</li>
+        <li>開課前先跑前置檢查：</li>
+      </ol>
+      <pre><code>cd step0_course_intro
+.\preflight.ps1</code></pre>
+      <p>看到「前置檢查全數通過，可以開課！」（含 <code>[WARN]</code> 也算通過）再進 step1。若出現 <code>[FAIL]</code>，照腳本印出的修復提示處理後重跑一次。</p>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>腳本逐項印出 11 項檢查（PASS／WARN／FAIL 三級）。四項 FAIL 級是命脈：.NET SDK ≥ 10、PostgreSQL 5432 可連、資料庫帳密可登入（<code>postgres</code>／<code>12345</code>）、port 5080 空、磁碟 ≥ 2GB、ExecutionPolicy 可執行腳本。最後一行是「前置檢查全數通過，可以開課！」。</p>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
+        <ul>
+          <li><strong>PostgreSQL 沒開或帳密不符</strong>：這是後端課的命脈。preflight 用 psql 實跑 <code>SELECT 1</code> 驗登入；連不上先看 <code>Get-Service postgresql*</code>，停著就 <code>Start-Service postgresql-x64-18</code>。</li>
+          <li><code>postgres</code>／<code>12345</code> <strong>只限本機教室 DEMO</strong>，不得沿用公司／正式環境——正式環境改用環境變數帶密碼。</li>
+          <li><strong>psql 不在 PATH</strong>：本機 psql 在 <code>C:\Program Files\PostgreSQL\18\bin\</code>（版號依安裝而定）。preflight 會自動去找並印出絕對路徑，之後凡要用 psql 都用那個絕對路徑。</li>
+          <li><strong>課前一天先做</strong>：首次 <code>dotnet run</code> 會還原套件、建庫、Migrate＋Seed（最花時間）；step4 首跑 E2E 會下載 Chromium（約 150MB）。這些等待不算課堂時間，務必課前先跑。</li>
+        </ul>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        這堂課全程動手做，環境沒備好會卡在半路。前置檢查一次把常見坑（沒裝 .NET、PostgreSQL 沒起來、5080 埠被占用）攔在開課前，省得上課才發現跑不起來。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="step" id="step1">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <h2>為什麼要有 harness？（後端版）</h2>
+      <span class="t">10 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>用「同一句後端需求、只差有沒有附規矩」的兩個產出，親眼看出差別。</li>
+          <li>知道後端的差別比前端更貴：前端比「像不像同一個團隊做的」，後端比「<strong>敢不敢上線</strong>」。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES-api）＋系統文件（SRS／SDD）＋標準範本 API</strong>（薄 Controller → Service → EF Core 的既有寫法）。沒有它，AI 分層、驗證、狀態碼、例外處理全憑當下高興；有了它，產出從「路人硬湊、跑得起來但不敢上線」變成「像老手照團隊規矩寫、能直接進 code review」。</p>
+      <ol>
+        <li>打開 <code>step1_why_harness/demo/PROMPT.md</code>——確認兩版給 AI 的需求<strong>是同一句</strong>，只差有沒有附規矩。</li>
+        <li>雙擊 <code>step1_why_harness/COMPARE.html</code>（免安裝、免連網）：左右並排兩份程式碼，<strong>紅底＝違規、綠底＝合規</strong>，每行有白話註解，上方一張 12 項差異總表。</li>
+        <li>對照 <code>demo/no-harness.cs</code> 與 <code>demo/with-harness.cs</code>，照 12 項總表逐項比。</li>
+      </ol>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>兩份都是「新增裝備」的 API，功能一樣能動，差的是「會不會出事」。重點看這幾條後端最貴的坑：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>會出什麼事</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>分層架構</td><td>SQL／商業邏輯全塞 Controller</td><td>Controller 薄委派 → Service</td><td>全攪一起沒人敢改，一動就連坐</td></tr>
+          <tr><td>2</td><td>相依取得</td><td>方法內 <code>new</code> 連線、帳密硬編碼</td><td>建構式注入 DbContext／Mapper</td><td>帳密寫死＝上 git 就外洩</td></tr>
+          <tr><td>3</td><td>SQL 安全</td><td>字串拼接組 SQL</td><td>EF Core 參數化查詢</td><td>拼字串＝SQL Injection 破口，<code>';DROP</code> 就砸表</td></tr>
+          <tr><td>4</td><td>請求驗證</td><td>散裝參數、零驗證</td><td>DTO ＋ DataAnnotations</td><td>空值、負數量、亂填 status 全進庫</td></tr>
+          <tr><td>5</td><td>狀態碼</td><td>一律回 200</td><td>201／400／404</td><td>前端無從判斷成敗，只能猜</td></tr>
+          <tr><td>8</td><td>例外處理</td><td>try/catch 吞例外，DB 斷線也回 200</td><td>只轉預期失敗，未預期上拋 500</td><td>資料沒存進去卻回「成功」，最難查的 bug</td></tr>
+          <tr><td>9</td><td>編碼產生</td><td>時間戳硬湊，不保證唯一</td><td>交易內同前綴 MAX+1 ＋唯一索引</td><td>編碼撞號，盤點對不上、出貨拿錯裝備</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
+        <ul>
+          <li><strong>別把 demo 那兩份 <code>.cs</code> 當「鐵證」</strong>——它們是用固定 prompt 各跑一次挑出來的策展成品，不是每次一字不差重現。要信，就自己拿 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次、照「A/B 違規計分表」逐項打分。</li>
+          <li>比的是「違規數的落差」，不是逐字內容。需求換難、規則換多，沒 harness 那版就會開始崩（尤其例外處理與 SQL 安全這種「跑得起來但會出事」的坑）。</li>
+        </ul>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>harness 不是限制 AI，是讓 AI 像你團隊的資深工程師。</strong> 沒 harness 那版能新增裝備，但它同時開了 SQL Injection、吞掉例外、帳密寫死——這才是後端最貴的坑。同一句需求，差的不是 AI 智商，是你給不給規矩。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step" id="step2">
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <h2>後端快速完工秘笈</h2>
+      <span class="t">35 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>記住快速完工的公式：<strong>範本給骨架、harness 給規矩、AI 出勞力。</strong></li>
+          <li>把現成範本 API 當使用者操作一輪（Swagger 玩 CRUD、跑測試、重置資料）。</li>
+          <li>認得後端 harness 四件、分層架構、DB 綱要與範本核心資料夾。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>這一節分五個子資料夾，照順序走：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>資料夾</th><th>是什麼</th><th>在這裡做什麼</th></tr></thead>
+        <tbody>
+          <tr><td><code>2.1_play_template</code></td><td>玩一輪範本 API</td><td>跑起來、Swagger 玩 CRUD、<code>dotnet test</code>、重置資料</td></tr>
+          <tr><td><code>2.2_system_docs</code></td><td>範本的 SRS／SDD</td><td>需要時查規格（SRS v1.2、SDD v1.6）</td></tr>
+          <tr><td><code>2.3_harness</code></td><td>AI 的規矩四件</td><td>讀懂 AI 每次會遵守的鐵律</td></tr>
+          <tr><td><code>2.4_architecture_db</code></td><td>架構視覺化＋psql 入門</td><td>看「請求的一生」圖、學 psql 三招</td></tr>
+          <tr><td><code>2.5_sample_api</code></td><td>人員 CRUD 範本（正本）</td><td>安裝啟動、對照分層資料夾</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <ol>
+        <li>啟動範本 API（首跑會自動建庫 <code>ai_crud_template</code>、Migrate、灌 24 筆種子 M-001~M-024）：</li>
+      </ol>
+      <pre><code>cd step2_speedrun_kit\2.5_sample_api\sample-api\src\CrudTemplate.Api
+dotnet run --urls http://localhost:5080</code></pre>
+      <ol start="2">
+        <li>開 <a href="http://localhost:5080/swagger">http://localhost:5080/swagger</a>，把人員 CRUD 五路由各打一次（<code>GET</code> 24 筆／<code>GET /{id}</code> 200・不存在 404／<code>POST</code> 201＋Location／<code>PUT</code> 200・不存在 404／<code>DELETE</code> 204・再刪 404）。</li>
+        <li>跑測試（在 <code>sample-api</code> 根目錄）：<code>dotnet test</code> → <strong>49 條全綠</strong>。</li>
+        <li>認識規矩：讀 <code>2.3_harness/</code> 四件與六條鐵律；開 <code>2.4_architecture_db/ARCHITECTURE_DB.html</code> 看「請求的一生」「分層架構」「POST 循序」圖。</li>
+      </ol>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>Swagger 五路由都通、狀態碼語意正確；<code>dotnet test</code> 印出 <strong>49 passed</strong>。範本的分層資料夾各司其職：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>資料夾</th><th>一句話</th></tr></thead>
+        <tbody>
+          <tr><td><code>Controllers</code></td><td>只做「呼叫 Service → 對映狀態碼」，不寫商業邏輯</td></tr>
+          <tr><td><code>Services</code></td><td>商業邏輯全在這：取號、產 id／updatedAt、查無回失敗</td></tr>
+          <tr><td><code>Data</code></td><td>DbContext、種子、Migration；snake_case 轉換與 CHECK／SEQUENCE 都在這</td></tr>
+          <tr><td><code>Entities</code></td><td>對應資料表的類別（PascalCase 屬性 ↔ snake_case 欄位）</td></tr>
+          <tr><td><code>Models</code></td><td>對外請求／回應形狀（camelCase），驗證規則寫在 Request DTO</td></tr>
+          <tr><td><code>Mapping</code></td><td>Mapperly 編譯期產生映射碼，不手寫逐欄賦值</td></tr>
+          <tr><td><code>Common</code></td><td>跨模組共用（<code>ModelResult</code> 封裝、狀態碼分流、全域例外）——複製新模組時<strong>不改</strong></td></tr>
+          <tr><td><code>Constants</code></td><td>允許值單一來源，DTO 與 DB CHECK 共用防漂移</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
+        <ul>
+          <li><strong>port 5080 一次只能跑一支 API</strong>：範本與參考解都用 5080，別同時開。被占用就 <code>Get-NetTCPConnection -LocalPort 5080</code> 找 PID 殺掉，或改 <code>--urls http://localhost:5090</code>。</li>
+          <li><strong>想確認資料真的進庫</strong>，用 <code>2.4_architecture_db/PSQL_QUICKSTART.md</code> 的三招（連線、<code>\dt</code> 看表、<code>SELECT</code> 看資料），把畫面資料和資料庫 row 對上。</li>
+        </ul>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>範本給骨架</strong>：分層、<code>ModelResult</code> 封裝、驗證、狀態碼、seed 全寫好了，複製改名即繼承。<strong>harness 給規矩</strong>：<code>CLAUDE.md</code> 是專案憲法，AI 每次對話自動讀，不會亂建表、亂設交易邊界。<strong>AI 出勞力</strong>：換實體、改欄位交給 AI，你只負責決策與驗收。三者湊齊，一個全新後端模組一小時就能長出符合規範、可跑的骨架。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step" id="step3">
+    <div class="step-head">
+      <div class="step-num">3</div>
+      <h2>複製範本開發新模組<span class="star">重頭戲</span></h2>
+      <span class="t">40 分</span>
+    </div>
+    <div class="step-body">
+      <blockquote><strong>這一步你不寫程式，你當的是「提需求、做決策、驗成果」的人。</strong> 寫程式的粗活是 AI 的事。</blockquote>
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>讀懂 PRD，理解「後端不是重新發明需求，是<strong>服從前端已經定好的契約</strong>」。</li>
+          <li>把需求丟給 AI，讓它<strong>先出選擇題釐清範圍</strong>（SCOPE 六題），你拍板。</li>
+          <li>讓 AI 依範本分層生出 SRS-delta／SDD-delta／API／Migration／測試，再三路驗收。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>跟著做</div>
+      <p>要長出的新模組是<strong>中心裝備物資</strong>（路由 <code>api/equipment/items</code>），用的是跟 step2 同一套範本＋harness。</p>
+
+      <h3>⓪ 準備工作區（3.0）</h3>
+      <p>在工作坊根目錄執行，把範本複製成自己的工作專案，<strong>只把 PRD 放進去，別的都不搬</strong>：</p>
+      <pre><code># 1. 複製範本 API 成你的工作專案（harness 四件在範本根目錄，會一起帶走）
+Copy-Item -Recurse step2_speedrun_kit\2.5_sample_api\sample-api step3_new_module\my-equipment-api
+
+# 2. 只把 PRD 放進專案（AI 才讀得到需求）——不複製任何答案檔
+Copy-Item step3_new_module\PRD-中心裝備物資-後端.md step3_new_module\my-equipment-api\
+
+# 3. 進入專案資料夾，在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
+cd step3_new_module\my-equipment-api</code></pre>
+      <blockquote><strong><code>solution-api</code>（參考解）與 <code>instructor/</code>（範圍答案）都不進工作區</strong>——答案在手邊，釐清練習就沒了。複製完可確認 harness 四件有跟過來：<code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code>，外加給 Codex 用的 <code>AGENTS.md</code>。</blockquote>
+
+      <h3>① 讀 PRD（3.1）</h3>
+      <p>打開 <code>step3_new_module/PRD-中心裝備物資-後端.md</code>。這份 PRD 從<strong>前端課的成品逆向整理</strong>而來——記的是「現況契約」，連缺口都照實記。核心觀念：<strong>前端的型別欄位叫什麼、哪些必填，後端就照著做；欄位名一個都不能改，改了前端就接不上。</strong> 契約是 13 欄（必填 6：<code>categoryKey</code>、<code>name</code>、<code>qty</code>、<code>unit</code>、<code>spec1</code>、<code>status</code>；選填 5；系統產生 2：<code>id</code>、<code>code</code>），回應另加 <code>updatedAt</code>、一律 camelCase。標「待釐清」的地方＝待你決策。</p>
+
+      <h3>② 貼起手 prompt，讓 AI 先問問題（3.2）</h3>
+      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔、跑指令）。從 <code>step3_new_module/PROMPTS.md</code> 複製【起手 prompt】整段貼上——這段同時交代「先依序讀 CLAUDE.md → AGENTS.md → 其餘 harness 規則 → PRD、先別寫程式、要用選擇題問範圍」。</p>
+      <div class="flow">你：貼【起手 prompt】
+      ▼
+AI：依序讀 CLAUDE.md → AGENTS.md → 其餘 harness 規則 → PRD
+      ▼
+AI：先不寫程式，改用「選擇題」問你範圍（5-7 題，每題附建議＋理由）
+      ▼
+你：一題一題拍板（可採納建議，但先想清楚為什麼）
+      ▼
+AI：輸出 SRS-delta／SDD-delta（寫進 docs/）＋任務清單（T1、T2…），停下等你確認
+      ▼
+你：說「開工」
+      ▼
+AI：依範本分層逐任務開發（Entity → migration → DTO → Mapper → Service → Controller → seed → 測試），每完成一個回報一行</div>
+
+      <h3>③ 一題一題拍板（SCOPE 六題）</h3>
+      <p>AI 會用選擇題把 PRD 第 5 節的岔路攤開來問你。這六題是<strong>這堂課的核心決策</strong>，每題都是在「完整需求」和「兩小時課堂」之間做取捨——做取捨的人是你：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>AI 會問（大意）</th></tr></thead>
+        <tbody>
+          <tr><td>Q1</td><td><code>code</code>（如 IT-LAP-001）誰產生、怎麼保證同前綴流水號不撞？</td></tr>
+          <tr><td>Q2</td><td><code>id</code>（如 E-001）怎麼產？種子的顯式 id 與新增的自動 id 怎麼銜接？</td></tr>
+          <tr><td>Q3</td><td>分類／項目字典要不要建資料表，還是當程式常數？</td></tr>
+          <tr><td>Q4</td><td>刪除是硬刪還是軟刪？</td></tr>
+          <tr><td>Q5</td><td>分頁／篩選／排序在後端做還是前端做？</td></tr>
+          <tr><td>Q6</td><td><code>purchaseDate</code> 可不可以空？資料庫存 null 還是空字串？</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <blockquote><strong>本手冊不給六題答案</strong>——答案（課堂裁決）由講師在你完成釐清問答後才發放（<code>instructor/SCOPE-後端課堂範圍決策.md</code>）。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。每一題都想一下<strong>為什麼</strong>，課後跟講師答案比對自己的裁決。</blockquote>
+
+      <h3>④ 確認任務清單、說「開工」</h3>
+      <p>AI 產出 SRS-delta／SDD-delta（只記「與人員範本的差異」，不動範本正本）與任務清單後停下。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
+
+      <h3>⑤ 三路驗收（3.3）</h3>
+      <p>AI 說做完後，先貼 <code>PROMPTS.md</code> 的【收工檢查 prompt】讓它自己跑一輪證據，<strong>然後換你親自驗</strong>（AI 說的不算，親眼看到才算）：</p>
+      <pre><code># 驗收 1：Swagger 五路由各打一次（先 dotnet run 起 API，開 http://localhost:5080/swagger）
+#   GET /api/equipment/items       → 200，24 筆
+#   GET /api/equipment/items/E-001 → 200；E-999 → 404
+#   POST                           → 201＋Location，code/id 由後端產生
+#   PUT /{id}                      → 200；不存在 → 404
+#   DELETE /{id}                   → 204；再刪一次 → 404
+
+# 驗收 2：測試全綠
+dotnet test
+
+# 驗收 3：psql 直查資料庫，親眼看到 24 筆（密碼 12345）
+&amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -p 5432 -d ai_crud_equipment -c "SELECT count(*) FROM equipment_item;"</code></pre>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <ul>
+        <li>AI <strong>先出釐清選擇題</strong>（不急著寫程式）——這代表 harness 在運作。</li>
+        <li>生完之後：Swagger 五路由通、<code>dotnet test</code> 全綠（參考解 <code>solution-api</code> 是 <strong>89 條全綠</strong>＝Members 49＋Equipment 40；你自己生的數量以 <code>docs/TASKS.md</code> 為準）。</li>
+        <li><strong>psql 查 <code>equipment_item</code> 表有 24 列</strong>，<code>code</code> 與前端種子一致（<code>E-001</code>~<code>E-024</code>，maintenance 3 筆、scrapped 2 筆）。這是「資料真的進了 PostgreSQL」的鐵證，也是這堂課跟前端課最大的差別。</li>
+      </ul>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑（照 PROMPTS.md 歪樓對照表打斷）</div>
+        <ul>
+          <li><strong>AI 沒提問就直接動工</strong>：立刻打斷「停，先不要寫程式、不要建檔案，請先以選擇題形式提 5-7 題釐清問題」。</li>
+          <li><strong>AI 想自作主張幫分類字典建表</strong>：那是釐清題之一，回「請把它列成選擇題（建表 vs 程式常數）讓我選」。</li>
+          <li><strong>AI 想改範本的 SRS／SDD 正本</strong>：回「正本不可改，差異一律寫進 docs/ 下的 delta」。</li>
+          <li><strong>AI 測試紅了想刪測試或放寬 assertion</strong>：回「不准刪測試、不准放寬斷言，先回報是哪條紅、原因是程式錯還是測試錯」。</li>
+          <li><strong>Q1 偏離範本 SEQUENCE 不算違規</strong>：範本 SEQUENCE 產不出「每前綴各自計數」的流水號，需求逼你偏離——只要把「為什麼偏離、偏離成什麼」寫進 SDD-delta，就是正確的工程判斷。</li>
+        </ul>
+        <p style="margin:10px 0 0"><strong>修正心法</strong>：用「看到什麼／期望什麼／只改這個」三段式，一次只提一個問題，兩次修不好就換個說法重新描述。</p>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        PRD 有太多「做得出來、但怎麼做要人決定」的岔路。讓 AI 先用選擇題把岔路攤開、你拍板，範圍才會小而完整——這跟 spec-kit 的 clarify 是同一個道理：<strong>先問對問題，再寫對程式。</strong> 卡住時 <code>solution-api/</code> 有參考解，但先自己做——直接抄答案學不到「怎麼提需求、怎麼驗收」，那才是這堂課的重點。
+      </div>
+      <blockquote><strong>跟不上怎麼辦（checkpoint）</strong>：課堂約 85 分鐘還跑不起來時，講師會用 <code>instructor/apply-solution-checkpoint.ps1 -Target my-equipment-api</code> 把裝備物資參考解一次套用到你的專案（補齊 Equipment 程式＋測試＋正確 DB 設定，套完 <strong>89 條全綠</strong>、psql 查得到 24 列），讓你跟上三路驗收與 step4 的 LOOP；<code>restore-checkpoint.ps1</code> 可還原。checkpoint 只證「驗收與 LOOP」，不證你自己的生成完整度。</blockquote>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step" id="step4">
+    <div class="step-head">
+      <div class="step-num">4</div>
+      <h2>LOOP 工程 × 全鏈路 E2E</h2>
+      <span class="t">20 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>理解 LOOP 工程：<strong>先給 AI 一個會給出紅／綠的自動驗證，再叫它自己修到綠。</strong></li>
+          <li>跑一次 <strong>6 條全鏈路 E2E</strong>（瀏覽器 → 前端 → 後端 → PostgreSQL），看到全綠，而且<strong>綠燈來自你自己的 <code>my-equipment-api</code></strong>。</li>
+          <li>親手經歷一整圈「紅 → 判因 → 修 → 綠」，記住兩條規則：兩次停損、修測試不修 App。</li>
+        </ol>
+      </div>
+
+      <h3>① 跑全鏈路 E2E（一支腳本自管整條鏈路）</h3>
+      <p>前端 mock 課要你另開視窗手動起服務；這一課鏈路較長（資料庫＋後端＋前端），<code>run-e2e.ps1</code> 自己把整條拉起來、跑完、再拆乾淨：</p>
+      <pre><code>cd step4_loop_e2e
+powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
+      <p>它依序做：重建 <code>_e2e</code> 專用資料庫 → 背景起後端（:5080，連 <code>_e2e</code> 庫）→ 背景起前端 fullchain-app（強制 <strong>:3199</strong>，<code>NUXT_PUBLIC_USE_API=true</code>）→ 跑 6 條 Playwright 測試 → 無論成敗都 teardown 釋放埠。Exit code <code>0</code>＝恰好 6 條全綠。</p>
+      <blockquote>
+        <strong>【本課最重要的一件事】被測 API 綁「你自己的作品」。</strong> <code>run-e2e.ps1</code> <strong>預設</strong>把被測後端指向 <code>..\step3_new_module\my-equipment-api</code>——這門課的綠燈要證明<strong>你自己生成的 API</strong> 過關，不是官方解偷跑。腳本開頭與報告最後都會印出<strong>被測 API 的絕對路徑</strong>與<strong>被測 DB 名稱</strong>，一眼看出這盞綠燈屬於誰。
+        <ul>
+          <li>若 <code>my-equipment-api</code> 還不存在，腳本會<strong>明確報錯</strong>，不會偷偷改用別的東西。</li>
+          <li>想確認評量真的在驗你的作品，做<strong>負向驗證</strong>：故意弄壞 <code>my-equipment-api</code>（例如改壞一個狀態碼）再跑一次 → E2E <strong>必須變紅</strong>；紅得起來，綠才有意義。</li>
+          <li><code>-UseCheckpoint</code> 才走官方 <code>solution-api</code> 的 fallback（老師救援用，只證驗收與 LOOP，<strong>不證你的生成完整度</strong>）。</li>
+        </ul>
+      </blockquote>
+
+      <h3>② 六條測試在驗什麼：持久化 vs mock</h3>
+      <p>同一套前端頁面，資料層切一個開關（<code>NUXT_PUBLIC_USE_API</code>）就從 mock 換成真後端。好幾條測試都故意「<strong>做一個動作 → reload → 再斷言</strong>」——<strong>reload 是試金石：mock 會掉回種子，持久化才會留下。</strong></p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>編號</th><th>驗什麼</th><th>對應觀念</th></tr></thead>
+        <tbody>
+          <tr><td>E1</td><td>API 模式進 <code>/equipment/crud</code>，表格與「共 24 筆」（資料來自 PostgreSQL）</td><td>Read（資料源是 DB）</td></tr>
+          <tr><td>E2</td><td>新增一台發電機 → 筆數 +1 → <b>reload 後那一筆仍在</b>，用編碼搜得到</td><td>Create ＋ 持久化</td></tr>
+          <tr><td>E3</td><td>新增後讀畫面 code，斷言格式「類別2碼-項目3碼-流水3碼」且前綴正確</td><td>後端產碼（前端只預覽）</td></tr>
+          <tr><td>E4</td><td>編輯第一列數量＋狀態 → <b>reload 後新值仍生效</b></td><td>Update ＋ 持久化</td></tr>
+          <tr><td>E5</td><td>刪除第一列 → <b>reload 後用編碼搜尋查無</b>（硬刪，真的從 DB 移除）</td><td>Delete ＋ 持久化</td></tr>
+          <tr><td>E6</td><td>前端新增一筆 → 直接 <code>request.get('/api/equipment/items')</code> → JSON 裡找得到</td><td>API 層鐵證</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>③ 動手練習：紅 → 判因 → 修 → 綠（LOOP 的完整一圈）</h3>
+      <p>看到綠只是起點。真正要學會的是<strong>當測試變紅時，你怎麼判斷是哪一層壞、怎麼修</strong>。練習包在 <code>step4_loop_e2e/lab-red-to-green/</code>（改壞<strong>後端</strong>一條驗證規則）。一句話流程：<strong>基準綠 → 注入 bug（拿掉後端數量下限驗證）→ 跑 <code>dotnet test</code> 看到 EV4 紅 → 判因（後端 bug？測試 bug？資料庫 bug？）→ 修 → 回到綠</strong>，過程留下四項證據。啟動 LOOP 的 prompt 一段話就夠：</p>
+      <pre><code>跑 step4_loop_e2e/run-e2e.ps1。
+若有紅字，找出原因、修正後再跑一次，直到 6 條全綠。
+規則：同一個問題連續修兩次還沒好就停下來回報（不要無限撞牆）。
+先分清楚紅的根因是「前端、後端、還是資料庫」，別急著改。
+若判斷是 App（前端或後端）真的有 bug，記下來回報，不要為了過測試放寬斷言。</code></pre>
+
+      <div class="block-title"><span class="ico">👀</span>你應該看到（全鏈路實拍，這五張就是證據鏈）</div>
+      <p>測試流程會對關鍵畫面主動截圖，存到 <code>e2e/screenshots/</code>。下面五張串起來，就是「資料真的落地」的完整故事：</p>
+
+      <figure>
+        <img src="images/01_list.png" alt="API 模式列表：共 24 筆，資料來自 PostgreSQL">
+        <figcaption><span class="hl">01：</span>API 模式列表——這 24 筆不是前端寫死的 mock，而是後端從 PostgreSQL 查出來、經 devProxy 回到畫面的。<span class="hl">這張在證明「資料源是資料庫」。</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="images/02_new_form_filled.png" alt="新增表單填好、待儲存">
+        <figcaption><span class="hl">02：</span>新增一台發電機的表單填好、待儲存。<span class="hl">這張在證明「使用者輸入了一筆新資料，準備送進後端」。</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="images/03_after_create_list.png" alt="新增後回列表，筆數 +1">
+        <figcaption><span class="hl">03：</span>按下儲存後回到列表，多了剛新增那一筆（筆數 +1）。<span class="hl">這張在證明「POST 打到後端、Service 產了 id 與 code、EF 寫進了資料表」。</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="images/04_after_reload_persisted.png" alt="reload 後那一筆仍在（持久化鐵證）">
+        <figcaption><span class="hl">04（高潮）：按 F5 重整之後，剛新增那一筆還在。</span> 這正是後端課跟前端課最大的差別——前端 mock 一 reload 就掉回 24 筆種子，這裡卻留住了，因為資料真的落進 PostgreSQL。<span class="hl">這張是整堂課的鐵證：F5 還在，才叫真的持久化。</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="images/05_after_delete_gone.png" alt="刪除並 reload 後查無">
+        <figcaption><span class="hl">05：</span>刪除那一筆、再 reload，用編碼搜尋查無。<span class="hl">這張在證明「DELETE 是硬刪，真的從資料表移除了，不是只把畫面藏起來」。</span></figcaption>
+      </figure>
+
+      <blockquote>另外 Playwright 設 <code>screenshot: 'only-on-failure'</code>——測試<strong>紅了</strong>會自動在 <code>e2e/test-results/</code> 存一張當下畫面，這是<strong>失敗診斷</strong>（不是視覺回歸）：一眼看出是「按鈕點不到」還是「畫面根本沒載出來」，AI 也看得懂截圖、能直接判斷 selector 怎麼改。服務起不來時，log 在 <code>.run-logs\</code>（<code>backend.err.log</code>、<code>frontend.err.log</code>）。</blockquote>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
+        <ul>
+          <li><strong>測試之間「不」重置資料庫</strong>——那是 mock 思維。資料庫由 <code>run-e2e.ps1</code> 於「每一輪」重建成乾淨 24 筆，測試在同一個庫上依序累加。E1 斷言「恰好 24」，其餘一律<strong>動態讀當前筆數再比對增減</strong>，不寫死絕對值。</li>
+          <li><strong>埠號別搞混</strong>：一鍵 E2E 前端固定 <strong>3199</strong>（不是前端課的 3100）；後端 5080。dev 庫 <code>ai_crud_equipment</code> 全程不碰，E2E 只用 <code>_e2e</code> 庫。</li>
+          <li><strong>別讓寫測試的 AI 自己審自己</strong>：它傾向相信自己寫對了。收尾換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場找假綠、猜的 selector、測試互相污染——交回原 AI 修 → 再跑 → 再審＝對抗式 LOOP。</li>
+        </ul>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>兩次停損規則</strong>：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。<strong>先判因再修</strong>：全鏈路的紅可能來自前端／後端／資料庫三層，亂改一層會愈修愈亂。<strong>修測試不修 App</strong>：LOOP 很會「為了讓燈變綠」而作弊，用這條把它框住。<strong>LOOP 的核心是經歷紅到綠，不是看到綠</strong>——只跑出一次全綠只證明現在沒壞，真正學到的是變紅之後怎麼判因、怎麼修。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="step" id="step5">
+    <div class="step-head">
+      <div class="step-num">5</div>
+      <h2>課程總結與回去怎麼用</h2>
+      <span class="t">5 分</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
+        <ol>
+          <li>收攏四個 step 各帶走一個觀念。</li>
+          <li>知道回公司落地的三個步驟。</li>
+        </ol>
+      </div>
+
+      <div class="block-title"><span class="ico">👣</span>課程回顧</div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Step</th><th>帶走的觀念</th></tr></thead>
+        <tbody>
+          <tr><td>step1</td><td>同一句「幫我加一個 API」，有沒有附 harness 產出天差地遠——差的不是能不能動，是命名慣例、驗證邏輯、危險操作（例如直接刪表、SQL 拼接）有沒有守住團隊規矩。</td></tr>
+          <tr><td>step2</td><td>一個成熟後端模組＝範本 API（骨架）＋系統文件（SRS/SDD）＋後端 harness 四件（規矩）＋分層架構與 DB 綱要，缺一塊 AI 就會自由發揮出風險。</td></tr>
+          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS-delta/SDD-delta → 生成 API＋migration → 人工反覆修正；六題裁決就是把「模糊需求」變成「可動手的契約」的關鍵一步。</td></tr>
+          <tr><td>step4</td><td>可以讓 AI 自己跑「改→驗→再改」，但你要親手經歷後端的「紅 → 判因 → 修 → 綠」；收尾一定要有全鏈路 E2E（瀏覽器打到資料庫）把關，不能只靠 <code>dotnet test</code> 全綠就說做完。</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="block-title"><span class="ico">🧳</span>回去怎麼用（三步驟）</div>
+      <ol>
+        <li><strong>把後端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code> 複製到你專案根目錄（<code>step2_speedrun_kit/2.3_harness/</code> 有現成一套），內容改成你們公司的規則（命名、分層邊界、狀態碼與封裝、禁止事項、migration 審查流程）。用 Codex 再放一份 <code>AGENTS.md</code> 指向 CLAUDE.md。</li>
+        <li><strong>把既有 API 整理成範本</strong>——挑最成熟的 CRUD API，拆成「複製區」（Entity、DTO、驗證、Controller、migration）與「共用區」（<code>ModelResult</code> 封裝、統一錯誤處理、DbContext 基礎設定、測試 fixture）。新模組只換實體，共用區完全不動。</li>
+        <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本 API。</li>
+      </ol>
+
+      <div class="block-title"><span class="ico">❓</span>常見問題</div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>問題</th><th>回答</th></tr></thead>
+        <tbody>
+          <tr><td>我們不是用 .NET？</td><td>harness 方法不綁語言。四件換成你們技術棧的等價規則即可；「PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP」流程在任何後端語言都適用。</td></tr>
+          <tr><td>沒有 PostgreSQL？</td><td>資料庫種類不是重點，重點是有沒有把 schema、migration 策略、id 產生方式寫成明確規則。換 MySQL／SQL Server 一樣要回答今天六題裁決。</td></tr>
+          <tr><td>AI 生成的 migration 敢直接上 production 嗎？</td><td>不敢，任何人寫的 migration 都一樣。一定要先在測試庫跑過、人工看過 SQL（有沒有意外刪欄位、改型別），並有回滾腳本，這跟是不是 AI 寫的無關。</td></tr>
+          <tr><td>測試全綠就能上線嗎？</td><td>不能。<code>dotnet test</code> 全綠只代表「符合寫測試的人想到的情境」，還要有 API 契約（swagger）與資料庫查表（psql）雙重人工驗收，這就是 step4 LOOP 要求紅→綠證據加全鏈路 E2E 的原因。</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        harness 方法<strong>不綁框架、不綁語言</strong>：四件換成你們的技術棧規則即可，範本「複製 vs 共用」的心法在任何後端框架都通。前後端兩課合起來的全鏈路就是一行：<strong>瀏覽器 → Nuxt（devProxy）→ .NET API → PostgreSQL</strong>——資料不再是 F5 就消失的 mock，而是真正落地在資料庫裡的一筆一筆紀錄。
+      </div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section class="step" id="done">
+    <div class="step-head">
+      <div class="step-num">✓</div>
+      <h2>完課檢核表</h2>
+    </div>
+    <div class="step-body">
+      <p>全部打勾，代表你真的走完了：</p>
+      <ul class="checklist">
+        <li>前置檢查 <code>preflight.ps1</code> 全數通過（含 WARN）</li>
+        <li>並排看過 no-harness 與 with-harness 兩份 <code>.cs</code>，說得出至少三個後端差別（分層、SQL 安全、例外處理）</li>
+        <li>範本人員 CRUD API 在本機跑起來（port 5080），Swagger 五路由都通、<code>dotnet test</code> 49 綠</li>
+        <li>看過後端 harness 四件與分層架構，知道 Controller 薄、Service 厚、Common 不改</li>
+        <li>讀懂 PRD，理解「後端服從前端已定好的契約，欄名一個都不能改」</li>
+        <li>貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）</li>
+        <li>SCOPE 六題逐題拍板，確認 SRS/SDD-delta 與任務清單後才說「開工」</li>
+        <li>三路驗收：Swagger 五路由、<code>dotnet test</code> 全綠、psql 查到 <code>equipment_item</code> 24 列</li>
+        <li><code>run-e2e.ps1</code> 跑出 6 條全綠、exit 0，而且報告印出的被測 API 路徑是<strong>你自己的 <code>my-equipment-api</code></strong></li>
+        <li>完成一次紅→判因→修→綠（留下四項證據）</li>
+        <li>說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則</li>
+        <li>親眼確認：新增一筆 → F5 reload → 那筆<strong>還在</strong>（持久化鐵證，就是截圖 04 那件事）</li>
+      </ul>
+
+      <div class="block-title"><span class="ico">🧭</span>回去怎麼用（三步驟速記）</div>
+      <ol>
+        <li><strong>帶四件</strong>：CLAUDE.md ＋ CODE-RULES-api ＋ contract-conventions-summary ＋ 使用說明，複製進你的專案、改成公司規則。</li>
+        <li><strong>整範本</strong>：挑最成熟的 CRUD API，拆「複製區 vs 共用區」。</li>
+        <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。</li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  AI CRUD 工作坊 · Backend EASY 版 — Step-by-Step 學習手冊　·　把假資料變真的，資料落地 PostgreSQL
+</div>
+
+</body>
+</html>

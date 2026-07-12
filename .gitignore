@@ -1,0 +1,31 @@
+# === .NET / EF Core ===
+[Bb]in/
+[Oo]bj/
+*.user
+.vs/
+TestResults/
+*.trx
+
+# === Node / Nuxt / Playwright ===
+node_modules/
+.nuxt/
+.output/
+dist/
+playwright-report/
+test-results/
+.playwright/
+
+# === 學員工作區（上課時各自產生，不進版控）===
+step3_new_module/my-equipment-api/
+
+# === 執行期產物 / checkpoint 備份 ===
+.checkpoint-backup/
+.added-manifest.txt
+.run-pids
+*.lab-backup
+.lab-backup/
+
+# === OS / 編輯器雜項 ===
+Thumbs.db
+.DS_Store
+*.swp

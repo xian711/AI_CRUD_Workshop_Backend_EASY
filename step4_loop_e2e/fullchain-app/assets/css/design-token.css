@@ -1,0 +1,637 @@
+/* ============================================================ */
+/* 自定義字型載入                                                */
+/* ============================================================ */
+/* 粉圓體 jf-openhuninn-2.0（由 justfont 開源）— 用於 Header 標題 */
+@font-face {
+  font-family: 'jf-openhuninn-2.0';
+  src: url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@2.0/font/jf-openhuninn-2.0.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================ */
+  /* 字體縮放係數 (Font Scale Factor)                              */
+  /* ============================================================ */
+  /* 用於實作字體大小切換功能（無障礙需求）
+   * 預設值為 1 (100%)，透過切換 <html> class 可調整縮放比例
+   * 使用方式：在 REF 層字體大小使用 calc(原始大小 * var(--ui-font-scale))
+   */
+  --ui-font-scale: 1;
+
+  /* ============================================================ */
+  /* REF 層 - 原始數值 (Reference Tokens)                         */
+  /* ============================================================ */
+  /* UI TOKEN */
+  --ui-ref-color-slate-50: #f8fafc;
+  --ui-ref-color-slate-100: #f1f5f9;
+  --ui-ref-color-slate-200: #e2e8f0;
+  --ui-ref-color-slate-300: #cad5e2;
+  --ui-ref-color-slate-400: #90a1b9;
+  --ui-ref-color-slate-500: #62748e;
+  --ui-ref-color-slate-600: #45556c;
+  --ui-ref-color-slate-700: #314158;
+  --ui-ref-color-slate-800: #1d293d;
+  --ui-ref-color-slate-900: #0f172b;
+  --ui-ref-color-slate-950: #020618;
+  --ui-ref-color-gray-50: #f9fafb;
+  --ui-ref-color-gray-100: #f3f4f6;
+  --ui-ref-color-gray-200: #e5e7eb;
+  --ui-ref-color-gray-300: #d1d5dc;
+  --ui-ref-color-gray-400: #99a1af;
+  --ui-ref-color-gray-500: #6a7282;
+  --ui-ref-color-gray-600: #4a5565;
+  --ui-ref-color-gray-700: #364153;
+  --ui-ref-color-gray-800: #1e2939;
+  --ui-ref-color-gray-900: #101828;
+  --ui-ref-color-gray-950: #030712;
+  --ui-ref-color-zinc-50: #fafafa;
+  --ui-ref-color-zinc-100: #f4f4f5;
+  --ui-ref-color-zinc-200: #e4e4e7;
+  --ui-ref-color-zinc-300: #d4d4d8;
+  --ui-ref-color-zinc-400: #9f9fa9;
+  --ui-ref-color-zinc-500: #71717b;
+  --ui-ref-color-zinc-600: #52525c;
+  --ui-ref-color-zinc-700: #3f3f46;
+  --ui-ref-color-zinc-800: #27272a;
+  --ui-ref-color-zinc-900: #18181b;
+  --ui-ref-color-zinc-950: #09090b;
+  --ui-ref-color-neutral-50: #fafafa;
+  --ui-ref-color-neutral-100: #f5f5f5;
+  --ui-ref-color-neutral-200: #e5e5e5;
+  --ui-ref-color-neutral-300: #d4d4d4;
+  --ui-ref-color-neutral-400: #a1a1a1;
+  --ui-ref-color-neutral-500: #737373;
+  --ui-ref-color-neutral-600: #525252;
+  --ui-ref-color-neutral-700: #404040;
+  --ui-ref-color-neutral-800: #262626;
+  --ui-ref-color-neutral-900: #171717;
+  --ui-ref-color-neutral-950: #0a0a0a;
+  --ui-ref-color-stone-50: #fafaf9;
+  --ui-ref-color-stone-100: #f5f5f4;
+  --ui-ref-color-stone-200: #e7e5e4;
+  --ui-ref-color-stone-300: #d6d3d1;
+  --ui-ref-color-stone-400: #a6a09b;
+  --ui-ref-color-stone-500: #79716b;
+  --ui-ref-color-stone-600: #57534d;
+  --ui-ref-color-stone-700: #44403b;
+  --ui-ref-color-stone-800: #292524;
+  --ui-ref-color-stone-900: #1c1917;
+  --ui-ref-color-stone-950: #0c0a09;
+  --ui-ref-color-red-50: #fef2f2;
+  --ui-ref-color-red-100: #ffe2e2;
+  --ui-ref-color-red-200: #ffc9c9;
+  --ui-ref-color-red-300: #ffa2a2;
+  --ui-ref-color-red-400: #ff6467;
+  --ui-ref-color-red-500: #fb2c36;
+  --ui-ref-color-red-600: #e7000b;
+  --ui-ref-color-red-700: #c10007;
+  --ui-ref-color-red-800: #9f0712;
+  --ui-ref-color-red-900: #82181a;
+  --ui-ref-color-red-950: #460809;
+  --ui-ref-color-orange-50: #fff7ed;
+  --ui-ref-color-orange-100: #ffedd4;
+  --ui-ref-color-orange-200: #ffd6a8;
+  --ui-ref-color-orange-300: #ffb86a;
+  --ui-ref-color-orange-400: #ff8904;
+  --ui-ref-color-orange-500: #ff6900;
+  --ui-ref-color-orange-600: #f54a00;
+  --ui-ref-color-orange-700: #ca3500;
+  --ui-ref-color-orange-800: #9f2d00;
+  --ui-ref-color-orange-900: #7e2a0c;
+  --ui-ref-color-orange-950: #441306;
+  --ui-ref-color-amber-50: #fffbeb;
+  --ui-ref-color-amber-100: #fef3c6;
+  --ui-ref-color-amber-200: #fee685;
+  --ui-ref-color-amber-300: #ffd230;
+  --ui-ref-color-amber-400: #ffba00;
+  --ui-ref-color-amber-500: #fd9a00;
+  --ui-ref-color-amber-600: #e17100;
+  --ui-ref-color-amber-700: #bb4d00;
+  --ui-ref-color-amber-800: #973c00;
+  --ui-ref-color-amber-900: #7b3306;
+  --ui-ref-color-amber-950: #461901;
+  --ui-ref-color-yellow-50: #fefce8;
+  --ui-ref-color-yellow-100: #fef9c2;
+  --ui-ref-color-yellow-200: #fff085;
+  --ui-ref-color-yellow-300: #ffdf20;
+  --ui-ref-color-yellow-400: #fcc800;
+  --ui-ref-color-yellow-500: #efb100;
+  --ui-ref-color-yellow-600: #d08700;
+  --ui-ref-color-yellow-700: #a65f00;
+  --ui-ref-color-yellow-800: #894b00;
+  --ui-ref-color-yellow-900: #733e0a;
+  --ui-ref-color-yellow-950: #432004;
+  --ui-ref-color-lime-50: #f7fee7;
+  --ui-ref-color-lime-100: #ecfcca;
+  --ui-ref-color-lime-200: #d8f999;
+  --ui-ref-color-lime-300: #bbf451;
+  --ui-ref-color-lime-400: #9ae600;
+  --ui-ref-color-lime-500: #7ccf00;
+  --ui-ref-color-lime-600: #5ea500;
+  --ui-ref-color-lime-700: #497d00;
+  --ui-ref-color-lime-800: #3d6300;
+  --ui-ref-color-lime-900: #35530e;
+  --ui-ref-color-lime-950: #1a2e05;
+  --ui-ref-color-green-50: #effdf5;
+  --ui-ref-color-green-100: #d9fbe8;
+  --ui-ref-color-green-200: #b3f5d1;
+  --ui-ref-color-green-300: #75edae;
+  --ui-ref-color-green-400: #00dc82;
+  --ui-ref-color-green-500: #00c16a;
+  --ui-ref-color-green-600: #00a155;
+  --ui-ref-color-green-700: #007f45;
+  --ui-ref-color-green-800: #016538;
+  --ui-ref-color-green-900: #0a5331;
+  --ui-ref-color-green-950: #052e16;
+  --ui-ref-color-emerald-50: #ecfdf5;
+  --ui-ref-color-emerald-100: #d0fae5;
+  --ui-ref-color-emerald-200: #a4f4cf;
+  --ui-ref-color-emerald-300: #5ee9b5;
+  --ui-ref-color-emerald-400: #00d492;
+  --ui-ref-color-emerald-500: #00bc7d;
+  --ui-ref-color-emerald-600: #009966;
+  --ui-ref-color-emerald-700: #007a55;
+  --ui-ref-color-emerald-800: #006045;
+  --ui-ref-color-emerald-900: #004f3b;
+  --ui-ref-color-emerald-950: #002c22;
+  --ui-ref-color-teal-50: #f0fdfa;
+  --ui-ref-color-teal-100: #ccfbf1;
+  --ui-ref-color-teal-200: #96f7e4;
+  --ui-ref-color-teal-300: #46ecd5;
+  --ui-ref-color-teal-400: #00d5be;
+  --ui-ref-color-teal-500: #00bba7;
+  --ui-ref-color-teal-600: #009689;
+  --ui-ref-color-teal-700: #00786f;
+  --ui-ref-color-teal-800: #005f5a;
+  --ui-ref-color-teal-900: #0b4f4a;
+  --ui-ref-color-teal-950: #022f2e;
+  --ui-ref-color-cyan-50: #ecfeff;
+  --ui-ref-color-cyan-100: #cefafe;
+  --ui-ref-color-cyan-200: #a2f4fd;
+  --ui-ref-color-cyan-300: #53eafd;
+  --ui-ref-color-cyan-400: #00d3f2;
+  --ui-ref-color-cyan-500: #00b8db;
+  --ui-ref-color-cyan-600: #0092b8;
+  --ui-ref-color-cyan-700: #007595;
+  --ui-ref-color-cyan-800: #005f78;
+  --ui-ref-color-cyan-900: #104e64;
+  --ui-ref-color-cyan-950: #053345;
+  --ui-ref-color-sky-50: #f0f9ff;
+  --ui-ref-color-sky-100: #dff2fe;
+  --ui-ref-color-sky-200: #b8e6fe;
+  --ui-ref-color-sky-300: #74d4ff;
+  --ui-ref-color-sky-400: #00bcff;
+  --ui-ref-color-sky-500: #00a6f4;
+  --ui-ref-color-sky-600: #0084d1;
+  --ui-ref-color-sky-700: #0069a8;
+  --ui-ref-color-sky-800: #00598a;
+  --ui-ref-color-sky-900: #024a70;
+  --ui-ref-color-sky-950: #052f4a;
+  --ui-ref-color-blue-50: #eff6ff;
+  --ui-ref-color-blue-100: #dbeafe;
+  --ui-ref-color-blue-200: #bedbff;
+  --ui-ref-color-blue-300: #8ec5ff;
+  --ui-ref-color-blue-400: #51a2ff;
+  --ui-ref-color-blue-500: #2b7fff;
+  --ui-ref-color-blue-600: #155dfc;
+  --ui-ref-color-blue-700: #1447e6;
+  --ui-ref-color-blue-800: #193cb8;
+  --ui-ref-color-blue-900: #1c398e;
+  --ui-ref-color-blue-950: #162456;
+  --ui-ref-color-indigo-50: #eef2ff;
+  --ui-ref-color-indigo-100: #e0e7ff;
+  --ui-ref-color-indigo-200: #c6d2ff;
+  --ui-ref-color-indigo-300: #a3b3ff;
+  --ui-ref-color-indigo-400: #7c86ff;
+  --ui-ref-color-indigo-500: #615fff;
+  --ui-ref-color-indigo-600: #4f39f6;
+  --ui-ref-color-indigo-700: #432dd7;
+  --ui-ref-color-indigo-800: #372aac;
+  --ui-ref-color-indigo-900: #312c85;
+  --ui-ref-color-indigo-950: #1e1a4d;
+  --ui-ref-color-violet-50: #f5f3ff;
+  --ui-ref-color-violet-100: #ede9fe;
+  --ui-ref-color-violet-200: #ddd6fe;
+  --ui-ref-color-violet-300: #c4b4ff;
+  --ui-ref-color-violet-400: #a684ff;
+  --ui-ref-color-violet-500: #8e51ff;
+  --ui-ref-color-violet-600: #7f22fe;
+  --ui-ref-color-violet-700: #7008e7;
+  --ui-ref-color-violet-800: #5d0ec0;
+  --ui-ref-color-violet-900: #4d179a;
+  --ui-ref-color-violet-950: #2f0d68;
+  --ui-ref-color-purple-50: #faf5ff;
+  --ui-ref-color-purple-100: #f3e8ff;
+  --ui-ref-color-purple-200: #e9d4ff;
+  --ui-ref-color-purple-300: #dab2ff;
+  --ui-ref-color-purple-400: #c27aff;
+  --ui-ref-color-purple-500: #ad46ff;
+  --ui-ref-color-purple-600: #9810fa;
+  --ui-ref-color-purple-700: #8200db;
+  --ui-ref-color-purple-800: #6e11b0;
+  --ui-ref-color-purple-900: #59168b;
+  --ui-ref-color-purple-950: #3c0366;
+  --ui-ref-color-fuchsia-50: #fdf4ff;
+  --ui-ref-color-fuchsia-100: #fae8ff;
+  --ui-ref-color-fuchsia-200: #f6cfff;
+  --ui-ref-color-fuchsia-300: #f4a8ff;
+  --ui-ref-color-fuchsia-400: #ed6bff;
+  --ui-ref-color-fuchsia-500: #e12afb;
+  --ui-ref-color-fuchsia-600: #c800de;
+  --ui-ref-color-fuchsia-700: #a800b7;
+  --ui-ref-color-fuchsia-800: #8a0194;
+  --ui-ref-color-fuchsia-900: #721378;
+  --ui-ref-color-fuchsia-950: #4b004f;
+  --ui-ref-color-pink-50: #fdf2f8;
+  --ui-ref-color-pink-100: #fce7f3;
+  --ui-ref-color-pink-200: #fccee8;
+  --ui-ref-color-pink-300: #fda5d5;
+  --ui-ref-color-pink-400: #fb64b6;
+  --ui-ref-color-pink-500: #f6339a;
+  --ui-ref-color-pink-600: #e60076;
+  --ui-ref-color-pink-700: #c6005c;
+  --ui-ref-color-pink-800: #a3004c;
+  --ui-ref-color-pink-900: #861043;
+  --ui-ref-color-pink-950: #510424;
+  --ui-ref-color-rose-50: #fff1f2;
+  --ui-ref-color-rose-100: #ffe4e6;
+  --ui-ref-color-rose-200: #ffccd3;
+  --ui-ref-color-rose-300: #ffa1ad;
+  --ui-ref-color-rose-400: #ff637e;
+  --ui-ref-color-rose-500: #ff2056;
+  --ui-ref-color-rose-600: #ec003f;
+  --ui-ref-color-rose-700: #c70036;
+  --ui-ref-color-rose-800: #a50036;
+  --ui-ref-color-rose-900: #8b0836;
+  --ui-ref-color-rose-950: #4d0218;
+  --ui-ref-color-white: #ffffff;
+
+  /* REF 層 - 圓角 (Border Radius) */
+  --ui-ref-radius-0: 0px;
+  --ui-ref-radius-2: 2px;
+  --ui-ref-radius-4: 4px;
+  --ui-ref-radius-8: 8px;
+  --ui-ref-radius-12: 12px;
+  --ui-ref-radius-16: 16px;
+  --ui-ref-radius-full: 999px;
+
+  /* REF 層字體大小使用縮放係數，支援字體大小切換功能 */
+  --ui-ref-font-size-12: calc(12px * var(--ui-font-scale));
+  --ui-ref-font-size-14: calc(14px * var(--ui-font-scale));
+  --ui-ref-font-size-16: calc(16px * var(--ui-font-scale));
+  --ui-ref-font-size-18: calc(18px * var(--ui-font-scale));
+  --ui-ref-font-size-20: calc(20px * var(--ui-font-scale));
+  --ui-ref-font-size-24: calc(24px * var(--ui-font-scale));
+  --ui-ref-font-size-32: calc(32px * var(--ui-font-scale));
+  --ui-ref-font-size-36: calc(36px * var(--ui-font-scale));
+  --ui-ref-font-size-48: calc(48px * var(--ui-font-scale));
+  --ui-ref-font-size-56: calc(60px * var(--ui-font-scale));
+  --ui-ref-font-size-64: calc(64px * var(--ui-font-scale));
+  --ui-ref-font-size-96: calc(96px * var(--ui-font-scale));
+  --ui-ref-font-size-128: calc(128px * var(--ui-font-scale));
+
+  /* REF 字重 */
+  --ui-ref-font-weight-thin: 100;
+  --ui-ref-font-weight-extralight: 200;
+  --ui-ref-font-weight-light: 300;
+  --ui-ref-font-weight-regular: 400;
+  --ui-ref-font-weight-medium: 500;
+  --ui-ref-font-weight-semibold: 600;
+  --ui-ref-font-weight-bold: 700;
+  --ui-ref-font-weight-extrabold: 800;
+  --ui-ref-font-weight-black: 900;
+
+  /* REF 字高 */
+  --ui-ref-font-line-height-100: 1;
+  --ui-ref-font-line-height-120: 1.2;
+  --ui-ref-font-line-height-140: 1.4;
+  --ui-ref-font-line-height-160: 1.6;
+
+  /* REF 字距 */
+  --ui-ref-font-letter-spacing-0: 0px;
+  --ui-ref-font-letter-spacing-250: 0.25;
+  --ui-ref-font-letter-spacing-500: 0.5;
+  --ui-ref-font-letter-spacing-750: 0.75;
+
+  /* REF 字體 */
+  --ui-ref-font-family-noto-sans-tc: "Noto Sans TC";
+  --ui-ref-font-family-sans: "Inter";
+  --ui-ref-font-family-mono: "Fira Code";
+
+
+
+
+  /* REF spacing */
+  --ui-ref-spacing-0: 0px;
+  --ui-ref-spacing-2: 2px;
+  --ui-ref-spacing-4: 4px;
+  --ui-ref-spacing-8: 8px;
+  --ui-ref-spacing-12: 12px;
+  --ui-ref-spacing-16: 16px;
+  --ui-ref-spacing-20: 20px;
+  --ui-ref-spacing-24: 24px;
+  --ui-ref-spacing-32: 32px;
+  --ui-ref-spacing-40: 40px;
+  --ui-ref-spacing-48: 48px;
+  --ui-ref-spacing-64: 64px;
+  --ui-ref-spacing-84: 84px;
+
+  /* REF sizing */
+  --ui-ref-sizing-16: 16px;
+  --ui-ref-sizing-20: 20px;
+  --ui-ref-sizing-24: 24px;
+  --ui-ref-sizing-32: 32px;
+  --ui-ref-sizing-40: 40px;
+  --ui-ref-sizing-48: 48px;
+  --ui-ref-sizing-56: 56px;
+  --ui-ref-sizing-64: 64px;
+  --ui-ref-sizing-84: 84px;
+
+
+  /* Shadow / Elevation - REF 層使用數字 */
+  --ui-ref-shadow-0: none;
+  --ui-ref-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --ui-ref-shadow-2: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --ui-ref-shadow-3: 0 8px 16px rgba(0, 0, 0, 0.10);
+  --ui-ref-shadow-4: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --ui-ref-shadow-5: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+  /* SYS raduis */
+  --ui-sys-shape-corner-none: var(--ui-ref-radius-0);
+  --ui-sys-shape-corner-extra-small: var(--ui-ref-radius-2);
+  --ui-sys-shape-corner-small: var(--ui-ref-radius-4);
+  --ui-sys-shape-corner-medium: var(--ui-ref-radius-8);
+  --ui-sys-shape-corner-large: var(--ui-ref-radius-16);
+  --ui-sys-shape-corner-full: var(--ui-ref-radius-full);
+
+
+  --ui-sys-spacing-none: var(--ui-ref-spacing-0);
+  --ui-sys-spacing-xxs: var(--ui-ref-spacing-2);
+  --ui-sys-spacing-extra-small: var(--ui-ref-spacing-4);
+  --ui-sys-spacing-small: var(--ui-ref-spacing-8);
+  --ui-sys-spacing-medium: var(--ui-ref-spacing-16);
+  --ui-sys-spacing-large: var(--ui-ref-spacing-24);
+  --ui-sys-spacing-extra-large: var(--ui-ref-spacing-40);
+  --ui-sys-color-outline: var(--ui-ref-color-neutral-500);
+  --ui-sys-color-on-surface-variant: var(--ui-ref-color-neutral-700);
+  --ui-sys-color-on-surface: var(--ui-ref-color-neutral-950);
+
+  /* primary — 品牌紅 #C8232C（防災協作中心品牌色） */
+  --ui-sys-color-primary: #C8232C;
+  --ui-sys-color-primary-rgb: 200 35 44; /* #C8232C RGB 通道，供 Tailwind opacity modifier 使用 */
+  --ui-sys-color-primary-hover: #A01D24;
+  --ui-sys-color-primary-container: #FFF0F0;
+  --ui-sys-color-on-primary: #FFFFFF;
+  --ui-sys-color-on-primary-container: #6B0C10;
+  /* secondary */
+  --ui-sys-color-secondary: var(--ui-ref-color-neutral-300);
+  --ui-sys-color-secondary-hover: var(--ui-ref-color-neutral-400);
+  --ui-sys-color-secondary-container: var(--ui-ref-color-neutral-200);
+  --ui-sys-color-on-secondary: var(--ui-ref-color-neutral-700);
+  --ui-sys-color-on-secondary-container: var(--ui-ref-color-neutral-500);
+  /* success */
+  --ui-sys-color-success: var(--ui-ref-color-green-500);
+  --ui-sys-color-success-hover: var(--ui-ref-color-green-600);
+  --ui-sys-color-success-container: var(--ui-ref-color-green-50);
+  --ui-sys-color-on-success: var(--ui-ref-color-green-50);
+  --ui-sys-color-on-success-container: var(--ui-ref-color-green-900);
+  /* warning */
+  --ui-sys-color-warning: var(--ui-ref-color-amber-400);
+  --ui-sys-color-warning-hover: var(--ui-ref-color-amber-500);
+  --ui-sys-color-warning-container: var(--ui-ref-color-amber-50);
+  --ui-sys-color-on-warning: var(--ui-ref-color-amber-900);
+  --ui-sys-color-on-warning-container: var(--ui-ref-color-amber-900);
+  /* error */
+  --ui-sys-color-error: var(--ui-ref-color-red-500);
+  --ui-sys-color-error-hover: var(--ui-ref-color-red-600);
+  --ui-sys-color-error-container: var(--ui-ref-color-red-50);
+  --ui-sys-color-on-error: var(--ui-ref-color-red-50);
+  --ui-sys-color-on-error-container: var(--ui-ref-color-red-900);
+  /* info */
+  --ui-sys-color-info: var(--ui-ref-color-pink-400);
+  --ui-sys-color-info-hover: var(--ui-ref-color-pink-500);
+  --ui-sys-color-info-container: var(--ui-ref-color-pink-50);
+  --ui-sys-color-on-info: var(--ui-ref-color-pink-50);
+  --ui-sys-color-on-info-container: var(--ui-ref-color-pink-900);
+  --ui-sys-color-surface-variant: var(--ui-ref-color-neutral-50);
+  --ui-sys-color-disabled: var(--ui-ref-color-neutral-300);
+  --ui-sys-color-surface: var(--ui-ref-color-white);
+  --ui-sys-color-on-disabled: var(--ui-ref-color-neutral-400);
+  --ui-sys-color-outline-variant: var(--ui-ref-color-neutral-200);
+  /* rescue (FE-11 地圖救援單位三類) */
+  --ui-sys-color-rescue-fire: var(--ui-sys-color-primary);
+  --ui-sys-color-rescue-police: var(--ui-ref-color-blue-700);
+  --ui-sys-color-rescue-medical: var(--ui-sys-color-success);
+
+
+  --ui-sys-font-family-default: var(--ui-ref-font-family-noto-sans-tc);
+  --ui-sys-font-family-code: var(--ui-ref-font-family-mono);
+  --ui-sys-font-weight-default: var(--ui-ref-font-weight-regular);
+  --ui-sys-font-weight-emphasis: var(--ui-ref-font-weight-medium);
+  --ui-sys-font-weight-strong: var(--ui-ref-font-weight-semibold);
+  --ui-sys-font-weight-heavy: var(--ui-ref-font-weight-bold);
+
+  --ui-sys-font-size-display-large: var(--ui-ref-font-size-48);
+  --ui-sys-font-size-display-medium: var(--ui-ref-font-size-32);
+  --ui-sys-font-size-headline-large: var(--ui-ref-font-size-24);
+  --ui-sys-font-size-headline-medium: var(--ui-ref-font-size-20);
+  --ui-sys-font-size-body-large: var(--ui-ref-font-size-20);
+  --ui-sys-font-size-body-medium: var(--ui-ref-font-size-18);
+  --ui-sys-font-size-label-large: var(--ui-ref-font-size-18);
+  --ui-sys-font-size-label-medium: var(--ui-ref-font-size-16);
+  --ui-sys-font-size-label-small: var(--ui-ref-font-size-14);
+
+  --ui-sys-font-line-height-display-large: var(--ui-ref-font-line-height-120);
+  --ui-sys-font-line-height-display-medium: var(--ui-ref-font-line-height-120);
+  --ui-sys-font-line-height-headline-large: var(--ui-ref-font-line-height-140);
+  --ui-sys-font-line-height-headline-medium: var(--ui-ref-font-line-height-140);
+  --ui-sys-font-line-height-body-large: var(--ui-ref-font-line-height-160);
+  --ui-sys-font-line-height-body-medium: var(--ui-ref-font-line-height-160);
+  --ui-sys-font-line-height-label-large: var(--ui-ref-font-line-height-140);
+  --ui-sys-font-line-height-label-medium: var(--ui-ref-font-line-height-140);
+  --ui-sys-font-line-height-label-small: var(--ui-ref-font-line-height-140);
+
+  --ui-sys-font-letter-spacing-display-large: var(--ui-ref-font-letter-spacing-0);
+  --ui-sys-font-letter-spacing-display-medium: var(--ui-ref-font-letter-spacing-0);
+  --ui-sys-font-letter-spacing-headline-large: var(--ui-ref-font-letter-spacing-0);
+  --ui-sys-font-letter-spacing-headline-medium: var(--ui-ref-font-letter-spacing-250);
+  --ui-sys-font-letter-spacing-body-large: var(--ui-ref-font-letter-spacing-250);
+  --ui-sys-font-letter-spacing-body-medium: var(--ui-ref-font-letter-spacing-250);
+  --ui-sys-font-letter-spacing-label-large: var(--ui-ref-font-letter-spacing-500);
+  --ui-sys-font-letter-spacing-label-medium: var(--ui-ref-font-letter-spacing-500);
+  --ui-sys-font-letter-spacing-label-small: var(--ui-ref-font-letter-spacing-500);
+
+  --ui-sys-font-size-body-small: var(--ui-ref-font-size-14);
+  --ui-sys-font-line-height-body-small: var(--ui-ref-font-line-height-140);
+  --ui-sys-font-letter-spacing-body-small: var(--ui-ref-font-letter-spacing-250);
+  
+  /* Elevation - SYS 層使用語意化名稱 */
+  --ui-sys-elevation-none: var(--ui-ref-shadow-0);
+  --ui-sys-elevation-small: var(--ui-ref-shadow-1);
+  --ui-sys-elevation-medium: var(--ui-ref-shadow-2);
+  --ui-sys-elevation-large: var(--ui-ref-shadow-3);
+  --ui-sys-elevation-extra-large: var(--ui-ref-shadow-4);
+  --ui-sys-elevation-modal: var(--ui-ref-shadow-5);
+  /* Icon sizes */
+  --ui-sys-icon-size-small: var(--ui-ref-sizing-16);
+  --ui-sys-icon-size-medium: var(--ui-ref-sizing-20);
+  --ui-sys-icon-size-large: var(--ui-ref-sizing-24);
+
+  /* ============================================================ */
+  /* 防災協作中心系統專用 Token                                    */
+  /* ============================================================ */
+
+  /* -- 頁面背景 -- */
+  --ui-sys-color-surface-page: #F5F6F8;       /* 一般頁面背景 */
+
+  /* -- 災時模式（小橘書配色，prepare.mnd.gov.tw） -- */
+  --ui-sys-color-disaster-primary:        #EA5532;  /* 主橘（Header 災時 / 重點） */
+  --ui-sys-color-disaster-primary-deep:   #C8421F;  /* 深橘（hover / pressed / Topbar 底） */
+  --ui-sys-color-disaster-primary-soft:   rgba(234, 85, 50, 0.08);  /* 淡橘（hover 背景、active 容器） */
+  --ui-sys-color-disaster-bg:             #eb5532;  /* 主橘（內容區背景） */
+  --ui-sys-color-disaster-on-primary:     #FFFFFF;  /* 橘底上的白字 */
+  --ui-sys-color-disaster-on-bg:          #231815;  /* 桃粉底上的深棕字 */
+  --ui-sys-color-disaster-divider:        rgba(35, 24, 21, 0.12);  /* 分隔線 / 細描邊 */
+
+  /* -- 平時 Header（白底 + 山景插畫；橘色暗示保留給災時，平時用綠色山景傳達安心感） -- */
+  --ui-sys-color-peacetime-header-bg:        #FFFFFF;
+  --ui-sys-color-peacetime-header-text:        #30CA89;             /* 標題前景：薄荷綠 */
+  --ui-sys-color-peacetime-header-text-stroke: #115438;             /* 標題前景描邊：深森林綠（1px） */
+  --ui-sys-color-peacetime-header-text-back:   #FFFFFF;             /* 標題底層：純白（粗描邊 4px） */
+  --ui-sys-color-peacetime-header-text-shadow: rgba(0, 52, 85, 0.5); /* 底層 drop shadow 色 */
+  --ui-sys-color-peacetime-header-ui:          #003F67;             /* Header 右側 icon / 使用者文字（深藍實色） */
+  --ui-sys-color-peacetime-header-border:    var(--ui-sys-color-outline-variant);
+  /* 山景插畫色（僅平時 Header 使用，不對外作為通用色） */
+  --ui-sys-color-peacetime-mountain-front: #0ECD35;  /* 前景亮綠（右山） */
+  --ui-sys-color-peacetime-mountain-mid:   #09994F;  /* 中景深綠（左山） */
+  --ui-sys-color-peacetime-mountain-back:  #83CCA6;  /* 遠景淺綠（左後小丘） */
+  --ui-sys-color-peacetime-wave:           #BFD9F0;  /* 底部裝飾線（淡藍） */
+  /* 標題字型（粉圓體，由 jf-openhuninn-2.0 CDN 載入） */
+  --ui-sys-font-family-display: "jf-openhuninn-2.0", "Noto Sans TC", sans-serif;
+
+  /* -- Header v2（Figma node 380:217）：3 模式色票 -- */
+  /* 條紋背景圖片（svg tile，水平 repeat）
+     三模式統一使用 bg.svg（Figma node 841:7128：桃粉中央條 #FDEDE4 + #ECB9AD/#F1A283 描邊） */
+  --ui-sys-header-stripe-image-peacetime: url('/images/header/bg.svg');
+  --ui-sys-header-stripe-image-drill:     url('/images/header/bg.svg');
+  --ui-sys-header-stripe-image-disaster:  url('/images/header/bg.svg');
+  /* 大圓徽章 3 層同心圓（外→中→內）
+     - outer：半透明，置於 bg stripe 後方做柔和暈染
+     - mid：白底環
+     - inner：白底 + 2px 邊框（包住 logo 內容） */
+  /* 三模式統一同心圓配色（Figma 841:7129/7144/7145）：
+     外圈 border #F1A283、內圈 border #ECB9AD、淡桃外暈、白底環 */
+  --ui-sys-header-ring-outer-border:           #F1A283;  /* 最外圈描邊（三模式共用，對齊 Figma Ellipse3 150px） */
+  --ui-sys-header-ring-outer-peacetime:        rgba(241, 162, 131, 0.3);  /* #F1A283 @ 30% 淡桃外暈 */
+  --ui-sys-header-ring-mid-peacetime:          #FFFFFF;
+  --ui-sys-header-ring-inner-peacetime:        #FFFFFF;
+  --ui-sys-header-ring-inner-border-peacetime: #ECB9AD;  /* 內圈描邊 */
+  --ui-sys-header-ring-outer-drill:            rgba(241, 162, 131, 0.3);
+  --ui-sys-header-ring-mid-drill:              #FFFFFF;
+  --ui-sys-header-ring-inner-drill:            #FFFFFF;
+  --ui-sys-header-ring-inner-border-drill:     #ECB9AD;
+  --ui-sys-header-ring-outer-disaster:         rgba(241, 162, 131, 0.3);
+  --ui-sys-header-ring-mid-disaster:           #FFFFFF;
+  --ui-sys-header-ring-inner-disaster:         #FFFFFF;
+  --ui-sys-header-ring-inner-border-disaster:  #ECB9AD;
+  /* 標題雙層文字（前層填色 + 1px 深色描邊 / 後層半透明填色 + 3px 白描邊 + drop shadow）
+     視覺效果：粉圓體招牌式雙描邊（白色外光暈 + 主色 + 深色細描邊） */
+  /* 三模式統一標題配色（Figma node 841:7134）：紅前景 #EA5532 + 綠位移底層 + 白外描邊 + 棕落影 */
+  --ui-sys-header-title-front-peacetime:        #EA5532;             /* 前景紅（Figma 841:7136） */
+  --ui-sys-header-title-front-stroke-peacetime: #5A1F0A;             /* 前景深棕紅細描邊 */
+  --ui-sys-header-title-front-inner-peacetime:  #F4B5A0;             /* 字緣高光（淡橘） */
+  --ui-sys-header-title-back-peacetime:         rgba(48, 202, 137, 0.8);  /* 位移底層綠（Figma 841:7135） */
+  --ui-sys-header-title-back-stroke-peacetime:  #FFFFFF;             /* 白色外描邊 */
+  --ui-sys-header-title-shadow-peacetime:       rgba(85, 54, 0, 0.6);     /* 棕色落影（Figma text-shadow） */
+  --ui-sys-header-title-front-drill:            #EA5532;
+  --ui-sys-header-title-front-stroke-drill:     #5A1F0A;
+  --ui-sys-header-title-front-inner-drill:      #F4B5A0;
+  --ui-sys-header-title-back-drill:             rgba(48, 202, 137, 0.8);
+  --ui-sys-header-title-back-stroke-drill:      #FFFFFF;
+  --ui-sys-header-title-shadow-drill:           rgba(85, 54, 0, 0.6);
+  --ui-sys-header-title-front-disaster:         #EA5532;
+  --ui-sys-header-title-front-stroke-disaster:  #5A1F0A;
+  --ui-sys-header-title-front-inner-disaster:   #F4B5A0;
+  --ui-sys-header-title-back-disaster:          rgba(48, 202, 137, 0.8);
+  --ui-sys-header-title-back-stroke-disaster:   #FFFFFF;
+  --ui-sys-header-title-shadow-disaster:        rgba(85, 54, 0, 0.6);
+  /* 群組按鈕（Figma 431:996：靛藍底 #2E3995 + 亮黃字 #FBFF00 + 白邊 + 黑陰影；normal/hover 3 模式相同） */
+  --ui-sys-header-groupbtn-bg:           #2E3995;
+  --ui-sys-header-groupbtn-text:         #FBFF00;
+  --ui-sys-header-groupbtn-bg-hover:     #4A57C9;            /* hover：提亮靛藍 */
+  --ui-sys-header-groupbtn-shadow:       4px 4px 1px rgba(0, 0, 0, 0.25);
+  /* active（目前頁面）= 各模式主色 + 白字，刻意與靛藍 normal「不同色相」以強化辨識度
+     演練主色為藍，會與靛藍撞色，故改用藍綠 teal 維持冷色調又能區隔 */
+  /* active（目前頁面）三模式統一採災時橘 #EA5532（= disaster-primary） */
+  --ui-sys-header-groupbtn-text-active:         #FFFFFF;
+  --ui-sys-header-groupbtn-bg-active-peacetime: #EA5532;
+  --ui-sys-header-groupbtn-bg-active-drill:     #EA5532;
+  --ui-sys-header-groupbtn-bg-active-disaster:  #EA5532;
+
+  /* 群組導覽 hover 下拉選單（Figma 488:902，深藍底＋黃字；3 模式相同以保留品牌色） */
+  --ui-sys-header-navmenu-bg:              #0D163E;   /* 選單面板底 */
+  --ui-sys-header-navmenu-border:          #38468C;   /* 面板外框（取 hover 藍）*/
+  --ui-sys-header-navmenu-item-text:       #FFFFFF;   /* 一般項文字／圖示 */
+  --ui-sys-header-navmenu-item-bg-hover:   #38468C;   /* hover/焦點 高亮藍 */
+  --ui-sys-header-navmenu-item-text-hover: #FFFF00;   /* hover/焦點 黃字／圖示 */
+
+  /* -- Deprecated（保留向後相容） -- */
+  --ui-sys-color-disaster-banner: var(--ui-sys-color-disaster-primary);
+  --ui-sys-color-on-disaster-banner: var(--ui-sys-color-disaster-on-primary);
+  --ui-sys-color-disaster-surface: var(--ui-sys-color-disaster-bg);
+
+  /* -- Sidebar 色（依角色） -- */
+  --ui-sys-color-sidebar-township: #2D2D2D;    /* 公所承辦 / 幹部 App */
+  --ui-sys-color-sidebar-county: #1A1A2E;      /* 縣市指揮機關 */
+  --ui-sys-color-sidebar-nfa: #0D0D1A;         /* 中央指揮機關（最深） */
+  --ui-sys-color-sidebar-text: #FFFFFF;        /* Sidebar 文字 */
+  --ui-sys-color-sidebar-active-bg: rgba(200, 35, 44, 0.18);  /* 選中項目背景（品牌紅透明） */
+  --ui-sys-color-sidebar-active-text: #FFFFFF; /* 選中項目文字 */
+  --ui-sys-color-sidebar-hover: rgba(255, 255, 255, 0.08);     /* Hover 背景 */
+  --ui-sys-color-sidebar-divider: #444444;                     /* Sidebar 子選單縮排線 */
+
+  /* -- 外部品牌色（第三方 OAuth） -- */
+  --ui-ref-color-brand-google: #4285F4;   /* Google 品牌藍 */
+  --ui-ref-color-brand-line: #06C755;     /* LINE 品牌綠 */
+
+  /* -- 地圖 Marker 立體化（UIUX 方案 B：perspective tilt + 投影） -- */
+  /* 開設中 / 啟用：傾斜 18° 顯示 3D 感；未開設 / 待命：完全扁平 0°；三角形（debris）用 12° 避免梯形變形 */
+  --ui-sys-elevation-marker-active: 18deg;
+  --ui-sys-elevation-marker-idle:    0deg;
+  --ui-sys-elevation-marker-debris:  12deg;
+  /* 地面投影（drop-shadow） */
+  --ui-sys-shadow-marker-active: 0 6px 8px rgba(0,0,0,0.30), 0 2px 3px rgba(0,0,0,0.20);
+  --ui-sys-shadow-marker-idle:   0 1px 2px rgba(0,0,0,0.15);
+  /* 脈動光環 timing — critical 用於容量 ≥100% 加快呼吸 */
+  --ui-sys-motion-marker-pulse-normal:   1.6s;
+  --ui-sys-motion-marker-pulse-critical: 1.0s;
+}
+
+/* ============================================================ */
+/* 字體大小縮放模式 (Font Size Scaling Modes)                   */
+/* ============================================================ */
+/* 透過在 <html> 元素添加對應 class 來切換字體大小
+ * 所有使用 REF 層字體 token 的元件會自動同步縮放
+ */
+
+/* 小字體模式 (90%) - 適用於顯示器較大或希望看到更多內容的使用者 */
+.font-size-small {
+  --ui-font-scale: 0.9;
+}
+
+/* 中字體模式 (100%) - 預設標準尺寸 */
+.font-size-medium {
+  --ui-font-scale: 1;
+}
+
+/* 大字體模式 (125%) - 適用於視力需求或偏好較大字體的使用者 */
+.font-size-large {
+  --ui-font-scale: 1.25;
+}
+
+/* 特大字體模式 (150%) - 無障礙需求，符合 WCAG 2.1 AA 標準 */
+.font-size-extra-large {
+  --ui-font-scale: 1.5;
+}

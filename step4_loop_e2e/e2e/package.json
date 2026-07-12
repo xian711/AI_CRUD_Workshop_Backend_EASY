@@ -1,0 +1,13 @@
+{
+  "name": "backend-easy-fullchain-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI CRUD 工作坊 後端 EASY 版｜全鏈路 E2E（6 條）。獨立 Playwright 專案，鎖 http://localhost:3199（前端 API 模式），經 devProxy 打真後端 .NET API 與 PostgreSQL。驗『持久化』——這是與前端 mock 課最大的差別。",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

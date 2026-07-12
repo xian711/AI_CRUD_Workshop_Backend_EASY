@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架構與資料庫 — CRUD 後端範本（EASY 版）</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --sub: #555; --accent: #C8232C; --accent-dark: #8f1620;
+    --line: #d9d9d9; --bg-soft: #faf5f5; --ok: #1a7f37; --warn: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif;
+    color: var(--ink); background: #fff; font-size: 19px; line-height: 1.7; }
+  header { padding: 44px 6vw 22px; border-bottom: 3px solid var(--accent); }
+  header h1 { font-size: 38px; margin: 0 0 8px; }
+  header p { font-size: 19px; color: var(--sub); margin: 0; }
+  header .ver { color: var(--accent); font-weight: 700; }
+  nav { padding: 14px 6vw; background: var(--bg-soft); border-bottom: 1px solid var(--line);
+    font-size: 17px; position: sticky; top: 0; z-index: 10; }
+  nav a { color: var(--accent); text-decoration: none; margin-right: 16px; white-space: nowrap; font-weight: 600; }
+  nav a:hover { text-decoration: underline; }
+  section { padding: 38px 4vw 26px; border-bottom: 1px solid var(--line); }
+  section h2 { font-size: 30px; margin: 0 0 6px; color: var(--accent); }
+  section p.desc { font-size: 19px; color: var(--sub); margin: 0 0 20px; }
+  .diagram { width: 100%; overflow-x: auto; background: #fff; }
+  .diagram svg { width: 100%; height: auto; display: block; min-width: 720px; }
+  .notes { margin-top: 20px; background: var(--bg-soft); border-left: 6px solid var(--accent);
+    border-radius: 4px; padding: 14px 22px; font-size: 17px; color: #333; }
+  .notes b { color: var(--accent-dark); }
+  .notes ul { margin: 6px 0 0; padding-left: 22px; }
+  .notes li { margin: 4px 0; }
+  code { background: #f2eaea; padding: 1px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 15px; }
+  footer { padding: 26px 6vw 60px; font-size: 16px; color: var(--sub); }
+  @media print { nav { display: none; position: static; } section { page-break-inside: avoid; } }
+
+  /* DB table */
+  .db-wrap { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; }
+  table.db-table { border-collapse: collapse; font-size: 14.5px; min-width: 600px; }
+  table.db-table th, table.db-table td { border: 1px solid var(--line); padding: 5px 10px; text-align: left; }
+  table.db-table th { background: var(--accent); color: #fff; font-size: 14px; }
+  table.db-table td.col { font-family: Consolas, monospace; }
+  .chk { background: #fdecea; color: var(--accent); font-size: 11.5px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--accent); white-space: nowrap; }
+  .arr-tag { background: #fff4e0; color: var(--warn); border: 1px solid #e6a23c; font-size: 11.5px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+  .pk-tag { background: #eef; color: #334; border: 1px solid #99a; font-size: 11.5px; padding: 1px 6px; border-radius: 4px; }
+  .side-col { display: flex; flex-direction: column; gap: 18px; min-width: 280px; }
+  .seq-box { border: 2px solid var(--accent); border-radius: 8px; padding: 16px; background: var(--bg-soft); font-family: Consolas, monospace; font-size: 13.5px; white-space: pre-wrap; }
+  .seq-box .cap { font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif; font-size: 15px; font-weight: 700; color: var(--accent-dark); display: block; margin-bottom: 8px; }
+  .map-box { border: 1px solid var(--line); border-radius: 8px; padding: 16px; background: #fff; }
+  .map-box .cap { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: block; }
+  .map-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+  .map-pair { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 14px; padding: 3px 10px; font-family: Consolas, monospace; font-size: 12.5px; }
+
+  /* pyramid */
+  .pyramid { display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 24px 0 10px; }
+  .pyr-layer { color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 10px; text-align: center; border-radius: 3px; }
+  .pyr-layer b { font-size: 18px; display: block; }
+  .pyr-layer span { font-size: 14px; opacity: .95; }
+  .pyr-l1 { width: 34%; background: var(--accent-dark); clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%); }
+  .pyr-l2 { width: 55%; background: #c8434f; clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%); }
+  .pyr-l3 { width: 78%; background: #d8828a; clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%); color: #3a1114; }
+  .pyr-l4 { width: 100%; background: #f3c6ca; color: #3a1114; clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%); }
+  .pyr-legend { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 18px; font-size: 14.5px; }
+  .pyr-legend div { border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; background: #fff; }
+  .pyr-legend b { color: var(--accent-dark); display: block; margin-bottom: 4px; }
+  @media (max-width: 720px) { .pyr-legend { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>架構與資料庫 — CRUD 後端範本 <span class="ver">EASY 版</span></h1>
+  <p>五張圖看懂範本 API 怎麼運作 ｜ 對應 SDD-CRUD後端標準-v1.6 ｜ 落點：sample-api/</p>
+</header>
+
+<nav>
+  <a href="#life">① 請求的一生</a>
+  <a href="#layer">② 分層架構</a>
+  <a href="#seq">③ POST 循序</a>
+  <a href="#db">④ DB 綱要</a>
+  <a href="#pyramid">⑤ 測試金字塔</a>
+</nav>
+
+<!-- ① 請求的一生 -->
+<section id="life">
+  <h2>① 請求的一生</h2>
+  <p class="desc">你在瀏覽器按一下「儲存」，資料怎麼一路跑到 PostgreSQL 再回來？跟著箭頭走一遍。</p>
+  <div class="diagram">
+    <svg viewBox="0 0 1100 430" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+      <defs>
+        <marker id="fArr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#C8232C"/></marker>
+        <marker id="fBack" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1a7f37"/></marker>
+      </defs>
+
+      <!-- boxes -->
+      <g font-size="15">
+        <rect x="20" y="70" width="150" height="80" rx="10" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="95" y="103" text-anchor="middle" font-size="17" font-weight="700">🌐 瀏覽器</text>
+        <text x="95" y="126" text-anchor="middle" font-size="13" fill="#555">前端畫面</text>
+
+        <rect x="205" y="70" width="150" height="80" rx="10" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="280" y="98" text-anchor="middle" font-size="17" font-weight="700">▲ Nuxt</text>
+        <text x="280" y="119" text-anchor="middle" font-size="12.5" fill="#555">devProxy</text>
+        <text x="280" y="136" text-anchor="middle" font-size="12.5" fill="#555">轉發 /api</text>
+
+        <rect x="390" y="70" width="160" height="80" rx="10" fill="#fdecea" stroke="#C8232C" stroke-width="2"/>
+        <text x="470" y="98" text-anchor="middle" font-size="16" font-weight="700">Controller</text>
+        <text x="470" y="119" text-anchor="middle" font-size="12.5" fill="#555">薄委派＋</text>
+        <text x="470" y="136" text-anchor="middle" font-size="12.5" fill="#555">模型驗證</text>
+
+        <rect x="585" y="70" width="160" height="80" rx="10" fill="#fdecea" stroke="#C8232C" stroke-width="2"/>
+        <text x="665" y="98" text-anchor="middle" font-size="16" font-weight="700">Service</text>
+        <text x="665" y="119" text-anchor="middle" font-size="12.5" fill="#555">商業邏輯</text>
+        <text x="665" y="136" text-anchor="middle" font-size="12.5" fill="#555">Mapperly 映射</text>
+
+        <rect x="780" y="70" width="150" height="80" rx="10" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="855" y="98" text-anchor="middle" font-size="16" font-weight="700">EF Core</text>
+        <text x="855" y="119" text-anchor="middle" font-size="12.5" fill="#555">AppDbContext</text>
+        <text x="855" y="136" text-anchor="middle" font-size="12.5" fill="#555">組 SQL</text>
+
+        <rect x="965" y="70" width="115" height="80" rx="10" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="1022" y="100" text-anchor="middle" font-size="15" font-weight="700">🗄️</text>
+        <text x="1022" y="122" text-anchor="middle" font-size="13" font-weight="700">PostgreSQL</text>
+        <text x="1022" y="138" text-anchor="middle" font-size="11.5" fill="#555">template_member</text>
+      </g>
+
+      <!-- forward arrows (red, top) -->
+      <line x1="170" y1="95" x2="203" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
+      <line x1="355" y1="95" x2="388" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
+      <line x1="550" y1="95" x2="583" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
+      <line x1="745" y1="95" x2="778" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
+      <line x1="930" y1="95" x2="963" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
+      <text x="550" y="52" text-anchor="middle" font-size="15" font-weight="700" fill="#C8232C">去程（紅）：請求帶著 JSON 往右送</text>
+
+      <!-- return arrows (green, bottom) -->
+      <line x1="963" y1="128" x2="932" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
+      <line x1="778" y1="128" x2="747" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
+      <line x1="583" y1="128" x2="552" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
+      <line x1="388" y1="128" x2="357" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
+      <line x1="203" y1="128" x2="172" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
+
+      <!-- step captions -->
+      <g font-size="13" fill="#333">
+        <text x="95"  y="200" text-anchor="middle">① 按「儲存」</text>
+        <text x="95"  y="218" text-anchor="middle" fill="#777">送 POST /api/...</text>
+        <text x="280" y="200" text-anchor="middle">② 同源轉發</text>
+        <text x="280" y="218" text-anchor="middle" fill="#777">/api → :5080</text>
+        <text x="470" y="200" text-anchor="middle">③ 驗證通過</text>
+        <text x="470" y="218" text-anchor="middle" fill="#777">失敗就回 400</text>
+        <text x="665" y="200" text-anchor="middle">④ 取號 M-###</text>
+        <text x="665" y="218" text-anchor="middle" fill="#777">填 updatedAt</text>
+        <text x="855" y="200" text-anchor="middle">⑤ INSERT</text>
+        <text x="855" y="218" text-anchor="middle" fill="#777">SaveChanges</text>
+        <text x="1022" y="200" text-anchor="middle">⑥ 寫入</text>
+        <text x="1022" y="218" text-anchor="middle" fill="#777">一筆 row</text>
+      </g>
+
+      <!-- return band -->
+      <rect x="20" y="260" width="1060" height="66" rx="8" fill="#e6f4ea" stroke="#1a7f37" stroke-width="1.5"/>
+      <text x="550" y="286" text-anchor="middle" font-size="15" font-weight="700" fill="#1a7f37">回程（綠）：DB 回存好的資料 → Service 用 Mapperly 轉成回應 DTO → 包成 ModelResult → Controller 回 201＋Location</text>
+      <text x="550" y="310" text-anchor="middle" font-size="14" fill="#2a6a3a">→ Nuxt 收到 { success, message, data } → 取出 data → 畫面更新，資料永久保存在 PostgreSQL</text>
+
+      <!-- envelope note -->
+      <rect x="300" y="352" width="500" height="56" rx="6" fill="#fff4e0" stroke="#e6a23c"/>
+      <text x="550" y="375" text-anchor="middle" font-size="13.5" fill="#7a5b00">關鍵：對外是 camelCase JSON（bloodType），DB 內是 snake_case（blood_type）</text>
+      <text x="550" y="395" text-anchor="middle" font-size="13.5" fill="#7a5b00">中間由 EF 命名轉換＋Mapperly 自動翻譯，你不用手寫逐欄改名</text>
+    </svg>
+  </div>
+  <div class="notes">
+    <b>白話重點</b>
+    <ul>
+      <li>開發期瀏覽器不直接打後端，而是先到 Nuxt（3100），由 <code>devProxy</code> 同源轉發到 API（5080）——所以本版後端還沒設定 CORS 也能動。</li>
+      <li>去程（紅）是「請求往右送」，回程（綠）是「資料往左回」。每一層只做自己該做的事，這就是「分層」。</li>
+      <li>前端只要把記憶體 mock 換成打這支 API，這條動線就通了——資料從此存進資料庫，F5 也不會消失。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ② 分層架構 -->
+<section id="layer">
+  <h2>② 分層架構</h2>
+  <p class="desc">依賴方向單向向右：Controller → IMemberService → MemberService → AppDbContext → PostgreSQL。上層只依賴下層的介面。</p>
+  <div class="diagram">
+    <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+      <defs><marker id="lArr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#333"/></marker></defs>
+
+      <rect x="10" y="50" width="180" height="90" rx="8" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+      <text x="100" y="88" text-anchor="middle" font-size="17" font-weight="700">MembersController</text>
+      <text x="100" y="112" text-anchor="middle" font-size="13" fill="#555">薄委派層</text>
+
+      <rect x="220" y="50" width="180" height="90" rx="8" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+      <text x="310" y="82" text-anchor="middle" font-size="12.5" fill="#555">«interface»</text>
+      <text x="310" y="102" text-anchor="middle" font-size="16" font-weight="700">IMemberService</text>
+      <text x="310" y="123" text-anchor="middle" font-size="12.5" fill="#555">建構子注入</text>
+
+      <rect x="430" y="50" width="180" height="90" rx="8" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+      <text x="520" y="88" text-anchor="middle" font-size="17" font-weight="700">MemberService</text>
+      <text x="520" y="112" text-anchor="middle" font-size="13" fill="#555">商業邏輯＋Mapperly</text>
+
+      <rect x="640" y="50" width="170" height="90" rx="8" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+      <text x="725" y="88" text-anchor="middle" font-size="17" font-weight="700">AppDbContext</text>
+      <text x="725" y="112" text-anchor="middle" font-size="13" fill="#555">EF Core</text>
+
+      <rect x="840" y="50" width="150" height="90" rx="8" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+      <text x="915" y="88" text-anchor="middle" font-size="16" font-weight="700">PostgreSQL</text>
+      <text x="915" y="112" text-anchor="middle" font-size="13" fill="#555">18</text>
+
+      <line x1="190" y1="95" x2="218" y2="95" stroke="#333" stroke-width="2" marker-end="url(#lArr)"/>
+      <line x1="400" y1="95" x2="428" y2="95" stroke="#333" stroke-width="2" marker-end="url(#lArr)"/>
+      <line x1="610" y1="95" x2="638" y2="95" stroke="#333" stroke-width="2" marker-end="url(#lArr)"/>
+      <line x1="810" y1="95" x2="838" y2="95" stroke="#333" stroke-width="2" marker-end="url(#lArr)"/>
+
+      <rect x="10" y="200" width="475" height="120" rx="8" fill="#fdecea" stroke="#C8232C" stroke-width="2"/>
+      <text x="247" y="226" text-anchor="middle" font-size="16" font-weight="700" fill="#8f1620">Controller 薄委派</text>
+      <text x="30" y="252" font-size="13" fill="#333">• 只呼叫 Service ＋ result.ToActionResult(失敗碼)</text>
+      <text x="30" y="274" font-size="13" fill="#333">• 禁止查資料庫／組路徑／寫 if 商業判斷</text>
+      <text x="30" y="296" font-size="13" fill="#333">• 端點用 [ProducesResponseType] 標各狀態碼</text>
+
+      <rect x="515" y="200" width="475" height="120" rx="8" fill="#fdecea" stroke="#C8232C" stroke-width="2"/>
+      <text x="752" y="226" text-anchor="middle" font-size="16" font-weight="700" fill="#8f1620">Service 不做 blanket try/catch（D11）</text>
+      <text x="535" y="252" font-size="13" fill="#333">• 查無資料＝預期失敗 → ModelResult{Success=false} → 404</text>
+      <text x="535" y="274" font-size="13" fill="#333">• DB 斷線＝未預期例外 → 不攔、直接上拋 → 500</text>
+      <text x="535" y="296" font-size="13" fill="#333">• 別用一個布林同時代表「找不到」和「伺服器掛了」</text>
+
+      <rect x="10" y="345" width="980" height="42" rx="8" fill="#faf5f5" stroke="#d9d9d9" stroke-width="1.5"/>
+      <text x="500" y="371" text-anchor="middle" font-size="14" fill="#333">ModelResult&lt;T&gt; 在 Controller↔Service 間流動；Mapperly 只在 Service 內部（ToEntity／Apply／ToResult），不外露</text>
+    </svg>
+  </div>
+  <div class="notes">
+    <b>白話重點</b>
+    <ul>
+      <li>「Controller 薄委派」是可檢查的紀律：看它有沒有 if／查詢／組字串，有就是違規。</li>
+      <li>介面 <code>IMemberService</code> 的價值在於可替換、可測試，不是為了多一層而多一層。</li>
+      <li>D11 是本範本刻意偏離原單位範本「全包 try/catch」的地方——全包會把基礎設施故障誤報成業務 404。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ③ POST 循序 -->
+<section id="seq">
+  <h2>③ POST 循序：新增一筆的完整步驟</h2>
+  <p class="desc">從請求進來到回 201，中間發生什麼：驗證分支、SEQUENCE 取號、Mapperly 映射、SaveChanges；含未預期例外 → 500 支線。</p>
+  <div class="diagram">
+    <svg viewBox="0 0 1080 640" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+      <defs>
+        <marker id="s3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#333"/></marker>
+        <marker id="s3x" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#C8232C"/></marker>
+      </defs>
+
+      <g>
+        <rect x="30" y="16" width="150" height="46" rx="6" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="105" y="37" text-anchor="middle" font-size="13.5" font-weight="700">呼叫端</text>
+        <text x="105" y="54" text-anchor="middle" font-size="11.5" fill="#555">前端／Swagger</text>
+        <rect x="270" y="16" width="150" height="46" rx="6" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="345" y="37" text-anchor="middle" font-size="13.5" font-weight="700">Controller</text>
+        <rect x="510" y="16" width="150" height="46" rx="6" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="585" y="37" text-anchor="middle" font-size="13.5" font-weight="700">Service</text>
+        <rect x="750" y="16" width="150" height="46" rx="6" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="825" y="37" text-anchor="middle" font-size="13.5" font-weight="700">DbContext</text>
+        <rect x="925" y="16" width="140" height="46" rx="6" fill="#fff" stroke="#C8232C" stroke-width="2"/>
+        <text x="995" y="34" text-anchor="middle" font-size="12.5" font-weight="700">GlobalException</text>
+        <text x="995" y="50" text-anchor="middle" font-size="11.5" fill="#555">Handler</text>
+      </g>
+
+      <line x1="105" y1="62" x2="105" y2="625" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="345" y1="62" x2="345" y2="625" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="585" y1="62" x2="585" y2="625" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="825" y1="62" x2="825" y2="625" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="995" y1="62" x2="995" y2="625" stroke="#bbb" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+      <line x1="105" y1="100" x2="343" y2="100" stroke="#333" stroke-width="1.8" marker-end="url(#s3)"/>
+      <text x="110" y="92" font-size="12.5">① POST /api/template/members { 表單資料 }</text>
+
+      <path d="M345,126 L392,126 L392,148 L353,148" fill="none" stroke="#333" stroke-width="1.6" marker-end="url(#s3)"/>
+      <text x="398" y="131" font-size="12">② 自動模型驗證（AllowedValues 先過，才跑 Validate 四規則）</text>
+
+      <rect x="70" y="166" width="760" height="86" fill="none" stroke="#8f1620" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <text x="120" y="184" font-size="12.5" font-weight="700" fill="#8f1620">若驗證失敗</text>
+      <line x1="345" y1="210" x2="107" y2="210" stroke="#333" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#s3)"/>
+      <text x="110" y="203" font-size="12.5">③ 400 ValidationProblemDetails（errors camelCase＋traceId），不進 Service</text>
+      <text x="120" y="240" font-size="12" fill="#8f1620">否則 → 驗證通過，往下</text>
+
+      <line x1="345" y1="278" x2="583" y2="278" stroke="#333" stroke-width="1.8" marker-end="url(#s3)"/>
+      <text x="350" y="270" font-size="12.5">④ Create(request)</text>
+
+      <line x1="585" y1="306" x2="823" y2="306" stroke="#333" stroke-width="1.8" marker-end="url(#s3)"/>
+      <text x="590" y="298" font-size="12.5">⑤ SELECT nextval('template_member_seq') — 交易內</text>
+      <rect x="600" y="314" width="210" height="22" rx="4" fill="#fff4e0" stroke="#e6a23c"/>
+      <text x="705" y="329" text-anchor="middle" font-size="11" fill="#7a5b00">唯一但允許缺號</text>
+      <line x1="825" y1="352" x2="587" y2="352" stroke="#333" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#s3)"/>
+      <text x="590" y="345" font-size="12.5">⑥ n（例如 25）</text>
+
+      <path d="M585,378 L632,378 L632,400 L593,400" fill="none" stroke="#333" stroke-width="1.6" marker-end="url(#s3)"/>
+      <text x="638" y="383" font-size="12">⑦ id = "M-025"；updatedAt = 今天（本地時區）；Mapperly.ToEntity</text>
+
+      <line x1="585" y1="428" x2="823" y2="428" stroke="#333" stroke-width="1.8" marker-end="url(#s3)"/>
+      <text x="590" y="420" font-size="12.5">⑧ Add(entity) + SaveChanges()</text>
+
+      <rect x="70" y="448" width="965" height="96" fill="none" stroke="#8f1620" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <text x="150" y="466" font-size="12.5" font-weight="700" fill="#8f1620">若未預期例外（DB 斷線等）</text>
+      <line x1="825" y1="490" x2="587" y2="490" stroke="#C8232C" stroke-width="1.8" stroke-dasharray="3 3" marker-end="url(#s3x)"/>
+      <text x="590" y="483" font-size="12" fill="#8f1620">⑨ throw（不 catch，直接上拋 — D11）</text>
+      <line x1="585" y1="520" x2="993" y2="520" stroke="#C8232C" stroke-width="1.8" stroke-dasharray="3 3" marker-end="url(#s3x)"/>
+      <text x="590" y="513" font-size="12" fill="#8f1620">⑩ 500 ProblemDetails{ traceId }（不含 stack／ex.Message）</text>
+
+      <line x1="825" y1="572" x2="587" y2="572" stroke="#333" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#s3)"/>
+      <text x="590" y="565" font-size="12.5">⑪ 成功 → Mapperly.ToResult → ModelResult{ Success:true, Data }</text>
+
+      <line x1="345" y1="604" x2="107" y2="604" stroke="#333" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#s3)"/>
+      <text x="110" y="597" font-size="12.5">⑫ 201 Created　Location: /api/template/members/M-025 ＋ body</text>
+    </svg>
+  </div>
+  <div class="notes">
+    <b>白話重點</b>
+    <ul>
+      <li>SEQUENCE「唯一但允許缺號」：rollback／失敗／快取都會消耗號碼且不退回，所以號碼可能跳號——但保證不重複。這比前端「掃最大值+1」穩，不會兩個請求搶同一個 id。</li>
+      <li>驗證失敗（②③）發生在框架模型繫結階段，根本不會進 Service——這是為何驗 400 的測試不用真的碰資料庫。</li>
+      <li>id 和 updatedAt 都是後端在這裡自己產的，前端 body 就算帶了也會被忽略（防竄改）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ④ DB 綱要 -->
+<section id="db">
+  <h2>④ DB 綱要</h2>
+  <p class="desc">template_member 表（snake_case 欄位、四組 CHECK、qualifications 原生陣列、bloodType 選填）；SEQUENCE 從 25 承接 24 筆種子；camelCase↔snake_case 對照。</p>
+  <div class="diagram">
+    <div class="db-wrap">
+      <table class="db-table">
+        <thead><tr><th>DTO（camelCase）</th><th>DB 欄位（snake_case）</th><th>型別</th><th>約束</th></tr></thead>
+        <tbody>
+          <tr><td class="col">id</td><td class="col">id</td><td>varchar(10)</td><td><span class="pk-tag">PK</span> M-###</td></tr>
+          <tr><td class="col">name</td><td class="col">name</td><td>varchar(50)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">gender</td><td class="col">gender</td><td>varchar(2)</td><td><span class="chk">CHECK</span> IN(男,女)</td></tr>
+          <tr><td class="col">birthDate</td><td class="col">birth_date</td><td>date</td><td>NOT NULL</td></tr>
+          <tr><td class="col">idType</td><td class="col">id_type</td><td>varchar(10)</td><td><span class="chk">CHECK</span> IN(身分證,居留證,護照)</td></tr>
+          <tr><td class="col">nationalId</td><td class="col">national_id</td><td>varchar(20)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">phone</td><td class="col">phone</td><td>varchar(10)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">email</td><td class="col">email</td><td>varchar(100)</td><td>NULL</td></tr>
+          <tr><td class="col">residenceCounty</td><td class="col">residence_county</td><td>varchar(10)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">residenceTownship</td><td class="col">residence_township</td><td>varchar(10)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">residenceAddress</td><td class="col">residence_address</td><td>varchar(100)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">groupName</td><td class="col">group_name</td><td>varchar(20)</td><td>NOT NULL</td></tr>
+          <tr><td class="col">positionCode</td><td class="col">position_code</td><td>varchar(20)</td><td><span class="chk">CHECK</span> IN(director/deputy/leader/member)</td></tr>
+          <tr><td class="col">qualifications</td><td class="col">qualifications</td><td>text[]</td><td><span class="arr-tag">原生陣列</span> DEFAULT '{}'</td></tr>
+          <tr><td class="col">status</td><td class="col">status</td><td>varchar(4)</td><td><span class="chk">CHECK</span> IN(在職,停用)</td></tr>
+          <tr><td class="col">note</td><td class="col">note</td><td>varchar(500)</td><td>NULL</td></tr>
+          <tr><td class="col">bloodType</td><td class="col">blood_type</td><td>text</td><td><span class="chk">CHECK</span> IN(A,B,AB,O)｜NULL 放行</td></tr>
+          <tr><td class="col">updatedAt</td><td class="col">updated_at</td><td>date</td><td>NOT NULL</td></tr>
+        </tbody>
+      </table>
+      <div class="side-col">
+        <div class="seq-box"><span class="cap">SEQUENCE（主鍵產生）</span>CREATE SEQUENCE template_member_seq
+  AS integer START WITH 25 INCREMENT BY 1;
+-- 25：24 筆種子（M-001~M-024）之後
+-- 服務層 SELECT nextval('template_member_seq')
+-- 格式化為 M-{n:D3}（例：25 → M-025）</div>
+        <div class="map-box"><span class="cap">camelCase ↔ snake_case 對照</span>
+          <div class="map-strip">
+            <span class="map-pair">birthDate ↔ birth_date</span>
+            <span class="map-pair">idType ↔ id_type</span>
+            <span class="map-pair">nationalId ↔ national_id</span>
+            <span class="map-pair">groupName ↔ group_name</span>
+            <span class="map-pair">positionCode ↔ position_code</span>
+            <span class="map-pair">bloodType ↔ blood_type</span>
+            <span class="map-pair">updatedAt ↔ updated_at</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <b>白話重點</b>
+    <ul>
+      <li>四組 CHECK 的允許值由程式的 <code>MemberEnums</code> 常數組出，跟 DTO 的 <code>[AllowedValues]</code> 共用同一份字面值——改一處兩邊同步，不會漂移。</li>
+      <li>qualifications 用 PostgreSQL 原生陣列 <code>text[]</code>，免另建關聯表；bloodType 是選填，DB 為 <code>text NULL</code>，沒填就是 NULL、CHECK 自然放行。</li>
+      <li>用 psql 下 <code>SELECT</code> 看到的是 snake_case 欄位；API 對外才是 camelCase——這正是「JSON camelCase / DB snake_case」這條契約的實體證據（psql 三招見 PSQL_QUICKSTART.md）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ⑤ 測試金字塔 -->
+<section id="pyramid">
+  <h2>⑤ 測試金字塔</h2>
+  <p class="desc">單元（不碰 DB，快）在底、整合（打測試庫）在中、手動與 E2E 在頂。基準 49 條，dotnet test 全綠。</p>
+  <div class="diagram">
+    <div class="pyramid">
+      <div class="pyr-layer pyr-l1"><b>E2E（瀏覽器）</b><span>前端整合後端全鏈路操作</span></div>
+      <div class="pyr-layer pyr-l2"><b>手動</b><span>Swagger／members.http 逐端點驗</span></div>
+      <div class="pyr-layer pyr-l3"><b>整合測試 I1–I15＋IB1–IB3</b><span>WebApplicationFactory → ai_crud_template_test（每輪 ClearAllPools＋EnsureDeleted＋Migrate＋seed 重建）</span></div>
+      <div class="pyr-layer pyr-l4"><b>單元測試 U1–U8＋UB</b><span>驗證規則、Mapperly 映射、bloodType 選填（xUnit，不碰 DB）</span></div>
+    </div>
+    <div class="pyr-legend">
+      <div><b>單元</b>身分證／電話／email 格式、允許值枚舉、qualifications、bloodType 選填、Mapperly 欄位齊全與忽略 Id/UpdatedAt</div>
+      <div><b>整合</b>五端點成功＋失敗路徑、qualifications round-trip、冪等 seed、500 traceId、必填漏洞回歸、bloodType round-trip/非法/未帶</div>
+      <div><b>手動</b>Swagger 與 members.http 逐端點手動驗；smoke 才斷言固定 M-025</div>
+      <div><b>E2E</b>前端課 Playwright：mock 模式（離線）＋api-mode（打真後端專用庫）</div>
+    </div>
+  </div>
+  <div class="notes">
+    <b>白話重點</b>
+    <ul>
+      <li>本範本整合測試占比偏高（18 條／49 條）——因為 CRUD 商業邏輯薄，驗證多靠 DataAnnotations 宣告式完成，真正要單元測試蓋的「手寫邏輯」有限。這是值得課堂討論的點。</li>
+      <li>測試庫固定叫 <code>ai_crud_template_test</code>，且 EnsureDeleted 前防呆「DB 名必須 _test 結尾」——避免誤刪開發／正式資料庫。</li>
+      <li>斷言紀律：清單斷「至少 24 筆」不斷「恰 24 筆」、POST 斷 id 格式不斷固定 M-025——讓測試不因執行順序而假紅假綠。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>本頁對應 SDD-CRUD後端標準-v1.6（2026-07-11）。純 HTML/CSS/inline SVG，零外部依賴、零 CDN，離線可用；投影教學建議瀏覽器縮放 100%~125%。完整規格見 ../2.2_system_docs/，psql 操作見同資料夾 PSQL_QUICKSTART.md。</p>
+</footer>
+
+</body>
+</html>

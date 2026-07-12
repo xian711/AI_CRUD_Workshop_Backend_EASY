@@ -1,0 +1,4 @@
+node_modules/
+test-results/
+playwright-report/
+# 註：screenshots/ 刻意「不」忽略——那是給總指揮做圖文手冊的素材（列表／新增／reload 後仍在／刪除後消失），需保留在版控內。

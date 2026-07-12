@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>為什麼要 harness — 後端版對比</title>
+<style>
+  :root {
+    --brand: #C8232C;
+    --brand-soft: #FFF0F0;
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-soft: #555555;
+    --line: #E3E5E9;
+    --code-bg: #FBFBFC;
+    --code-ink: #24292E;
+    --num: #B0B4BA;
+    --bad-bg: #FDECEC;
+    --bad-bar: #E5484D;
+    --bad-note: #B4232A;
+    --good-bg: #EAF7EF;
+    --good-bar: #17925A;
+    --good-note: #0F7A48;
+    --kw: #9A2FA0;
+    --str: #B4232A;
+    --com: #7A8290;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #FF6B72;
+      --brand-soft: #3A1417;
+      --bg: #14161A;
+      --surface: #1D2026;
+      --ink: #ECECEC;
+      --ink-soft: #A8AEB8;
+      --line: #2E323A;
+      --code-bg: #0F1115;
+      --code-ink: #D6DAE0;
+      --num: #565C66;
+      --bad-bg: #3A1B1D;
+      --bad-bar: #E5484D;
+      --bad-note: #FF9AA0;
+      --good-bg: #16311F;
+      --good-bar: #2FB673;
+      --good-note: #6FE3A6;
+      --kw: #E080E8;
+      --str: #FF9AA0;
+      --com: #6E7681;
+    }
+  }
+  :root[data-theme="dark"] {
+    --brand: #FF6B72; --brand-soft: #3A1417; --bg: #14161A; --surface: #1D2026;
+    --ink: #ECECEC; --ink-soft: #A8AEB8; --line: #2E323A; --code-bg: #0F1115;
+    --code-ink: #D6DAE0; --num: #565C66; --bad-bg: #3A1B1D; --bad-bar: #E5484D;
+    --bad-note: #FF9AA0; --good-bg: #16311F; --good-bar: #2FB673; --good-note: #6FE3A6;
+    --kw: #E080E8; --str: #FF9AA0; --com: #6E7681;
+  }
+  :root[data-theme="light"] {
+    --brand: #C8232C; --brand-soft: #FFF0F0; --bg: #F5F6F8; --surface: #FFFFFF;
+    --ink: #1A1A1A; --ink-soft: #555555; --line: #E3E5E9; --code-bg: #FBFBFC;
+    --code-ink: #24292E; --num: #B0B4BA; --bad-bg: #FDECEC; --bad-bar: #E5484D;
+    --bad-note: #B4232A; --good-bg: #EAF7EF; --good-bar: #17925A; --good-note: #0F7A48;
+    --kw: #9A2FA0; --str: #B4232A; --com: #7A8290;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans TC", system-ui, -apple-system, "Microsoft JhengHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 26px; margin: 0;
+    border-left: 6px solid var(--brand); padding-left: 12px;
+  }
+  h1 small { display: block; font-size: 14px; color: var(--ink-soft); font-weight: 400; margin-top: 4px; }
+  .theme-btn {
+    background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 14px; cursor: pointer; font: inherit; font-size: 14px;
+  }
+  .theme-btn:hover { border-color: var(--brand); }
+
+  .lede {
+    background: var(--brand-soft); border-radius: 12px; padding: 14px 18px;
+    margin: 16px 0 28px; font-size: 15px;
+  }
+  .lede b { color: var(--brand); }
+
+  h2 { font-size: 19px; margin: 32px 0 12px; }
+
+  /* 差異總表 */
+  .diff-table { width: 100%; border-collapse: collapse; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 14px; }
+  .diff-table th, .diff-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .diff-table thead th { background: var(--brand); color: #fff; font-weight: 600; border-bottom: none; }
+  .diff-table tbody tr:last-child td { border-bottom: none; }
+  .diff-table td.n { text-align: center; font-weight: 700; color: var(--brand); width: 34px; }
+  .diff-table td.bad { color: var(--bad-note); }
+  .diff-table td.good { color: var(--good-note); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); white-space: nowrap; }
+
+  /* 程式碼並排 */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 960px) { .cols { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .panel-head { padding: 12px 16px; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .panel-head.no { background: var(--bad-bg); color: var(--bad-note); border-bottom: 2px solid var(--bad-bar); }
+  .panel-head.yes { background: var(--good-bg); color: var(--good-note); border-bottom: 2px solid var(--good-bar); }
+  .panel-head .file { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; font-weight: 500; opacity: 0.8; }
+
+  .code { overflow-x: auto; background: var(--code-bg); font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12.5px; line-height: 1.55; padding: 8px 0; }
+  .code table { border-collapse: collapse; width: 100%; }
+  .code td { vertical-align: top; padding: 0; }
+  .code td.num { text-align: right; color: var(--num); user-select: none; padding: 0 12px 0 14px; width: 1%; white-space: nowrap; }
+  .code td.src { color: var(--code-ink); white-space: pre; padding-right: 16px; }
+  .code tr.bad { background: var(--bad-bg); box-shadow: inset 3px 0 0 var(--bad-bar); }
+  .code tr.good { background: var(--good-bg); box-shadow: inset 3px 0 0 var(--good-bar); }
+  .note { display: block; white-space: normal; font-family: "Noto Sans TC", sans-serif; font-size: 11.5px; margin: 2px 0 3px; padding-left: 2px; }
+  .note.b { color: var(--bad-note); }
+  .note.b::before { content: "⚠ "; }
+  .note.g { color: var(--good-note); }
+  .note.g::before { content: "✓ "; }
+  .kw { color: var(--kw); }
+  .st { color: var(--str); }
+  .cm { color: var(--com); font-style: italic; }
+
+  .foot { margin-top: 36px; text-align: center; font-size: 16px; }
+  .foot b { color: var(--brand); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>為什麼要 harness？<small>同一句「幫我寫一個新增裝備的 API」，有沒有給團隊規矩，AI 產出天差地遠</small></h1>
+    <button class="theme-btn" id="themeBtn" type="button">切換深／淺色</button>
+  </header>
+
+  <div class="lede">
+    左邊是<b>沒有 harness</b>、AI 憑一句話自由發揮的產出；右邊是<b>附上團隊規矩</b>後的產出。
+    兩份都是「新增裝備」API，功能目標一樣——差的不是「有沒有做出來」，是「能不能安全上線、像不像同一個資深後端寫的」。
+    紅底是違規、綠底是合規，滑到程式碼看每一行的白話註解。
+  </div>
+
+  <h2>12 項差異總表</h2>
+  <table class="diff-table">
+    <thead>
+      <tr><th class="n">#</th><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>對應規矩</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="n">1</td><td>分層架構</td><td class="bad">全塞 Controller，查詢／SQL／商業邏輯攪一起</td><td class="good">Controller 薄委派 → Service 處理</td><td><span class="tag">分層</span></td></tr>
+      <tr><td class="n">2</td><td>相依取得</td><td class="bad">方法內 new 連線、連線字串＋帳密硬編碼</td><td class="good">建構式注入 DbContext / Mapper</td><td><span class="tag">分層</span></td></tr>
+      <tr><td class="n">3</td><td>SQL 安全</td><td class="bad">字串拼接組 SQL，SQL Injection 破口</td><td class="good">EF Core 查詢，參數化、無拼接</td><td><span class="tag">資料存取</span></td></tr>
+      <tr><td class="n">4</td><td>請求驗證</td><td class="bad">散裝參數、零驗證，空值負數亂填照收</td><td class="good">DTO ＋ DataAnnotations 宣告式驗證</td><td><span class="tag">DTO</span></td></tr>
+      <tr><td class="n">5</td><td>狀態碼</td><td class="bad">不管成敗一律回 200</td><td class="good">201 建立 / 400 驗證 / 404 查無</td><td><span class="tag">契約</span></td></tr>
+      <tr><td class="n">6</td><td>回應封裝</td><td class="bad">裸匿名物件，每支 API 格式各異</td><td class="good">統一 ModelResult 封裝</td><td><span class="tag">契約</span></td></tr>
+      <tr><td class="n">7</td><td>錯誤鍵命名</td><td class="bad">無錯誤鍵；欄位 PascalCase 混亂</td><td class="good">框架回 400，錯誤鍵 camelCase</td><td><span class="tag">DTO</span></td></tr>
+      <tr><td class="n">8</td><td>例外處理</td><td class="bad">blanket try/catch 吞例外，DB 斷線也回 200</td><td class="good">只轉預期失敗，未預期上拋 500</td><td><span class="tag">例外</span></td></tr>
+      <tr><td class="n">9</td><td>編碼產生</td><td class="bad">時間戳硬湊，不符規則、不保證唯一</td><td class="good">交易內同前綴 MAX+1 ＋唯一索引</td><td><span class="tag">編碼</span></td></tr>
+      <tr><td class="n">10</td><td>Location 標頭</td><td class="bad">無；前端拿不到新資源位置</td><td class="good">201 + CreatedAtAction 帶 Location</td><td><span class="tag">契約</span></td></tr>
+      <tr><td class="n">11</td><td>對外訊息</td><td class="bad">中英夾雜，還把 ex.Message 直接外露</td><td class="good">全繁中、可安全外露，不夾例外細節</td><td><span class="tag">例外</span></td></tr>
+      <tr><td class="n">12</td><td>欄位命名一致性</td><td class="bad">Name／qty1／item_name／Qty 各處不同</td><td class="good">全對齊契約 camelCase 欄位</td><td><span class="tag">契約</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>程式碼並排（紅底＝違規／綠底＝合規）</h2>
+  <div class="cols">
+    <!-- 沒 harness -->
+    <div class="panel">
+      <div class="panel-head no">沒 harness<span class="file">demo/no-harness.cs</span></div>
+      <div class="code"><table id="code-no"></table></div>
+    </div>
+    <!-- 有 harness -->
+    <div class="panel">
+      <div class="panel-head yes">有 harness<span class="file">demo/with-harness.cs</span></div>
+      <div class="code"><table id="code-yes"></table></div>
+    </div>
+  </div>
+
+  <p class="foot"><b>harness 不是限制 AI，是讓 AI 像你團隊的資深工程師。</b></p>
+</div>
+
+<script>
+"use strict";
+// 主題切換：覆蓋系統偏好
+(function () {
+  var btn = document.getElementById("themeBtn");
+  btn.addEventListener("click", function () {
+    var root = document.documentElement;
+    var cur = root.getAttribute("data-theme");
+    var isDark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", isDark ? "light" : "dark");
+  });
+})();
+
+// 極簡語法上色（關鍵字／字串／註解），避免外部相依
+var KEYWORDS = ["using","namespace","public","private","class","string","int","var","new","return","await","async","Task","void","null","true","false","if","is","while","this"];
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function hi(line){
+  var e = esc(line);
+  // 註解整行
+  var t = line.trimStart();
+  if (t.indexOf("//") === 0) return '<span class="cm">' + e + '</span>';
+  // 字串（單引號或雙引號）
+  e = e.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|"[^"]*"|'[^']*')/g, function(m){ return '<span class="st">'+m+'</span>'; });
+  e = e.replace(/(&quot;.*?&quot;)/g, function(m){ return m.indexOf('class="st"')>=0?m:'<span class="st">'+m+'</span>'; });
+  // 關鍵字（避開已被 span 包住的段落，簡單處理）
+  KEYWORDS.forEach(function(k){
+    e = e.replace(new RegExp("(^|[^\\w>])(" + k + ")(?=[^\\w<]|$)","g"), function(mm,p1,p2){ return p1 + '<span class="kw">'+p2+'</span>'; });
+  });
+  return e;
+}
+function render(tableId, lines, marks){
+  var tb = document.getElementById(tableId);
+  var html = "";
+  lines.forEach(function(line, i){
+    var n = i + 1;
+    var mk = marks[n];
+    var cls = mk ? (mk.t === "b" ? "bad" : "good") : "";
+    html += '<tr class="'+cls+'"><td class="num">'+n+'</td><td class="src">'+ hi(line);
+    if (mk) html += '<span class="note '+mk.t+'">'+mk.msg+'</span>';
+    html += '</td></tr>';
+  });
+  tb.innerHTML = html;
+}
+
+// ---- 沒 harness 原始碼 ----
+var NO = [
+"// 沒有 harness：AI 憑一句話自由發揮的典型產出",
+"using Microsoft.AspNetCore.Mvc;",
+"using Npgsql;",
+"",
+"[ApiController]",
+"[Route(\"api\")]",
+"public class EquipmentController : ControllerBase",
+"{",
+"    // 連線字串硬編碼在 Controller 裡，帳密全都攤在原始碼",
+"    private string connstr = \"Host=localhost;...;Username=postgres;Password=12345\";",
+"",
+"    // 路由亂取、動詞塞進 URL、欄位命名到處不一致（Name/qty1/spec）",
+"    [HttpPost(\"addEquipment\")]",
+"    public IActionResult AddEquipment(string categoryKey, string Name, int qty1,",
+"        string unit, string spec, string keeper, string status)",
+"    {",
+"        try",
+"        {",
+"            // 完全沒有驗證：空字串、負數量、亂填的 status 通通照收",
+"            var conn = new NpgsqlConnection(connstr);",
+"            conn.Open();",
+"",
+"            // 編碼直接用時間戳硬湊，不保證唯一、也不符合「前綴-流水3碼」規則",
+"            string code = \"IT-\" + DateTime.Now.Ticks;",
+"",
+"            // 字串拼接組 SQL —— 典型 SQL Injection 破口",
+"            string sql = \"INSERT INTO equipment_item (code, category_key, name, qty, ...) \" +",
+"                \"VALUES ('\" + code + \"','\" + categoryKey + \"','\" + Name + \"',\" + qty1 + \")\";",
+"            var cmd = new NpgsqlCommand(sql, conn);",
+"            cmd.ExecuteNonQuery();",
+"            conn.Close();",
+"",
+"            // 不管成功失敗都回 200；訊息中英夾雜",
+"            return Ok(new { msg = \"add equipment 成功!\", code = code });",
+"        }",
+"        catch (Exception ex)",
+"        {",
+"            // blanket try/catch 吞掉所有例外，還把 ex.Message 直接外露",
+"            return Ok(new { msg = \"有錯誤: \" + ex.Message });",
+"        }",
+"    }",
+"",
+"    [HttpGet(\"getEquipmentList\")]",
+"    public IActionResult GetList()",
+"    {",
+"        var conn = new NpgsqlConnection(connstr);",
+"        conn.Open();",
+"        var cmd = new NpgsqlCommand(\"SELECT * FROM equipment_item\", conn);",
+"        var reader = cmd.ExecuteReader();",
+"        var list = new List<object>();",
+"        while (reader.Read())",
+"        {",
+"            // 欄位用索引硬取，順序一改就整包錯位；命名 item_name/Qty 混亂",
+"            list.Add(new { Id = reader[0], itemCode = reader[1],",
+"                item_name = reader[3], Qty = reader[4] });",
+"        }",
+"        return Ok(list);",
+"    }",
+"}"
+];
+var NO_MARKS = {
+  10: {t:"b", msg:"#2 連線字串＋帳密硬編碼在 Controller"},
+  13: {t:"b", msg:"#1 路由把動詞塞進 URL、非 RESTful"},
+  14: {t:"b", msg:"#4/#7/#12 直接收散裝參數、無 DTO（無 camelCase 錯誤鍵）；Name/qty1 命名混亂"},
+  20: {t:"b", msg:"#1/#2 方法內 new 連線，資料存取沒分層"},
+  24: {t:"b", msg:"#9 編碼用時間戳硬湊，不符規則、可能撞號"},
+  27: {t:"b", msg:"#3 字串拼接組 SQL：SQL Injection 破口"},
+  34: {t:"b", msg:"#5/#6/#10/#11 一律回 200（無 201+Location）、裸物件、訊息中英夾雜"},
+  39: {t:"b", msg:"#8/#11 blanket catch 吞例外＋外露 ex.Message，DB 斷線也回 200"},
+  54: {t:"b", msg:"#12 欄位用索引硬取，命名 item_name/Qty 各處不一致"}
+};
+
+// ---- 有 harness 原始碼 ----
+var YES = [
+"// 有 harness：AI 照團隊規矩（CODE-RULES-api.md ＋ 契約）產出",
+"using System.ComponentModel.DataAnnotations;",
+"using CrudTemplate.Api.Common;      // ModelResult 統一封裝",
+"",
+"// 請求 DTO：DataAnnotations 宣告驗證，刻意不宣告 id/code/updatedAt",
+"public class EquipmentItemRequest",
+"{",
+"    [Required(ErrorMessage = \"分類為必填\")]",
+"    [AllowedValues(EquipmentEnums.CategoryKeys, ErrorMessage = \"分類不在允許清單內\")]",
+"    public string CategoryKey { get; set; } = string.Empty;",
+"",
+"    [Required(ErrorMessage = \"項目名稱為必填\")]",
+"    [StringLength(50, ErrorMessage = \"名稱長度不可超過 50 字\")]",
+"    public string Name { get; set; } = string.Empty;",
+"",
+"    [Range(0, int.MaxValue, ErrorMessage = \"數量不可小於 0\")]",
+"    public int Qty { get; set; }",
+"",
+"    [Required(ErrorMessage = \"狀態為必填\")]",
+"    [AllowedValues(\"normal\", \"maintenance\", \"scrapped\", ErrorMessage = \"狀態值不合法\")]",
+"    public string Status { get; set; } = string.Empty;",
+"",
+"    // 選填欄位：keeperPhone 填了才驗（手機或市話）",
+"    public string? Keeper { get; set; }",
+"    [RegularExpression(@\"^(09\\d{8}|0\\d{1,2}-?\\d{6,8})$\", ErrorMessage = \"電話格式錯誤\")]",
+"    public string? KeeperPhone { get; set; }",
+"}",
+"",
+"// Controller：薄委派，只負責委派 Service → 依結果對映狀態碼",
+"[ApiController]",
+"[Route(\"api/equipment/items\")]",
+"public class EquipmentItemsController(IEquipmentItemService service) : ControllerBase",
+"{",
+"    [HttpPost]",
+"    public async Task<IActionResult> Create([FromBody] EquipmentItemRequest request)",
+"    {",
+"        var result = await service.Create(request);",
+"        // 201 + Location 標頭指向新資源；驗證失敗由框架回 400（camelCase 鍵）",
+"        return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);",
+"    }",
+"}",
+"",
+"// Service：商業邏輯與資料存取，相依一律建構式注入",
+"public class EquipmentItemService(AppDbContext db, EquipmentItemMapper mapper)",
+"{",
+"    public async Task<ModelResult<EquipmentItemResult>> Create(EquipmentItemRequest request)",
+"    {",
+"        var entity = mapper.ToEntity(request);",
+"        // 同一交易內產生 code：同前綴取最大流水號 +1；唯一索引擋併發撞號",
+"        await using var tx = await db.Database.BeginTransactionAsync();",
+"        var prefix = EquipmentEnums.PrefixOf(request.CategoryKey, request.Name);",
+"        var maxSeq = await db.EquipmentItems",
+"            .Where(e => e.Code.StartsWith(prefix + \"-\"))",
+"            .Select(e => e.Seq).DefaultIfEmpty(0).MaxAsync();",
+"        entity.Code = $\"{prefix}-{(maxSeq + 1):D3}\";",
+"        db.EquipmentItems.Add(entity);",
+"        await db.SaveChangesAsync();",
+"        await tx.CommitAsync();",
+"        return new ModelResult<EquipmentItemResult> { Data = mapper.ToResult(entity) };",
+"    }",
+"",
+"    public async Task<ModelResult<EquipmentItemResult>> GetById(string id)",
+"    {",
+"        var entity = await db.EquipmentItems.AsNoTracking()",
+"            .FirstOrDefaultAsync(e => e.Id == id);",
+"        if (entity is null)",
+"            // 查無資料＝預期業務失敗，轉 ModelResult（Controller 映 404）；",
+"            // 未預期例外不 try/catch，直接上拋 GlobalExceptionHandler 回 500",
+"            return new ModelResult<EquipmentItemResult> { Success = false, Message = $\"找不到裝備 {id}\" };",
+"        return new ModelResult<EquipmentItemResult> { Data = mapper.ToResult(entity) };",
+"    }",
+"}"
+];
+var YES_MARKS = {
+  6:  {t:"g", msg:"#4/#12 請求收斂到 DTO，欄位對齊契約 camelCase"},
+  8:  {t:"g", msg:"#4/#7 DataAnnotations 宣告式驗證，錯誤鍵自動 camelCase"},
+  16: {t:"g", msg:"#4 [Range] 擋負數量"},
+  20: {t:"g", msg:"#4 [AllowedValues] 鎖 status 三值"},
+  25: {t:"g", msg:"#4 keeperPhone 選填、填了才驗"},
+  31: {t:"g", msg:"RESTful 路由對齊契約 /api/equipment/items"},
+  32: {t:"g", msg:"#1/#2 Controller 薄委派＋建構式注入相依，不硬編碼連線"},
+  39: {t:"g", msg:"#5/#10 201 + Location；驗證失敗框架回 400"},
+  44: {t:"g", msg:"#2 Service 注入 DbContext / Mapper"},
+  54: {t:"g", msg:"#3 EF Core 查詢，參數化、無 SQL 拼接"},
+  55: {t:"g", msg:"#9 交易內同前綴 MAX+1 產編碼＋唯一索引擋撞號"},
+  59: {t:"g", msg:"#6 統一 ModelResult 封裝回應"},
+  69: {t:"g", msg:"#8/#11 只轉預期失敗、繁中安全訊息；未預期上拋 500"}
+};
+
+render("code-no", NO, NO_MARKS);
+render("code-yes", YES, YES_MARKS);
+</script>
+</body>
+</html>

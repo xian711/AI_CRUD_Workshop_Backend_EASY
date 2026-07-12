@@ -1,0 +1,31 @@
+# API 測試檔範本（VS / Rider REST Client 可直接執行）
+# 慣例（原單位範本）：每個 API 一個 .http 檔，放 Tests/{external|internal}/；
+# 環境值放 http-client.env.json（帳密等敏感值不進版控）。
+
+@host = https://localhost:5001
+
+### 0. 取得 token（帳密來自 http-client.env.json，不寫死）
+POST {{host}}/token
+Content-Type: application/json
+
+{
+  "account": "{{account}}",
+  "password": "{{password}}"
+}
+
+> {% client.global.set("token", response.body.data); %}
+
+### TC-01 happy path：查詢清單（FR-01）
+GET {{host}}/api/work-orders?page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### TC-03 驗證錯誤：日期區間不合法 → 400 VALIDATION_ERROR（FR-XX）
+GET {{host}}/api/work-orders?startDate=2026-13-01
+Authorization: Bearer {{token}}
+
+### TC-04 無權限 → 403 FORBIDDEN（FR-XX）
+GET {{host}}/api/work-orders
+Authorization: Bearer {{invalid_token}}
+
+# 對應的 curl（PowerShell 必須用 curl.exe，不能用 curl 別名）：
+# curl.exe -s -H "Authorization: Bearer {{token}}" "https://localhost:5001/api/work-orders?page=1&pageSize=20"
