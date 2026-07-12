@@ -38,10 +38,10 @@
   - 【測試】新增 Equipment 單元／整合測試，並覆蓋整合測試 factory `CustomWebAppFactory.cs`（改連測試庫 `ai_crud_equipment_test`）。
   - 【文件】把 `SRS-delta`／`SDD-delta`／`TASKS.md` 複製進學員專案 `docs\`，供三路驗收比對。
   - 覆蓋前一律把學員原檔備份到 `<Target>\.checkpoint-backup\`（保留相對路徑結構，只在第一次備份，重複執行 apply 不會覆蓋掉「套用前」的原始檔）。
-  - 除非加 `-SkipVerify`，套用完自動依序跑：`dotnet build`（預期 0 warning／0 error）→ `dotnet test`（預期 89 條全綠，可用 `-ExpectedTestCount` 覆蓋預期數）→ 啟動 API 驗 `GET /api/equipment/items` 回 24 筆 → psql 驗實際連線 `current_database()` 是否為 `ai_crud_equipment`，全程印出實測輸出方便當場核對。
+  - 除非加 `-SkipVerify`，套用完自動依序跑四項驗收，並**以機器可判定的方式 fail-closed**：`dotnet build -p:TreatWarningsAsErrors=true`（警告視為錯誤，用 exit code 判零警告零錯誤，不看語系相關的摘要字串）→ `dotnet test` 輸出 **TRX** 並解析與語系無關的 invariant counters（預期 passed=89／failed=0，可用 `-ExpectedTestCount` 覆蓋）→ 啟動 API 驗 `GET /api/equipment/items` 筆數（預期 24，可用 `-ExpectedRowCount` 覆蓋）→ 讀套用後 `appsettings.Development.json` 的 `Database=` 比對（預期 `ai_crud_equipment`，可用 `-ExpectedDbName` 覆蓋）並用 psql 確認該庫可連。**四項全過腳本才 `exit 0`；任一項無法解析／數量不符／失敗都 `exit 1`**（可用在 CI／講師快速判斷）。
   - 前提：學員專案沿用範本命名空間 `CrudTemplate.Api`（工作坊複製範本時不改名），否則複製過去的檔案命名空間對不上、無法編譯（腳本會自動嘗試偵測 `src\`／`tests\` 下的專案資料夾，唯一才自動採用）。
 - **`restore-checkpoint.ps1`** 與 apply 對稱：把 `.checkpoint-backup\` 內備份的原始檔複製回學員專案對應位置，讓學員能回到套用前的樣子。
-- 套完務必請學員核對自動驗收摘要（build exit／test passed vs 預期 89／GET 筆數 24／psql DB 名稱 `ai_crud_equipment`）都符合，才算跟上；有任何一項紅字，個別重跑對應指令排查，別急著往下走。
+- 套完看腳本結尾的四項 `[PASS]／[FAIL]` 摘要與 exit code：`exit 0`＝四項全過、已回到 solution baseline；`exit 1`＝有 `[FAIL]`（見紅字那項），排查後重跑，未回到 baseline 前別急著往 step4 走。
 
 ## 三、故障分流表（五種）
 

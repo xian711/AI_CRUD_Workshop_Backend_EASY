@@ -55,7 +55,7 @@
 | P1-3 | SCOPE 答案仍在學生路徑公開 | 學生路徑（`step3_new_module/README.md`、`PROMPTS.md`）淨空六題建議與裁決，只留問題面向與空白理由欄；答案只留 `instructor/SCOPE-後端課堂範圍決策.md` | grep 全文淨空確認：答案檔僅存在於 `instructor/` |
 | P1-4 | harness 四件與相對路徑指向不存在檔案 | 統一檔名（`CODE-RULES-api-本專案.md` 等）；把必要 baseline SRS／SDD 複製進 `step2_speedrun_kit/2.5_sample_api/sample-api/docs/baseline/`，讓工作區自包含 | 確認 `sample-api/docs/baseline/SRS-CRUD後端標準-v1.2.md`、`SDD-CRUD後端標準-v1.6.md` 已存在；`AGENTS.md`、`CODE-RULES-api-本專案.md` 命名一致 |
 | P1-5 | 講師 GUIDE 仍是 checkpoint 未完成時的舊稿 | 重寫 `instructor/GUIDE.md` 第二節，列出實際複製檔清單、限制、指令、預期 test count（89）、DB 名稱、失敗回復方式；preflight 段落同步成 11 項 | 讀 `instructor/GUIDE.md` 確認內容與 `apply-solution-checkpoint.ps1` 實際行為一致，不再是「尚未產出」舊稿 |
-| P1-6 | README 承諾的 HANDBOOK／BUILD_LOG 不存在 | 本檔即 BUILD_LOG（已建立）；**HANDBOOK 尚未建立，補製中**——本輪寫作當下磁碟上仍無 `HANDBOOK/` 目錄，屬於未完成項，不在此宣稱已補齊 | `Test-Path HANDBOOK` = False（本輪確認） |
+| P1-6 | README 承諾的 HANDBOOK／BUILD_LOG 不存在 | 本檔即 BUILD_LOG（已建立）；HANDBOOK 已補齊：`HANDBOOK/HANDBOOK.md`＋自包含 `HANDBOOK.html`＋`images/`（5 張全鏈路實拍截圖），教「綠燈要來自你自己的 my-equipment-api」正確流程 | `Test-Path` 確認 `HANDBOOK/HANDBOOK.md`／`HANDBOOK.html`／5 張 png 皆存在；根 README 的 `HANDBOOK/`、`BUILD_LOG.md` 連結均可解析 |
 | P1-7 | 舊 PID 清理可能誤殺無關程序 | `run-e2e.ps1` 的 PID 記錄改記 `PID＋exe path＋command line＋start time`；清理前需身分（exe／啟動時間）吻合、且該程序樹仍佔用 5080／3199 才終止；不吻合只 WARN 並刪過期記錄 | 讀 `Save-StartedPid`／`Clear-StaleProcesses` 函式確認三種情況（PID 已不存在／PID 被重用成不同程序／身分吻合但已釋放埠）皆不誤殺，只終止身分與佔用埠都吻合者 |
 
 ### 4.3 P2 群（教材與維護品質，本輪一併處理）
@@ -72,13 +72,36 @@
 
 補充風險（非分級項）：教材將 PostgreSQL 超級使用者 `postgres/12345` 直接寫入設定與腳本，`instructor/GUIDE.md` 故障分流表已標註「**僅限本機教室 DEMO，不得沿用公司／正式環境**」，正式環境建議改用環境變數 `ConnectionStrings__Default`／`PGPASSWORD`。
 
+### 4.4 追加審查：checkpoint 自動驗收的「機器判定假綠」（2026-07-12 覆審 P1）
+
+覆審發現 `apply-solution-checkpoint.ps1` 的套用後驗收雖然會印紅字，卻**永遠 exit 0**——屬同一類假綠：
+
+- build 只用 regex 抓英文摘要 `X Warning(s)`／`X Error(s)`，繁中機器輸出「警告／錯誤」→ 解析成 `$null`；
+- test 只抓英文 `Passed:／Total:`，繁中在地化 → 解析失敗；
+- 收尾**無條件 `exit 0`**，即使解析失敗、測試數不符、GET 非 24、DB 名不符也一樣綠。
+
+處置（fail-closed，與 CLI 語系無關）：
+- build 改 `-p:TreatWarningsAsErrors=true`，用 **exit code** 判零警告零錯誤。
+- test 改輸出 **TRX**，解析 invariant counters（`passed`／`failed`），不看在地化摘要字串。
+- DB 名改讀套用後 `appsettings.Development.json` 的 `Database=` 做**檔案比對**（可決定性重現），psql 再確認可連。
+- 四項結果**累積**，任一項無法解析／數量不符／失敗即 `exit 1`；新增 `-ExpectedRowCount`／`-ExpectedDbName` 便於覆寫與回歸。
+
+實測（回歸 harness `ckpt_regression.ps1`，全新假工作區，`ALL_REGRESSION_OK=True`）：
+
+| 案例 | 驅動失敗的檢查 | exit | 預期 |
+|---|---|---|---|
+| 正向（預設） | 四項全 PASS | 0 | 0 |
+| `-ExpectedTestCount 999` | test FAIL | 1 | 1 |
+| `-ExpectedRowCount 999` | GET FAIL | 1 | 1 |
+| `-ExpectedDbName nope` | DB 名 FAIL | 1 | 1 |
+
+正向的 build 在 `TreatWarningsAsErrors` 下仍 exit 0，證明參考解本身零警告；test 的 TRX 計數在繁中摘要下仍正確解出 89。
+
 ## 5. 已知限制與開課 Gate
 
 - **資安**：`postgres/12345` 僅限本機教室 DEMO 使用，**不得**沿用到公司或正式環境。
 - **G2 尚未達成**：需至少 3 位符合目標輪廓的真人，從 blank workspace 完整 dry run，並記錄各段 P50／P90 耗時、checkpoint 使用率、求助次數——這是需要真人執行的行動，**本輪尚未進行**，因此「120 分鐘完課」目前仍只是估算目標，非承諾。
-- **目前定位**：G0（技術與教材缺陷）已修畢，**適合講師高度介入的內部小班試教**；正式對外開課前，仍需：
-  - 補齊 G1 剩項（HANDBOOK 圖文手冊）；
-  - 取得 G2 真人 dry run 數據，且確認「學生作品通過」不是由官方 solution 冒充。
+- **目前定位**：G0（技術與教材缺陷，含 §4.4 checkpoint 機器判定假綠）已修畢、HANDBOOK 已補、四項回歸實測綠，**適合講師高度介入的內部小班試教**；正式對外開課前仍需取得 **G2 真人 dry run 數據**，且確認「學生作品通過」不是由官方 solution 冒充。
 
 ## 6. 素材與環境
 

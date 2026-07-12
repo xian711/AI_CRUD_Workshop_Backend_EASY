@@ -18,8 +18,12 @@
       - 覆蓋前一律把學員原檔備份到 <Target>\.checkpoint-backup\（保留相對路徑結構，
         只在第一次備份，重複執行 apply 不會覆蓋掉「套用前的原始檔」），可用
         restore-checkpoint.ps1 對稱還原。
-      - 套用完成後自動執行 dotnet build／dotnet test／啟動 API 驗 GET 筆數／psql 驗
-        DB 名稱，印出實測結果，方便講師與學員當場核對是否回到 solution baseline。
+      - 套用完成後自動 fail-closed 驗收四項：dotnet build（-p:TreatWarningsAsErrors=true，
+        用 exit code 判零警告零錯誤，不看語系相關摘要字串）／dotnet test（輸出 TRX，解析與
+        語系無關的 invariant counters，預期 passed=$ExpectedTestCount、failed=0）／啟動 API 驗
+        GET 筆數（預期 $ExpectedRowCount）／讀 appsettings.Development.json 的 Database= 比對
+        $ExpectedDbName 並用 psql 確認可連。四項全過才 exit 0；任一項無法解析／數量不符／失敗
+        即 exit 1（適合 CI 或講師快速判定是否回到 solution baseline）。
 
     前提：學員專案沿用範本命名空間 CrudTemplate.Api（工作坊複製範本時不改名），
           否則複製過去的檔案命名空間會對不上、無法編譯。
@@ -40,6 +44,10 @@ param(
     [string] $Target,
 
     [int] $ExpectedTestCount = 89,
+
+    [int] $ExpectedRowCount = 24,
+
+    [string] $ExpectedDbName = 'ai_crud_equipment',
 
     [switch] $SkipVerify
 )
@@ -262,59 +270,68 @@ try {
     $slnFile = Get-ChildItem -LiteralPath $Target -Filter '*.sln' -ErrorAction SilentlyContinue | Select-Object -First 1
     $buildTarget = if ($slnFile) { $slnFile.FullName } else { $Target }
 
-    # ── 1) dotnet build ──
+    # ── 1) dotnet build（-p:TreatWarningsAsErrors=true：任何警告都升級成錯誤，
+    #     直接用 exit code 判定「零警告零錯誤」，不依賴 CLI 語系的摘要字串）──
     Write-Host ''
-    Write-Host '[1/4] dotnet build' -ForegroundColor Cyan
-    $buildOutput = & dotnet build $buildTarget 2>&1 | Out-String
+    Write-Host '[1/4] dotnet build（警告視為錯誤）' -ForegroundColor Cyan
+    $buildOutput = & dotnet build $buildTarget -p:TreatWarningsAsErrors=true 2>&1 | Out-String
     $buildExit = $LASTEXITCODE
     Write-Host $buildOutput
-    # 解析 MSBuild 摘要行「X Warning(s)」「X Error(s)」的實際數字，
-    # 不要只數「warning」「error」關鍵字出現次數（那樣連「0 Warning(s)」本身都會被誤算成 1 次）。
-    $warnMatch = [regex]::Match($buildOutput, '(\d+)\s+Warning\(s\)')
-    $errMatch  = [regex]::Match($buildOutput, '(\d+)\s+Error\(s\)')
-    $warnCount = if ($warnMatch.Success) { [int]$warnMatch.Groups[1].Value } else { $null }
-    $errCount  = if ($errMatch.Success)  { [int]$errMatch.Groups[1].Value }  else { $null }
-    if ($buildExit -eq 0) {
-        if ($warnCount -eq 0 -and $errCount -eq 0) {
-            Write-Host "  build 結果：exit 0，$warnCount warning／$errCount error（符合 0 警告 0 錯誤）。" -ForegroundColor Green
-        } else {
-            Write-Host "  build 結果：exit 0，但摘要顯示 $warnCount warning／$errCount error（未達 0/0，請人工檢查上方輸出）。" -ForegroundColor Yellow
-        }
+    $buildPass = ($buildExit -eq 0)
+    if ($buildPass) {
+        Write-Host '  build 結果：exit 0（零警告零錯誤，PASS）。' -ForegroundColor Green
     } else {
-        Write-Host "  build 結果：exit $buildExit（FAIL）。" -ForegroundColor Red
+        Write-Host "  build 結果：exit $buildExit（有警告或錯誤，FAIL）。" -ForegroundColor Red
     }
 
-    # ── 2) dotnet test ──
+    # ── 2) dotnet test（輸出 TRX，解析與語系無關的 invariant counters；
+    #     不靠 CLI 摘要字串 Passed:/Total:，那些會被在地化成繁中而解析失敗）──
     Write-Host ''
-    Write-Host '[2/4] dotnet test' -ForegroundColor Cyan
+    Write-Host '[2/4] dotnet test（TRX 計數判定）' -ForegroundColor Cyan
     $actualTestCount = $null
+    $failedCount = $null
     $testExit = $null
-    if ($buildExit -ne 0) {
-        Write-Host '  略過（build 未成功）。' -ForegroundColor Yellow
+    $testPass = $false
+    if (-not $buildPass) {
+        Write-Host '  略過並判 FAIL（build 未通過，無法驗證測試）。' -ForegroundColor Red
     } else {
-        $testOutput = & dotnet test $dstTestsDir 2>&1 | Out-String
+        $trxDir  = Join-Path $env:TEMP 'checkpoint-verify-trx'
+        $trxName = 'checkpoint-verify.trx'
+        $trxPath = Join-Path $trxDir $trxName
+        if (Test-Path -LiteralPath $trxPath) { Remove-Item -LiteralPath $trxPath -Force -ErrorAction SilentlyContinue }
+        $testOutput = & dotnet test $dstTestsDir --logger "trx;LogFileName=$trxName" --results-directory $trxDir 2>&1 | Out-String
         $testExit = $LASTEXITCODE
         Write-Host $testOutput
-        # dotnet test 摘要格式如：Passed!  - Failed: 0, Passed: 89, Skipped: 0, Total: 89, Duration: ...
-        $m = [regex]::Match($testOutput, 'Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)')
-        if ($m.Success) {
-            $actualTestCount = [int]$m.Groups[1].Value
-            $totalCount = [int]$m.Groups[3].Value
-            if ($actualTestCount -eq $ExpectedTestCount -and $testExit -eq 0) {
-                Write-Host "  測試結果：passed=$actualTestCount／total=$totalCount，符合預期 $ExpectedTestCount，exit 0。" -ForegroundColor Green
-            } else {
-                Write-Host "  測試結果：passed=$actualTestCount／total=$totalCount（預期 $ExpectedTestCount），exit $testExit。" -ForegroundColor Red
+        if (Test-Path -LiteralPath $trxPath) {
+            try {
+                [xml]$trxXml = Get-Content -LiteralPath $trxPath -Raw
+                $nsm = New-Object System.Xml.XmlNamespaceManager($trxXml.NameTable)
+                $nsm.AddNamespace('t', 'http://microsoft.com/schemas/VisualStudio/TeamTest/2010')
+                $counters = $trxXml.SelectSingleNode('//t:ResultSummary/t:Counters', $nsm)
+                if ($counters) {
+                    $actualTestCount = [int]$counters.GetAttribute('passed')
+                    $failedCount     = [int]$counters.GetAttribute('failed')
+                }
+            } catch {
+                Write-Host "  （解析 TRX 失敗：$($_.Exception.Message)）" -ForegroundColor DarkYellow
             }
+        }
+        $testPass = ($null -ne $actualTestCount) -and ($failedCount -eq 0) -and ($actualTestCount -eq $ExpectedTestCount) -and ($testExit -eq 0)
+        if ($testPass) {
+            Write-Host "  測試結果：passed=$actualTestCount／failed=$failedCount，符合預期 $ExpectedTestCount，exit 0（PASS）。" -ForegroundColor Green
+        } elseif ($null -eq $actualTestCount) {
+            Write-Host "  測試結果：無法從 TRX 解析計數（FAIL）。exit $testExit" -ForegroundColor Red
         } else {
-            Write-Host "  測試結果：無法從輸出解析測試摘要，請人工檢查上方輸出。exit $testExit" -ForegroundColor Yellow
+            Write-Host "  測試結果：passed=$actualTestCount／failed=$failedCount（預期 passed=$ExpectedTestCount、failed=0），exit $testExit（FAIL）。" -ForegroundColor Red
         }
     }
 
     # ── 3) 啟動 API，驗 GET /api/equipment/items 筆數 ──
     Write-Host ''
-    Write-Host '[3/4] 啟動 API 驗 GET /api/equipment/items 筆數（預期 24 筆）' -ForegroundColor Cyan
+    Write-Host "[3/4] 啟動 API 驗 GET /api/equipment/items 筆數（預期 $ExpectedRowCount 筆）" -ForegroundColor Cyan
     $apiUrl = 'http://localhost:5080/api/equipment/items'
     $apiProc = $null
+    $getPass = $false
     try {
         $apiProc = Start-Process -FilePath 'dotnet' `
             -ArgumentList @('run', '--project', $dstApiDir, '--urls', 'http://localhost:5080') `
@@ -338,16 +355,17 @@ try {
             # 回應是 ModelResult<List<EquipmentItemResult>>（{ success, data: [...] }），
             # 實際筆數在 .data，不是頂層物件本身。
             $count = @($resp.data).Count
-            if ($count -eq 24) {
-                Write-Host "  GET 結果：$count 筆，符合預期 24 筆。" -ForegroundColor Green
+            $getPass = ($count -eq $ExpectedRowCount)
+            if ($getPass) {
+                Write-Host "  GET 結果：$count 筆，符合預期 $ExpectedRowCount 筆（PASS）。" -ForegroundColor Green
             } else {
-                Write-Host "  GET 結果：$count 筆（預期 24 筆）。" -ForegroundColor Red
+                Write-Host "  GET 結果：$count 筆（預期 $ExpectedRowCount 筆，FAIL）。" -ForegroundColor Red
             }
         } else {
-            Write-Host '  API 20 秒內未就緒，略過 GET 驗證（請人工用 dotnet run 確認）。' -ForegroundColor Yellow
+            Write-Host '  API 20 秒內未就緒，無法驗證 GET 筆數（FAIL）。' -ForegroundColor Red
         }
     } catch {
-        Write-Host "  啟動 API 或呼叫 GET 失敗（略過此項）：$($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "  啟動 API 或呼叫 GET 失敗（FAIL）：$($_.Exception.Message)" -ForegroundColor Red
     } finally {
         if ($apiProc -and -not $apiProc.HasExited) {
             Stop-Process -Id $apiProc.Id -Force -ErrorAction SilentlyContinue
@@ -355,45 +373,79 @@ try {
         }
     }
 
-    # ── 4) psql 驗實際連的 DB 名稱 ──
+    # ── 4) 驗開發連線 DB 名稱 ──
+    #   主判定＝讀套用後的 appsettings.Development.json 的 Database=，與 $ExpectedDbName 比對
+    #   （檔案判定，與語系無關、可決定性重現）；psql 再確認該庫可連（psql 不在 PATH 時僅告警）。
     Write-Host ''
-    Write-Host '[4/4] psql 驗開發連線實際 DB 名稱（預期 ai_crud_equipment）' -ForegroundColor Cyan
-    $psqlCmd = Get-Command psql -ErrorAction SilentlyContinue
-    $psqlExe = if ($psqlCmd) { $psqlCmd.Source } else {
-        # PATH 上常沒有 psql（本機常見安裝路徑做為後備，不需要使用者事先設定 PATH）。
-        Get-ChildItem -Path 'C:\Program Files\PostgreSQL\*\bin\psql.exe' -ErrorAction SilentlyContinue |
-            Sort-Object FullName -Descending | Select-Object -First 1 -ExpandProperty FullName
+    Write-Host "[4/4] 驗開發連線 DB 名稱（預期 $ExpectedDbName）" -ForegroundColor Cyan
+    $devSettings = Join-Path $dstApiDir 'appsettings.Development.json'
+    $dbNameFromSettings = $null
+    if (Test-Path -LiteralPath $devSettings) {
+        $dbm = [regex]::Match((Get-Content -LiteralPath $devSettings -Raw), 'Database=([A-Za-z0-9_]+)')
+        if ($dbm.Success) { $dbNameFromSettings = $dbm.Groups[1].Value }
     }
-    if (-not $psqlExe) {
-        Write-Host '  找不到 psql，略過此項（請人工確認 appsettings.Development.json 的 Database=ai_crud_equipment）。' -ForegroundColor Yellow
+    $dbNamePass = ($null -ne $dbNameFromSettings) -and ($dbNameFromSettings -eq $ExpectedDbName)
+    if (-not $dbNamePass) {
+        Write-Host "  appsettings.Development.json 的 Database=$dbNameFromSettings（預期 $ExpectedDbName，FAIL）。" -ForegroundColor Red
     } else {
-        try {
-            $env:PGPASSWORD = '12345'
-            $dbNameOutput = & $psqlExe -U postgres -h localhost -d ai_crud_equipment -t -c 'SELECT current_database();' 2>&1
-            $dbName = ($dbNameOutput | Out-String).Trim()
-            if ($dbName -eq 'ai_crud_equipment') {
-                Write-Host "  psql 實際連線 DB：$dbName（符合預期）。" -ForegroundColor Green
-            } else {
-                Write-Host "  psql 輸出：$dbName（請人工確認是否為 ai_crud_equipment）。" -ForegroundColor Yellow
+        Write-Host "  appsettings.Development.json 的 Database=$dbNameFromSettings（符合預期）。" -ForegroundColor Green
+        $psqlCmd = Get-Command psql -ErrorAction SilentlyContinue
+        $psqlExe = if ($psqlCmd) { $psqlCmd.Source } else {
+            Get-ChildItem -Path 'C:\Program Files\PostgreSQL\*\bin\psql.exe' -ErrorAction SilentlyContinue |
+                Sort-Object FullName -Descending | Select-Object -First 1 -ExpandProperty FullName
+        }
+        if (-not $psqlExe) {
+            Write-Host '  （找不到 psql，略過該庫連線確認；DB 名比對已由 appsettings 檔案判定。）' -ForegroundColor DarkYellow
+        } else {
+            try {
+                $env:PGPASSWORD = '12345'
+                $dbNameOutput = & $psqlExe -U postgres -h localhost -d $ExpectedDbName -t -c 'SELECT current_database();' 2>&1
+                $dbName = ($dbNameOutput | Out-String).Trim()
+                if ($dbName -eq $ExpectedDbName) {
+                    Write-Host "  psql 確認可連，current_database=$dbName。" -ForegroundColor Green
+                } else {
+                    Write-Host "  psql 連線 $ExpectedDbName 回應異常：$dbName（FAIL）。" -ForegroundColor Red
+                    $dbNamePass = $false
+                }
+            } catch {
+                Write-Host "  psql 連線 $ExpectedDbName 失敗（FAIL）：$($_.Exception.Message)" -ForegroundColor Red
+                $dbNamePass = $false
+            } finally {
+                Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
             }
-        } catch {
-            Write-Host "  psql 查詢失敗（略過此項）：$($_.Exception.Message)" -ForegroundColor Yellow
-        } finally {
-            Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
         }
     }
 
+    # ══════════════════════════════════════════════════════════════
+    # 驗收摘要：四項全過才 exit 0，任一未過（含無法解析／數量不符／失敗）即 exit 1。
+    # ══════════════════════════════════════════════════════════════
     Write-Host ''
-    Write-Host '=== 驗收摘要 ===' -ForegroundColor Cyan
-    Write-Host ("  build exit        : {0}" -f $buildExit)
-    Write-Host ("  test exit          : {0}" -f $testExit)
-    Write-Host ("  test passed/expect : {0}/{1}" -f $actualTestCount, $ExpectedTestCount)
+    Write-Host '=== 驗收摘要（四項全過才 exit 0，任一未過即 exit 1）===' -ForegroundColor Cyan
+    $checks = @(
+        @{ Name = '1) build（零警告零錯誤）'; Pass = $buildPass },
+        @{ Name = "2) test（passed=$actualTestCount／預期 $ExpectedTestCount，failed=$failedCount）"; Pass = $testPass },
+        @{ Name = "3) GET 筆數（預期 $ExpectedRowCount）"; Pass = $getPass },
+        @{ Name = "4) DB 名稱（預期 $ExpectedDbName）"; Pass = $dbNamePass }
+    )
+    $allPass = $true
+    foreach ($c in $checks) {
+        if ($c.Pass) {
+            Write-Host ("  [PASS] {0}" -f $c.Name) -ForegroundColor Green
+        } else {
+            Write-Host ("  [FAIL] {0}" -f $c.Name) -ForegroundColor Red
+            $allPass = $false
+        }
+    }
     Write-Host ''
-    Write-Host '下一步：' -ForegroundColor Cyan
-    Write-Host '  若上面各項未達預期，可個別重跑對應指令排查；' -ForegroundColor Gray
-    Write-Host '  若要復原成套用前的樣子，跑 restore-checkpoint.ps1 -Target 同一目錄。' -ForegroundColor Gray
-
-    exit 0
+    if ($allPass) {
+        Write-Host '四項驗收全數通過：已回到 solution baseline。' -ForegroundColor Green
+        Write-Host '  若要復原成套用前的樣子，跑 restore-checkpoint.ps1 -Target 同一目錄。' -ForegroundColor Gray
+        exit 0
+    } else {
+        Write-Host '有驗收項目未通過（見上方 [FAIL]）；未回到 solution baseline 前不要往 step4 走。' -ForegroundColor Red
+        Write-Host '  排查後重跑；若要復原成套用前的樣子，跑 restore-checkpoint.ps1 -Target 同一目錄。' -ForegroundColor Gray
+        exit 1
+    }
 }
 catch {
     Write-Host ("FAIL：{0}" -f $_.Exception.Message) -ForegroundColor Red
