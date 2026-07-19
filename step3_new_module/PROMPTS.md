@@ -96,8 +96,8 @@ AI 說做完之後，先讓它自己跑一輪證據，你再動手驗。把這�
 ```powershell
 # --- 驗收 1：swagger 五路由各打一次 ---
 # 先確認 API 有跑（在 my-equipment-api 資料夾）：
-#   dotnet run --project src --urls http://localhost:5080
-# （專案路徑以你的實際結構為準；範本是 src\CrudTemplate.Api）
+#   dotnet run --project src\CrudTemplate.Api --urls http://localhost:5080
+# （若你改過專案資料夾名稱，路徑以你的實際結構為準）
 # 瀏覽器開 http://localhost:5080/swagger，五條路由各執行一次：
 #   GET /api/equipment/items          → 200，24 筆
 #   GET /api/equipment/items/E-001    → 200；改打 E-999 → 404

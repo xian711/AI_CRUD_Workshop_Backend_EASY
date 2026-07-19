@@ -127,7 +127,13 @@ dotnet run --project src\CrudTemplate.Api --urls http://localhost:5080
 # 開 http://localhost:5080/swagger，五端點各操作一次
 ```
 
-全域搜尋殘留：`Select-String -Path src -Pattern "Member|template" -Recurse`（或 grep），把漏改的字串清乾淨。
+全域搜尋殘留，把漏改的字串清乾淨：
+
+```powershell
+Get-ChildItem src -Recurse -File | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' } | Select-String -Pattern 'Member|template'
+```
+
+（`Select-String` 沒有 `-Recurse` 參數，要先用 `Get-ChildItem -Recurse` 展開檔案再接管線；濾掉 `bin`／`obj` 是為了排除建置產物的假命中。）
 
 ## 3. Windows 指令對照表
 
@@ -138,7 +144,7 @@ dotnet run --project src\CrudTemplate.Api --urls http://localhost:5080
 | 複製整資料夾 | `Copy-Item -Recurse src dst` | `cp -r src dst` |
 | 建資料夾 | `New-Item -ItemType Directory -Force dir` | `mkdir -p dir` |
 | 刪資料夾 | `Remove-Item -Recurse -Force dir` | `rm -rf dir` |
-| 全文搜尋 | `Select-String -Path src -Pattern "Member" -Recurse` | `grep -rn "Member" src` |
+| 全文搜尋 | `Get-ChildItem src -Recurse -File \| Select-String -Pattern "Member"` | `grep -rn "Member" src` |
 
 ## 4. 常見坑
 
