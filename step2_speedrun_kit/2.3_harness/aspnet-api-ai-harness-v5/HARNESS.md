@@ -67,7 +67,7 @@ UI Spec → Page Draft（綁 mock 資料）→ Token Check → 人工目視
 
 1. **文件同步**：程式為準，SPEC / README / UML 圖跟上。圖優先於長文字，用 Mermaid（骨架見 `templates/uml-mermaid-snippets.md`）：循序圖每個主要流程一張、狀態圖每個有生命週期實體一張、ER 圖一張；一張圖不超過一屏。過時的圖比沒圖更糟。
 2. **重構掃描**：對照 `harness/CODE-RULES-api.md` / `CODE-RULES-ui.md`（只讀涉及的那份）找重複碼、死碼、過長方法、冗餘註解（細則見 `/milestone-loop`；功能型指令註解一律保留並前後計數防誤刪）。小改直接做並複驗；大改列待辦問人，不順手大重構。
-3. 之後過 Review Gate、回填 LESSONS、經同意後 commit。
+3. 之後過 Review Gate、回填 LESSONS、經同意後 commit。下一段落建議開新對話開始（context 歸零、規則不衰減；狀態靠 LOOP.md／TASKS.md 接手）。
 
 ### Review Gate
 

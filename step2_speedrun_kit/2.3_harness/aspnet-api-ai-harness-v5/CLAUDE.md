@@ -13,6 +13,7 @@
 | 接手既有系統（不是自己從零寫的） | 先照 `templates/intake-checklist.md` 盤點與補料，再走對應 loop |
 | 功能段落收尾 | `/milestone-loop` |
 | 完工審查（開新對話） | `/review-loop` |
+| 接續上次進度（新對話續作） | 先讀 `harness/LOOP.md`（Next 欄）與 `harness/TASKS.md`，不重新規劃、直接延續 |
 
 ## 底線
 

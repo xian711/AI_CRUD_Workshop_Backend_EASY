@@ -26,5 +26,6 @@
 | LS-06 | 改共用元件弄破別的頁面 | 沒先盤點使用方 | 改共用元件 / token 前先 grep 所有使用方，列回歸清單 |
 | LS-07 | PowerShell 跑 curl 指令參數全錯 | `curl` 在 PowerShell 是 `Invoke-WebRequest` 別名 | smoke 測試一律明寫 `curl.exe` |
 | LS-08 | 改既有檔案時悄悄刪掉原始碼 | 編輯範圍過大、整段覆寫 | commit 前跑 `git diff -- <檔案>` 逐行看被刪的行（10 秒），非預期刪除即還原 |
+| LS-09 | 新寫的 `.ps1` 一跑就 parse error、中文全亂碼 | 無 BOM 的 UTF-8 被 PowerShell 5.1 以 ANSI 解碼 | 含中文的 `.ps1` 一律存成 UTF-8 with BOM |
 
 （種子條目來自內部專案實戰，出處見 `docs/case-studies.md`。新專案導入時可清空重記。）

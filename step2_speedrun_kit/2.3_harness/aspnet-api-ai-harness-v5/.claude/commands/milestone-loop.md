@@ -20,6 +20,7 @@ Input: `$ARGUMENTS`（段落名稱或範圍）
 4. **審查**：提示在新對話執行 `/review-loop`（審寫分離）。
 5. **收尾**：逐項對照 `harness/LESSONS.md` 事件表（E1–E5）回填；更新 `harness/LOOP.md`（Gate 設 REVIEW）。
 6. 經使用者同意後 commit（繁中 message，`feat/fix/refactor/docs:` 前綴）。
+7. 提示：下一段落建議**開新對話**開始——context 歸零省 token、規則不衰減；狀態由 `harness/LOOP.md` 與 `TASKS.md` 接手（CLAUDE.md 路由表有「接續上次進度」）。
 
 ## Output
 
