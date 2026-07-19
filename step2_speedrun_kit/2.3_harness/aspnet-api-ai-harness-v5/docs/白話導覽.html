@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>白話導覽 — 這套 Harness 每個檔案為什麼存在</title>
+<style>
+  :root { --ink:#1a2332; --sub:#5a6b7f; --line:#e3e8ee; --bg:#f7f9fb; --card:#ffffff; --accent:#0a6ebd; --accent-bg:#eaf4fc; --warn:#b45309; --bad:#c0392b; --bad-bg:#fdf1ef; --good:#1e7e46; --good-bg:#eff9f2; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif; color:var(--ink); background:var(--bg); line-height:1.75; }
+  header { background:linear-gradient(135deg,#0d3b66,#0a6ebd); color:#fff; padding:48px 24px 40px; text-align:center; }
+  header h1 { font-size:1.9rem; letter-spacing:.03em; }
+  header p { margin-top:10px; opacity:.92; }
+  header .tag { display:inline-block; margin-top:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:4px 16px; font-size:.9rem; }
+  nav { position:sticky; top:0; background:var(--card); border-bottom:1px solid var(--line); padding:10px 16px; text-align:center; z-index:9; }
+  nav a { color:var(--accent); text-decoration:none; margin:0 10px; font-size:.95rem; }
+  main { max-width:1000px; margin:0 auto; padding:32px 20px 64px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:28px 32px; margin-bottom:24px; }
+  h2 { font-size:1.3rem; color:var(--accent); border-left:5px solid var(--accent); padding-left:12px; margin-bottom:16px; }
+  h3 { font-size:1.05rem; margin:22px 0 10px; color:#0d3b66; }
+  p.lead { color:var(--sub); margin-bottom:12px; }
+  p { margin-bottom:10px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.93rem; }
+  th,td { border:1px solid var(--line); padding:8px 12px; text-align:left; vertical-align:top; }
+  th { background:var(--accent-bg); }
+  code { background:#eef2f6; border-radius:4px; padding:1px 6px; font-family:Consolas,monospace; font-size:.9em; }
+  .quote { border-left:4px solid var(--warn); background:#fffbf3; padding:12px 18px; border-radius:0 8px 8px 0; margin:14px 0; }
+  .tree { background:#0d1b2a; color:#d7e3f4; border-radius:8px; padding:16px 20px; font-family:Consolas,monospace; font-size:.9rem; overflow-x:auto; line-height:1.9; margin:12px 0; }
+  .tree i { color:#7fb3e8; font-style:normal; }
+  /* 旅程圖 */
+  .journey { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:16px 0; }
+  .journey .st { background:var(--accent-bg); border:1.5px solid var(--accent); color:#0d3b66; border-radius:10px; padding:8px 12px; font-size:.88rem; text-align:center; line-height:1.4; }
+  .journey .st b { display:block; color:var(--accent); }
+  .journey .ar { color:var(--accent); font-weight:700; font-size:1.1rem; }
+  .journey .st.gate { background:#f3ecfd; border-color:#9333ea; color:#4c1d95; }
+  .journey .st.gate b { color:#9333ea; }
+  .journey .st.done { background:var(--good-bg); border-color:var(--good); color:#14532d; }
+  .journey .st.done b { color:var(--good); }
+  .loopnote { color:var(--sub); font-size:.85rem; margin-top:4px; }
+  /* 紅綠程式碼對照 */
+  .cmp { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0; }
+  .panel { border-radius:10px; overflow:hidden; border:1.5px solid; }
+  .panel.bad { border-color:var(--bad); }
+  .panel.good { border-color:var(--good); }
+  .panel .cap { padding:8px 14px; font-weight:700; color:#fff; font-size:.92rem; }
+  .panel.bad .cap { background:var(--bad); }
+  .panel.good .cap { background:var(--good); }
+  .panel pre { margin:0; padding:12px 14px; font-family:Consolas,monospace; font-size:.8rem; line-height:1.65; overflow-x:auto; }
+  .panel.bad pre { background:var(--bad-bg); }
+  .panel.good pre { background:var(--good-bg); }
+  .panel pre em { font-style:normal; font-weight:700; }
+  .panel.bad pre em { color:var(--bad); }
+  .panel.good pre em { color:var(--good); }
+  /* 逐項卡片 */
+  .item { border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin-bottom:12px; background:#fcfdfe; }
+  .item h4 { font-size:1rem; color:#0d3b66; margin-bottom:8px; }
+  .item h4 code { font-size:.95em; }
+  .kv { display:flex; gap:10px; margin-bottom:6px; align-items:flex-start; }
+  .kv .k { flex:0 0 4.2em; text-align:center; border-radius:6px; padding:1px 0; color:#fff; font-weight:700; font-size:.8rem; margin-top:4px; }
+  .kv .k.what { background:var(--accent); }
+  .kv .k.why { background:var(--warn); }
+  .kv .k.ex { background:var(--good); }
+  .kv .v { flex:1; font-size:.93rem; }
+  .layers { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+  .layers span { border-radius:999px; padding:4px 14px; font-size:.88rem; font-weight:700; color:#fff; }
+  .layers .a{background:#0a6ebd}.layers .b{background:#1e7e46}.layers .c{background:#b45309}.layers .d{background:#64748b}
+  .steps { counter-reset:s; list-style:none; margin:10px 0; }
+  .steps li { counter-increment:s; position:relative; padding:12px 16px 12px 58px; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; background:#fcfdfe; }
+  .steps li::before { content:counter(s); position:absolute; left:14px; top:14px; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  footer { text-align:center; color:var(--sub); font-size:.85rem; padding:24px; }
+  @media (max-width:720px){ section{padding:20px 16px} .cmp{grid-template-columns:1fr} nav a{margin:0 6px; font-size:.85rem} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>白話導覽</h1>
+  <p>這套 Harness 每個檔案為什麼存在——白話、有圖、有例子</p>
+  <div class="tag">不是 AI 變聰明，而是 Harness 讓 AI 被正確約束</div>
+</header>
+
+<nav>
+  <a href="#problem">解什麼問題</a><a href="#code">20 行程式碼</a><a href="#journey">開發旅程</a><a href="#map">資料夾地圖</a><a href="#files">逐項說明</a><a href="#faq">常見疑問</a><a href="#go">上路三步</a>
+</nav>
+
+<main>
+
+<section id="problem">
+  <h2>一、Harness 到底在解什麼問題</h2>
+  <div class="quote">
+    你跟 AI 說「幫我做一個裝置查詢 API」。十分鐘後它交出來：多了一個你沒要求的匯出 CSV、清單回傳的是寫死的假資料（看起來能動，其實根本沒接資料庫）、還順手把你別的檔案「優化」了一輪。你花在<strong>收拾</strong>的時間，比自己寫還久。
+  </div>
+  <p>這不是 AI 不聰明，是它有四個天生的毛病。Harness 的每個機制都對著其中一個：</p>
+  <table>
+    <tr><th>AI 的毛病</th><th>具體長相</th><th>Harness 的解法</th></tr>
+    <tr><td><strong>愛發揮</strong></td><td>沒人要求的功能順手加、規格沒寫的自己腦補</td><td>SDD first：先有規格再有程式，範圍外預設移除（<code>SPEC.md</code>＋鐵律 1）</td></tr>
+    <tr><td><strong>裝完成</strong></td><td>沒做完的功能回假資料、效能數字用猜的</td><td>誠實原則：未實作回 501、mock 必標示、數字標 <code>[待實機]</code>（鐵律 2）</td></tr>
+    <tr><td><strong>會漂移</strong></td><td>對話聊久了，前面立的規矩慢慢忘光</td><td>規則常駐（<code>CLAUDE.md</code>）＋開場自動重灌（SessionStart hook）</td></tr>
+    <tr><td><strong>重複踩坑</strong></td><td>上週踩過的坑，這週換個對話又踩一次</td><td>錯誤防範庫（<code>LESSONS.md</code>）＋事件表強制回填</td></tr>
+  </table>
+</section>
+
+<section id="code">
+  <h2>二、用 20 行程式碼看差別</h2>
+  <p class="lead">同一句需求：「幫我做一個裝置查詢 API」。同一個 AI 模型，差別只在有沒有 harness。</p>
+  <div class="cmp">
+    <div class="panel bad">
+      <div class="cap">❌ 沒有 harness——AI 交出這個</div>
+      <pre>
+[HttpGet("GetAllDevice_List")]   <em>← ② 命名自創一格</em>
+public IActionResult GetAllDeviceList()
+{
+    return Ok(new[] {            <em>← ③ 寫死的假資料</em>
+      new { id=1, name="裝置A", status="OK" },
+      new { id=2, name="裝置B", status="OK" }
+    });
+}
+
+[HttpDelete("DeleteDevice")]     <em>← ① 沒人要求的刪除</em>
+public IActionResult DeleteDevice(int id)
+{
+    _db.Devices.Remove(
+      _db.Devices.Find(id));     <em>← ④ 商業規則用猜的</em>
+    _db.SaveChanges();
+    return Ok("刪除成功");
+}</pre>
+    </div>
+    <div class="panel good">
+      <div class="cap">✅ 有 harness——同一句需求</div>
+      <pre>
+/// &lt;summary&gt;查詢裝置清單（FR-01）&lt;/summary&gt;
+[HttpGet]                        <em>← 命名照 CODE-RULES</em>
+public async Task&lt;IActionResult&gt; GetListAsync(
+    [FromQuery] DeviceQueryDto query)
+{
+    var result = await
+      _deviceService.GetListAsync(query);
+                                 <em>← 分層：邏輯在 Service</em>
+    return result.Success
+      ? Ok(result)
+      : BadRequest(result);      <em>← 統一 envelope</em>
+}
+
+// SPEC 沒有刪除需求 → 不寫（鐵律 1）。
+// 之後要加，AI 會先用選擇題問你 BR：
+//   誰能刪？軟刪還硬刪？</pre>
+    </div>
+  </div>
+  <p>左邊四個記號就是第一節的四大毛病現形。最危險的是 ③——<strong>看起來能動，所以沒人發現它是假的</strong>，直到上線那天。</p>
+  <table>
+    <tr><th>差異</th><th>沒 harness</th><th>有 harness</th><th>靠哪個機制</th></tr>
+    <tr><td>範圍</td><td>順手加了沒人要的刪除</td><td>規格沒寫的不做</td><td>鐵律 1 SDD first＋SPEC 編號</td></tr>
+    <tr><td>誠實</td><td>假資料回 200 冒充完成</td><td>真的接 Service；沒定案的回 501</td><td>鐵律 2 誠實原則</td></tr>
+    <tr><td>慣例</td><td>命名、分層自由發揮</td><td>跟公司既有專案長一樣</td><td><code>CODE-RULES-api.md</code></td></tr>
+    <tr><td>決策</td><td>商業規則自己猜</td><td>用選擇題問人再動手</td><td>鐵律 5 越權標記＋鐵律 6 互動決策</td></tr>
+    <tr><td>可追溯</td><td>程式對應哪個需求？沒人知道</td><td>標 <code>FR-01</code>，review 逐條對帳</td><td>SPEC 編號＋覆蓋矩陣</td></tr>
+  </table>
+</section>
+
+<section id="journey">
+  <h2>三、一次開發會經過什麼</h2>
+  <div class="journey">
+    <div class="st"><b>你提出需求</b></div><div class="ar">→</div>
+    <div class="st"><b>CLAUDE.md 路由</b>判斷走哪條 loop</div><div class="ar">→</div>
+    <div class="st"><b>/api-loop 或 /crud-loop</b>讀 SPEC 與 TASKS</div><div class="ar">→</div>
+    <div class="st"><b>產出一項任務</b>＋立刻驗證<br><span class="loopnote">失敗最多修 2 輪，過了才勾</span></div><div class="ar">→</div>
+    <div class="st gate"><b>/milestone-loop</b>文件同步＋重構掃描</div><div class="ar">→</div>
+    <div class="st gate"><b>/review-loop</b>開新對話審查<br><span class="loopnote">有 ❌ 退回修</span></div><div class="ar">→</div>
+    <div class="st done"><b>候選完工</b>由人最終核可</div>
+  </div>
+  <p>記住三個節奏：</p>
+  <ol class="steps">
+    <li><strong>平常</strong>：一個 loop 做一項任務，做完馬上驗，驗過才算數。</li>
+    <li><strong>段落收尾</strong>：<code>/milestone-loop</code> 讓文件跟上程式，順手掃冗餘。</li>
+    <li><strong>完工前</strong>：<strong>開新對話</strong>跑 <code>/review-loop</code>，全綠才能說「候選完工」——最後拍板的永遠是人。</li>
+  </ol>
+</section>
+
+<section id="map">
+  <h2>四、資料夾地圖</h2>
+  <div class="tree">aspnet-api-ai-harness-v5/
+├─ CLAUDE.md            <i>← 路由器：AI 每次對話自動讀的「總機」</i>
+├─ HARNESS.md           <i>← 規則總部：六條鐵律＋所有流程的原始出處</i>
+├─ USER-GUIDE.md        <i>← 使用手冊：5 分鐘上手＋逐檔速查表</i>
+├─ .claude/             <i>← 給 Claude Code 的自動化：指令、技能、開場 hook</i>
+├─ harness/             <i>← 每次任務的工作檔：規格、任務、狀態、踩坑、程式規範</i>
+├─ modules/             <i>← 需要才載入的細節：UI 慣例、審查規則、驗證規則</i>
+├─ templates/           <i>← 範本：照著填就對了，AI 不自由發揮</i>
+├─ examples/            <i>← 填好的完整範例：不會填 SPEC 時抄這個</i>
+├─ prompts/             <i>← 沒有 Claude Code 的環境用的濃縮 prompt</i>
+├─ scripts/             <i>← 跑測試的統一入口</i>
+└─ docs/                <i>← 參考文件：簡報、工作坊流程、本頁</i></div>
+  <p>分層邏輯一句話——每條規則只寫在一個地方，其他地方用引用的：</p>
+  <div class="layers"><span class="a">HARNESS＝規則</span><span class="b">commands＝動作</span><span class="c">modules＝細節</span><span class="d">docs＝參考</span></div>
+</section>
+
+<section id="files">
+  <h2>五、逐項說明（是什麼／為什麼／舉例）</h2>
+
+  <h3>根目錄三份</h3>
+  <div class="item"><h4><code>CLAUDE.md</code>——路由器</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">AI 每次開對話自動讀的檔，只有 20 幾行：鐵律濃縮＋「你要做什麼 → 用哪個指令」對照表。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">這個檔<strong>每次對話都付 token</strong>。細節放在用到才載入的 command 裡，常駐的只留路標——總機不用會修機器，只要知道轉給誰。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">你說「幫我加個查詢畫面」→ AI 從路由表看到「後端＋畫面 → <code>/crud-loop</code>」→ 走對流程，而不是憑感覺直接改檔案。</span></div>
+  </div>
+  <div class="item"><h4><code>HARNESS.md</code>——規則總部</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">六條鐵律、三種 Mode、驗證分級、模型分級、完工三關的唯一原始出處。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">規則散在十個檔案，AI 每次讀到的版本可能不一致；集中一處，其他檔案只引用。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">鐵律 2 誠實原則——做不完的端點必須回 <code>501</code>，不准回寫死的假資料。<strong>假的 200 比沒做更危險</strong>：demo 那天才發現全是假資料就來不及了。</span></div>
+  </div>
+  <div class="item"><h4><code>USER-GUIDE.md</code>——使用手冊</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">5 分鐘上手＋每個檔案的一行式速查表。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">新人第一份要讀的檔。本導覽講「為什麼」，它講「怎麼用」，互補。</span></div>
+  </div>
+
+  <h3>.claude/——給 Claude Code 的自動化</h3>
+  <div class="item"><h4>五個指令（commands/）</h4>
+    <table>
+      <tr><th>指令</th><th>一句話</th><th>防的坑</th></tr>
+      <tr><td><code>/api-loop</code></td><td>做一個後端 API 的固定流程</td><td>每次 prompt 品質不一——一句指令觸發同樣的完整流程</td></tr>
+      <tr><td><code>/crud-loop</code></td><td>API＋畫面一起做</td><td>畫面返工最貴——先審 UI Spec 再產碼；新建超過 3 個元件先用選擇題問你</td></tr>
+      <tr><td><code>/ui-loop</code></td><td>只做畫面雛形（無後端）</td><td>雛形不需要 API 產物；美感 AI 不可靠，一律標「待人工目視」</td></tr>
+      <tr><td><code>/milestone-loop</code></td><td>段落收尾：文件同步＋重構掃描＋清冗餘註解</td><td>程式迭代文件必掉隊；「過時的圖比沒圖更糟」</td></tr>
+      <tr><td><code>/review-loop</code></td><td>完工審查（必須開新對話）</td><td>自己審自己一定放水——見下方常見疑問 Q1</td></tr>
+    </table>
+    <div class="kv"><span class="k ex">舉例</span><span class="v"><code>/api-loop</code> 的驗證回圈：AI 寫完 API 不是說「完成了」就結束——要實際啟動服務、用 <code>curl.exe</code> 打真的請求、貼<strong>真實回應</strong>給你看。跑不起來就老實標 blocker，不准捏造輸出。</span></div>
+  </div>
+  <div class="item"><h4>兩個技能（skills/）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v"><code>aspnet-api-crud-sdd-loop</code>（忘記打指令時 AI 仍會自動照流程走）、<code>gis-frontend</code>（地圖開發的專屬規則與坑）。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">技能平常只佔一行描述的 token，講到相關話題才整份載入——專業領域規則「零常駐成本」。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">你直接說「幫我做個設備管理功能」沒打指令——skill 接住，自動照流程走，不讓 AI 自由發揮。</span></div>
+  </div>
+  <div class="item"><h4>開場 hook（hooks/session-start.sh＋settings.json）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">每次開新對話、或長對話被壓縮後，<strong>自動</strong>把鐵律／路由／完工三關的摘要重新塞進對話開頭。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">對話越長，AI 對開頭規則的記憶越糊——像傳話遊戲傳到第 50 句。規則衰減靠 AI 自己記是記不住的，hook 是機器保證的重灌。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">長對話尾聲你說「順手加個欄位」。沒 hook：AI 早忘了路由表，直接動手。有 hook：規則剛被重灌，照樣走 <code>/crud-loop</code>。<br><strong>要知道的一件事</strong>：第一次在這個資料夾啟動 Claude Code 會跳「是否信任此 hook」——按同意就好，之後不再問。</span></div>
+  </div>
+
+  <h3>harness/——每次任務的工作檔</h3>
+  <div class="item"><h4><code>SPEC.md</code>——規格（一切的源頭）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">本次任務的規格範本：功能需求（FR）、商業規則（BR）、測試案例（TC）都有編號；API contract、Mermaid 圖、完工標準。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">有編號才能對帳。審查時產「覆蓋矩陣」——每條 FR 有沒有對應程式和測試一眼看出；反過來也抓得出「沒有任何需求對應的程式」（AI 又發揮了）。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v"><code>FR-03：Given 未登入，When 呼叫查詢 API，Then 回 401</code>。程式和測試都標 <code>// FR-03</code>，review 時矩陣上這格就是綠的。</span></div>
+  </div>
+  <div class="item"><h4><code>TASKS.md</code>——任務清單（WBS）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">規格定案後 AI 展開的 checkbox 清單，每條標對應 FR 和驗證方式。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">「做完了沒」不能靠印象。<code>- [ ]</code> 機器可掃；<strong>驗證通過才准勾</strong>，勾了就是有證據的。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v"><code>- [ ] T7 curl smoke（FR-01～03）｜驗證: L2</code>——沒勾之前誰都不能說做完了。決定不做的要經你用選擇題核可、標 <code>[-]</code>，不准默默消失。</span></div>
+  </div>
+  <div class="item"><h4><code>LOOP.md</code>——目前狀態</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">現在進行到哪、這輪的待辦和決策。<strong>只記待辦，不記已完成。</strong></span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">記已完成會吃掉對話額度，還誘導 AI 自我感覺良好。進度看 TASKS、證據看 git、這裡只放還沒解決的事。</span></div>
+  </div>
+  <div class="item"><h4><code>LESSONS.md</code>——踩坑紀錄</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">踩過的坑，固定格式「問題 → 原因 → 防範」，一行一坑；每個 loop 開工前 AI 先掃一遍。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">AI 沒有跨對話記憶，同一個坑會無限重踩。回填不靠自覺，靠<strong>事件表 E1–E5</strong> 逐項對照（fix 修兩輪、review ❌、被人指正、驗證曾失敗、你否決過它的建議）——像餐廳關店檢查表，逐項勾而不是憑感覺。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">真實條目 LS-07：「PowerShell 打 curl 參數全錯 → curl 是別名 → 防範：一律明寫 <code>curl.exe</code>」。記下來之後這個坑再沒踩過。</span></div>
+  </div>
+  <div class="item"><h4><code>CODE-RULES-api.md</code>／<code>CODE-RULES-ui.md</code>——程式規範（按面向拆兩份）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">後端（分層、命名、資料表、migration）和前端（框架慣例、API 封裝）細則各一份。<strong>技術棧綁定全集中在這裡</strong>——核心規則不綁棧，換技術棧只換這兩份＋templates。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">純後端工作不必載前端規則，省 token；也防 AI 把前端慣例套到後端。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">AI 預設用它習慣的通用風格。有了這份，它寫的 Controller 分層、表命名（<code>work_order_m</code> 小蛇形）、審計欄位跟公司既有專案長一樣——review 的人不用重新適應。</span></div>
+  </div>
+
+  <h3>modules/——需要才載入的細節</h3>
+  <div class="item"><h4><code>crud-ui/</code> 三件（UI 慣例、Design Token 規則、Design System 摘要）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">表單互動慣例（必填加 <code>*</code>、危險操作二次確認…）、樣式 token 檢查規則、公司設計系統的摘要版。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">完整設計文件太大，每次貼會爆 token；摘要一次寫好重複用。token 規則做成「可執行的檢查」——檢查 → 修正 → 複驗，閉環。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">AI 想寫 <code>color: #FF0000</code> → token 檢查攔下 → 改成 <code>var(--color-danger)</code>。將來換主色改一個變數全站生效。</span></div>
+  </div>
+  <div class="item"><h4><code>review/</code> 兩件（審查規則＋通用檢查清單）</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">審查的完整規則（三維度、嚴重度分級、申辯通道）＋不需要規格也能審的通用清單。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">AI 不只會<strong>漏做</strong>（缺 fallback、缺邊界），也會<strong>多做</strong>（沒人要的抽象層、用不到的 Cache）。雙向偵測同時抓兩頭。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">申辯通道：Reviewer 標 ❌「刪除沒做軟刪除」，但規格明寫硬刪除——Coder 可拿規格條文要求重審那一條（限一次），不用去「修一個本來就沒錯的東西」。</span></div>
+  </div>
+  <div class="item"><h4><code>verify/</code>——驗證分級</h4>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">L0（build）→ L1（測試）→ L2（curl 實打）→ L3（瀏覽器 E2E），永遠先跑便宜的。</span></div>
+    <div class="kv"><span class="k why">為什麼</span><span class="v">各級成本差十倍以上。build 都不過就去測 E2E 是燒錢燒時間；L0 不過就不跑 L1，L3 預設跳過。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">E2E 裡外部付費 API 一律 mock——曾有測試直接打真的 AI API 把額度燒掉（LESSONS 記過這條）。</span></div>
+  </div>
+
+  <h3>templates/、examples/、prompts/、scripts/、docs/</h3>
+  <div class="item">
+    <div class="kv"><span class="k what">templates</span><span class="v"><code>.http</code> 測試檔、TDD 案例、mock 資料、Mermaid 圖骨架、接手舊系統盤點清單……<strong>AI 照範本填，不自由發揮</strong>——產出格式統一，review 的人每次看到的長相都一樣。</span></div>
+    <div class="kv"><span class="k what">examples</span><span class="v">兩個<strong>填好的</strong>完整範例（派工單 API、設備 CRUD）。不會填 SPEC？抄這個，比讀十頁說明快。</span></div>
+    <div class="kv"><span class="k what">prompts</span><span class="v">沒有 Claude Code 的環境（其他 AI 工具）用的濃縮 prompt，把 loop 精華壓成可貼上的幾段話。</span></div>
+    <div class="kv"><span class="k what">scripts</span><span class="v">跑測試的統一入口（<code>run-tests.ps1</code>／<code>.sh</code>）——L1 驗證只有一個門。</span></div>
+    <div class="kv"><span class="k what">docs</span><span class="v">簡報、網頁版手冊、三堂課流程、導入 FAQ、規則演進紀錄（每條規則當初踩了什麼坑才立的）。開發時用不到，備課和導入時用。</span></div>
+  </div>
+</section>
+
+<section id="faq">
+  <h2>六、三個最常被問的「為什麼」</h2>
+  <h3>Q1：為什麼審查一定要開新對話？</h3>
+  <div class="quote">同一個對話裡，AI 記得自己剛才「為什麼這樣寫」，檢查時會沿著同樣思路找<strong>支持自己的證據</strong>——它會驗證，不會證偽。就像自己改自己的考卷，錯的地方看十遍也看不出來。開新對話＝換一個沒有包袱的腦袋，只看程式和規格，這才是真正的第二雙眼睛。</div>
+  <h3>Q2：為什麼 AI 不能自己宣告完工？</h3>
+  <div class="quote">「看起來做完」和「真的做完」差很遠，而 AI 天生偏向前者。完工有三關：TASKS 無殘留 → Done Criteria 逐條成立 → review 全綠。三關全過，AI 也只能說「<strong>候選</strong>完工」——最後拍板的是人。這不是不信任 AI，是把「說了算」的權力留在該在的地方。</div>
+  <h3>Q3：為什麼規則不全部寫進 CLAUDE.md？</h3>
+  <div class="quote">CLAUDE.md 每次對話都付 token，而且<strong>規則越長，每一條被記住的機率越低</strong>。所以採「路由器」設計：常駐的只有 20 行路標，細節放在「做那件事才載入」的檔案裡。省錢，而且每條規則出場時都是主角。</div>
+</section>
+
+<section id="go">
+  <h2>七、新手上路三步</h2>
+  <ol class="steps">
+    <li><strong>複製</strong>整個資料夾到你的專案根目錄（不要挑著複製，檔案之間有相互引用）。</li>
+    <li><strong>填</strong> <code>harness/SPEC.md</code>（照 <code>examples/</code> 抄格式），導入期補 <code>CODE-RULES-*</code> 的公司實值。</li>
+    <li><strong>開始</strong>：<code>/api-loop 你的功能名</code>——剩下的流程 AI 會照著走，該問你的時候它會用選擇題問。</li>
+  </ol>
+  <p class="lead">有疑問先查 <code>USER-GUIDE.md</code> 速查表；想知道某條規則的來歷，看 <code>docs/case-studies.md</code>。</p>
+</section>
+
+</main>
+
+<footer>本頁是 <code>docs/白話導覽.md</code> 的網頁版——內容以 MD 為源頭，改動請先改 MD 再同步本頁。</footer>
+
+</body>
+</html>

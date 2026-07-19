@@ -44,6 +44,8 @@
 
 驗證分級：L0 build → L1 test → L2 curl smoke → L3 瀏覽器 E2E（預設跳過）。**為什麼分級**：各級成本差距極大，永遠先跑便宜的，前一級不過就不跑下一級。
 
+模型分級（同一邏輯用在模型成本）：一般產碼 Sonnet 即可；架構變更／安全路徑、同一問題第 2 輪 fix、`/review-loop` 時 AI 會提醒 `/model` 升 Opus——提醒不阻塞。
+
 **完工判斷（三關）**：① `TASKS.md` 無 `- [ ]` 殘留 → ② SPEC Done Criteria 逐條成立 → ③ Review 無 ❌。三關過後 AI 回報「候選完工」，由人最終核可——AI 不自我宣告完工。
 
 ## 逐檔說明（內容＋為何要設定）
@@ -65,8 +67,8 @@
 | `commands/api-loop.md` | API 開發固定流程：SPEC 併入 → 產出（引用編號）→ 輸出前四檢查（SPEC 對應 / 完整性 / 安全 / 可測試）→ L0/L1 → L2 smoke → 回填 LESSONS | 一句 `/api-loop` 觸發固定流程，避免每次 prompt 品質不一；四檢查放在輸出前，便宜的自我把關先於昂貴驗證 |
 | `commands/crud-loop.md` | API 流程＋UI Spec 先行、Token Check、缺件超過 3 個以選擇題熔斷 | 畫面返工成本高——先審 UI Spec 再產碼；批量建元件的副作用需要人先點頭 |
 | `commands/ui-loop.md` | 雛形流程：UI Spec → Page Draft（綁 mock、標 `// TODO: DEV 串接`）→ Token Check → 人工目視 | 無後端情境走 crud-loop 會產生多餘產物；美學判斷 AI 不可靠，標「待人工目視」 |
-| `commands/milestone-loop.md` | 段落收尾：文件同步（程式為準）、UML 圖更新、重構掃描（小改直接做並複驗、大改選擇題問人） | 程式迭代文件必掉隊；重構集中在收尾處理，避免每輪順手大改 |
-| `commands/review-loop.md` | 審查閘門：三維度（Completeness / Correctness / Coherence）＋雙向偵測（設計遺漏 DG＋過度設計 OE）、FR 覆蓋矩陣、❌/⚠️/💡 分級 | 必須在新對話執行（鐵律 3）；雙向偵測是因為 AI 不只會漏做、也會過度設計 |
+| `commands/milestone-loop.md` | 段落收尾：文件同步（程式為準）、UML 圖更新、重構掃描＋冗餘註解清理（功能型指令前後計數防誤刪；小改直接做並複驗、大改選擇題問人） | 程式迭代文件必掉隊；重構與註解衛生集中在收尾處理，避免每輪順手大改 |
+| `commands/review-loop.md` | 審查閘門：三維度（Completeness / Correctness / Coherence）＋雙向偵測（設計遺漏 DG＋過度設計 OE）、FR 覆蓋矩陣、❌/⚠️/💡 分級、申辯重審（附依據、每條限一次）；建議以 Opus 執行 | 必須在新對話執行（鐵律 3）；雙向偵測是因為 AI 不只會漏做、也會過度設計；申辯防一個誤判卡死整條線 |
 | `skills/aspnet-api-crud-sdd-loop/SKILL.md` | Mode 判斷與觸發、四條禁止 | 使用者忘記打指令時，AI 仍會依 skill 自動遵循流程 |
 | `skills/gis-frontend/SKILL.md` | GIS 前端角色：地圖規則與實戰坑，疊加在 crud / ui loop 之上 | skill 描述常駐一行、本文觸發才載入——專業領域規則零常駐成本 |
 | `hooks/session-start.sh`＋`settings.json` | SessionStart hook：開新對話／compact 後自動注入 Harness 提要（鐵律、路由、模型分級、完工三關、底線） | 長對話後早期規則會被壓縮或淡出（「聊久了不守規矩」）；hook 讓規則每次自動重灌，不靠 AI 記得。Windows 依賴 Git Bash（裝 git 就有） |
@@ -111,7 +113,7 @@
 
 | 檔案 | 內容 |
 |---|---|
-| `白話導覽.md` | 每個檔案為什麼存在——白話＋Mermaid 圖＋實例，新人第二份讀物 |
+| `白話導覽.md`＋`.html` | 每個檔案為什麼存在——白話＋圖＋20 行程式碼對照＋實例，新人第二份讀物（`.html` 雙擊即開，MD 為源頭） |
 | `harness-overview.html` | 本手冊的網頁版（瀏覽器直接開） |
 | `harness-overview.pptx` | 簡報版（工作坊開場） |
 | `workshop-guide.md` | 三堂工作坊流程 |

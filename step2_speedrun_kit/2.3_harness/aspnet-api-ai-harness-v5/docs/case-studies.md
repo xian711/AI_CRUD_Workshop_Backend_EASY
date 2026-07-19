@@ -15,6 +15,7 @@ v4 是網路討論出來的範本（保留低 token compact loop、不建 PR、�
 | 內部專案 G | 成本標註文化；唯讀 DB 帳號；單一事實來源＋同步哨兵 | VERIFY 成本標註、review-checklist API 項 |
 | 內部專案 H | commit 由人主導；共用元件分支紀律；多文件 Swagger；`.http` 測試慣例；前後端程式範本 | CLAUDE.md commit 規則、HARNESS OpenAPI 規則、`api-tests-sample.http`、`harness/CODE-RULES-api.md` / `-ui.md` |
 | 內部專案 I | 接手既有系統的知識盤點（四狀態＋放行判斷）；業務語意不腦補、假設必標驗證方式；改檔後掃誤刪 | `templates/intake-checklist.md`、HARNESS Loop Rule 4、LESSONS LS-08 |
+| specrun（外部 kit 對照，v5.13–15） | 測試反錨定；模型分級；審查申辯；反膨脹閘；冗餘註解清理；事件表回填；SessionStart 規則重灌 | HARNESS Loop Rule 5 / 模型分級節、REVIEW 申辯、LESSONS 升級規則與 E1–E5、milestone 註解掃描、`.claude/hooks/` |
 
 ## 案例詳述
 
@@ -91,6 +92,22 @@ v5 的兩塊直接取材：
 
 - **CODE-RULES 範本來源**：Controller 薄轉發＋Service 分層、`ModelResult` envelope、`BaseEntity` 審計欄位（`cre_id/cre_date/upd_id/upd_date`）、小蛇形表名＋`[Table]/[Column]` 明確標註、多文件 Swagger（External/Internal/TV 依命名空間分組、dev 才開）、前端功能模組分層與 `VITE_` env 慣例。範本檔案清單見 `harness/CODE-RULES-api.md` 與 `CODE-RULES-ui.md` 文末。
 - **`.http` 測試慣例**：每個 API 配 `Tests/{external|internal}/*.http`，環境值放 `http-client.env.json` 不進版控，先取 token 再帶入後續請求。→ `templates/api-tests-sample.http` 與 L2 smoke 的「同步維護 `.http`」規則。
+
+### 9. specrun 對照分析 — 外部 kit 互相參照（v5.13–15）
+
+[specrun](https://github.com/jay123578951/specrun) 是同一套 SDD 理念的 plugin 版實作（subagent pipeline、自動編排）。v5.13–15 逐項對照後引入八個機制，並刻意**不**引入其形態（stack pack、跨專案 JSONL、marketplace）——那是多專案 plugin 生態的解法，本 Harness 的場景是企業導入與教育訓練，透明可教優先於自動化。
+
+收進來的教訓：
+
+- **測試反錨定**：先照 SPEC 自列「該驗什麼」，才准看既有測試——防被現成測試錨定思路，漏掉沒人測過的洞。
+- **模型分級**：一般產碼 Sonnet；架構／安全／第 2 輪 fix 才提醒升 Opus——token 錢花在判斷力值錢的地方。
+- **審查申辯**：修正方可附依據對單一 ❌ 要求重審（限一次）——審查者也會看走眼，防「修一個本來就沒錯的東西」。
+- **反膨脹閘**：規則升級前必答「最便宜等效替代」——防規則庫慢性膨脹吃掉 token 預算。
+- **冗餘註解清理**（掛 milestone）＋**功能型指令前後計數**防誤刪。
+- **事件表 E1–E5**：回填從自由心證改為機械對照——未遂事件（驗證曾失敗、建議被否決）也留下紀錄。
+- **SessionStart hook**：規則提要在開場／壓縮後自動重灌——長對話規則衰減靠機器解，不靠 AI 記得。
+
+同場決策：核心規則鬆綁技術棧（v5.15）——受 specrun「核心 stack 無關」啟發，但用單包分層（CODE-RULES 集中綁定）而非它的選裝 pack，理由是零依賴可攜。
 
 ## 帶進工作坊的三句話
 

@@ -15,6 +15,7 @@
 - Martin Fowler: Harness Engineering for coding agent users.
 - Addy Osmani: Loop Engineering.
 - Anthropic Claude Code docs: Skills, slash commands, hooks.
+- specrun (jay123578951): SDD pipeline plugin — anti-anchoring tests, model tiering, review appeal, anti-bloat gate, event-table retro, SessionStart rule re-injection (adopted in v5.13–15; see case-studies.md case 9).
 - Microsoft ASP.NET Core integration testing with WebApplicationFactory.
 - EF Core SQL Server provider and Npgsql EF Core provider.
 

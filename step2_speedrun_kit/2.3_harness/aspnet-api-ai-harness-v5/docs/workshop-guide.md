@@ -66,7 +66,7 @@ Review：
 
 ### 1:50–2:00 收尾
 
-回填 `harness/LESSONS.md` 一條本堂踩到的坑。
+對照 `harness/LESSONS.md` 事件表（E1–E5）回填一條本堂踩到的坑。
 
 ## 第 3 堂：Review Gate 與分級驗證
 
@@ -86,7 +86,7 @@ Review：
 
 ### 0:45–1:10 修正與重審
 
-回產碼對話修 ❌ 項 → 回填 `harness/LESSONS.md` → 重審到通過。
+回產碼對話修 ❌ 項（認定誤判且有依據可申辯重審該條）→ 對照事件表（E1–E5）回填 `harness/LESSONS.md` → 重審到通過。
 
 ### 1:10–1:30 段落收尾演練
 
