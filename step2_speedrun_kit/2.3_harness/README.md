@@ -20,7 +20,7 @@
 
 | 檔案 | 是什麼 | 什麼時候用 |
 |---|---|---|
-| `aspnet-api-ai-harness-v5/` | 後端 API 的完整 harness 參考包（SDD loop、六條鐵律、驗證分級、`/api-loop`／`/crud-loop` 等 command、樣板規則檔） | **課堂用不到**；回公司做更大型 .NET 後端時照這套，讀它的 `CLAUDE.md` 走對應 loop。本課「四件」即從這套精煉、換成本專案實值 |
+| `aspnet-api-ai-harness-v5/` | 完整 harness 參考包 **v5.15**（SDD loop、六條鐵律、驗證分級、`/api-loop`／`/crud-loop` 等 command、樣板規則檔；核心規則不綁技術棧，.NET 細節集中在 `CODE-RULES-api.md`）。近版新增：模型分級提醒、審查申辯通道、LESSONS 事件表 E1–E5、收尾冗餘註解掃描、SessionStart 規則提要 hook | **課堂用不到**；回公司做更大型後端時照這套，讀它的 `CLAUDE.md` 走對應 loop。本課「四件」即從這套精煉、換成本專案實值。內附 `.claude/settings.json` 的 hook——第一次在該資料夾啟動 Claude Code 會詢問是否信任，同意後每次開場自動重灌規則提要（防長對話規則衰減） |
 
 ## 怎麼運作
 

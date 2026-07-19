@@ -2,7 +2,7 @@
 
 ## Purpose
 
-低 token 的 ASP.NET Core API / CRUD AI Harness 核心規則。
+低 token 的後端 API / CRUD AI Harness 核心規則。核心與技術棧無關；棧細節（預設 ASP.NET Core＋Vue）集中在 `harness/CODE-RULES-api.md` / `CODE-RULES-ui.md` 與 `templates/`、`scripts/`——換技術棧只換這些檔，本檔與 commands / modules 不動。
 
 一套 compact SDD loop，閘門：`SPEC → BUILD → MILESTONE → REVIEW → DONE`。
 
@@ -25,7 +25,7 @@ v5 = v4（網路討論版）＋ 內部專案實戰驗證過的規則。每條規
 
 ### API Mode
 
-用於 API contract、mock data、TDD cases、ASP.NET Core 測試草稿與驗證。
+用於 API contract、mock data、TDD cases、後端測試草稿與驗證。
 
 ```text
 SDD → Mock Data → TDD Cases → Test Code → Verify → Smoke → Fix → Summary
@@ -35,7 +35,7 @@ OpenAPI 規則：
 
 - API Mode 預設啟用 OpenAPI，**只開在 dev 環境**（或以開關控制）。
 - 專案已有 Swagger 設定就沿用，不重複配置（如多文件分組）。
-- .NET 9+ 用內建 `AddOpenApi()`；舊版才用 Swashbuckle。
+- 啟用方式依技術棧，見 `harness/CODE-RULES-api.md`。
 - SDD 的 contract 是草稿，程式生成的 OpenAPI 是活文件；兩者一致性由 Review Gate 檢查。
 
 ### CRUD Mode
@@ -66,12 +66,12 @@ UI Spec → Page Draft（綁 mock 資料）→ Token Check → 人工目視
 一個功能段落完成後執行 `/milestone-loop`：
 
 1. **文件同步**：程式為準，SPEC / README / UML 圖跟上。圖優先於長文字，用 Mermaid（骨架見 `templates/uml-mermaid-snippets.md`）：循序圖每個主要流程一張、狀態圖每個有生命週期實體一張、ER 圖一張；一張圖不超過一屏。過時的圖比沒圖更糟。
-2. **重構掃描**：對照 `harness/CODE-RULES-api.md` / `CODE-RULES-ui.md`（只讀涉及的那份）找重複碼、死碼、過長方法。小改直接做並複驗；大改列待辦問人，不順手大重構。
+2. **重構掃描**：對照 `harness/CODE-RULES-api.md` / `CODE-RULES-ui.md`（只讀涉及的那份）找重複碼、死碼、過長方法、冗餘註解（細則見 `/milestone-loop`；功能型指令註解一律保留並前後計數防誤刪）。小改直接做並複驗；大改列待辦問人，不順手大重構。
 3. 之後過 Review Gate、回填 LESSONS、經同意後 commit。
 
 ### Review Gate
 
-MILESTONE 之後、DONE 之前，在**新對話**執行 `/review-loop`。規則見 `modules/review/REVIEW.md`。有 ❌ 項就回到 Fix，修正後重審。
+MILESTONE 之後、DONE 之前，在**新對話**執行 `/review-loop`。規則見 `modules/review/REVIEW.md`。有 ❌ 項就回到 Fix，修正後重審；修正方認定某條係誤判且有依據（SPEC 條款、實測結果）時，可對該條申辯重審，每條限一次（規則見 REVIEW.md）。
 
 ### 完工判斷（三關，DONE 的定義）
 
@@ -90,11 +90,19 @@ MILESTONE 之後、DONE 之前，在**新對話**執行 `/review-loop`。規則�
 | 級別 | 內容 | 成本 | 時機 |
 |---|---|---|---|
 | L0 | build / typecheck | 零 | 每次改碼後 |
-| L1 | 自動化測試（`dotnet test`、前端單元測試） | 低 | 每個 loop 結尾 |
+| L1 | 自動化測試（後端走 `scripts/run-tests.*`、前端單元測試） | 低 | 每個 loop 結尾 |
 | L2 | API smoke（curl 實打，貼真實回應） | 低中 | API 實作完成後 |
 | L3 | 真實瀏覽器 E2E | 高（token 與時間） | 預設跳過；使用者明確要求或 CRUD 最終驗收才跑 |
 
 L2 通過後把實測 curl 指令附進交付並同步 `.http` 檔；L3 的外部付費 API 一律 mock，不燒真實額度。
+
+## 模型分級
+
+一般產碼 Sonnet 即可；遇下列情況**停下提醒使用者 `/model` 升 Opus**，提醒後不阻塞、使用者不切也照常繼續：
+
+- 該任務涉及架構變更或安全路徑（授權、金流、個資）。
+- 同一問題進第 2 輪 fix（升級後本功能完成前不建議降回）。
+- `/review-loop` 一律建議以 Opus 執行（審查判斷力優先於成本）。
 
 ## Token Budget Rules
 
@@ -115,13 +123,13 @@ L2 通過後把實測 curl 指令附進交付並同步 `.http` 檔；L3 的外�
 2. 判斷 mode：預設 API Mode；有 CRUD UI 需求用 CRUD Mode；只做畫面雛形（無後端）用 UI Mode。
 3. SDD 完成後若 TASKS 尚未展開，依 SPEC 展開（每條標對應 FR 與驗證方式；不可驗證的不算任務）。
 4. 檢查缺漏：會阻塞 → 用選擇題問人並記入 `harness/LOOP.md`；不阻塞 → 記 Assumption 繼續——但**業務與資料語意不腦補**：查得到的（DB、原始碼）先查再記，每條 Assumption 都要寫驗證方式。
-5. 取 TASKS 的下一項，只產生該項的最小產出，並引用 SPEC 編號（FR / BR / TC）。
+5. 取 TASKS 的下一項，只產生該項的最小產出，並引用 SPEC 編號（FR / BR / TC）。寫 TDD cases／測試碼前，先照 SPEC 自列「該驗什麼」清單，列完才准讀既有測試檔對照補缺（防止被現成測試錨定思路）。
 6. 跑或建議最小驗證指令（先 L0 再 L1；API 實作完成後跑 L2 smoke）。
 7. 任務完成**且驗證通過**才勾 `[x]`。commit 仍由使用者主導：commit 時勾選與產出放同一個；尚未 commit 前在 `LOOP.md` 註記待補，不得偽稱已 commit。
 8. 只修與本功能相關的問題；fix 滿 2 輪即停止。
 9. CRUD UI 產出後跑 token 檢查；違規 → 修正 → 複驗。
 10. 需要新建的元件超過 3 個時，以選擇題確認再動工。
-11. 依 `harness/LESSONS.md` 記載的時機回填踩坑；新 loop 開始先掃該檔。
+11. loop 結尾逐項對照 `harness/LESSONS.md` 事件表（E1–E5），中的事件回填；新 loop 開始先掃該檔。
 12. 階段全部完成時不自行推測下一階段任務，回報並等待指示。
 
 ## Human Interrupt Criteria

@@ -1,11 +1,11 @@
 ---
 name: aspnet-api-crud-sdd-loop
-description: Use for ASP.NET Core API and CRUD tasks that need SDD, mock data, TDD cases, design-token-compliant CRUD UI, staged verification, and a review gate before completion.
+description: Use for backend API and CRUD tasks that need SDD, mock data, TDD cases, design-token-compliant CRUD UI, staged verification, and a review gate before completion.
 ---
 
-# ASP.NET API / CRUD SDD Loop
+# API / CRUD SDD Loop
 
-產生或修改 ASP.NET Core API、CRUD 功能或 UI 雛形時使用本 skill，遵守 `HARNESS.md` 鐵律。
+產生或修改後端 API、CRUD 功能或 UI 雛形時使用本 skill，遵守 `HARNESS.md` 鐵律（技術棧慣例以 `harness/CODE-RULES-*.md` 為準）。
 
 Mode 判斷：
 

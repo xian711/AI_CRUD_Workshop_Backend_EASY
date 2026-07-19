@@ -10,7 +10,7 @@ L0–L3 分級定義見 `HARNESS.md`；本檔只列各級執行規則。
 
 ## L2 API smoke 規則
 
-- `dotnet run` 背景啟動；**埠號從啟動輸出或 launchSettings 抓，不寫死**。
+- 以專案啟動指令背景啟動（指令與埠號來源見 `harness/CODE-RULES-api.md`）；**埠號從啟動輸出或設定檔抓，不寫死**。
 - 只打 TC 對應案例：happy path ＋ 1–2 個錯誤案例（400 / 403），不全打。
 - **貼真實回應，不得捏造**；跑不起來（缺 DB、缺連線字串）就誠實標 blocker 或 `[待實機]`（鐵律 2）。
 - PowerShell 的 `curl` 是 `Invoke-WebRequest` 別名，參數不相容：**一律明寫 `curl.exe`**。

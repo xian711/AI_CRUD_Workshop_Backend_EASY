@@ -14,10 +14,11 @@ Input: `$ARGUMENTS`（段落名稱或範圍）
    - UML 圖：依 `templates/uml-mermaid-snippets.md` 更新受影響的圖；圖優先於長文字，過時的圖直接改或刪。
 3. **重構掃描（只列清單，不順手大重構）**：
    - 找：重複程式碼、死碼、過長方法、與 `harness/CODE-RULES-api.md` / `CODE-RULES-ui.md`（只讀本段落涉及的那份）不符處。
+   - 冗餘註解（只掃本段落 diff）：刪思考過程（「先這樣試試」）、複述程式碼的廢話（`count++ // 加一`）、註解掉的死碼、空泛 TODO；保留解釋「為什麼」的註解、API 文件註解與功能型指令（`#pragma`、`#nullable`、`eslint-disable`、`@ts-ignore` 等）。防誤刪：清理前後對功能型指令逐項計數，少了就補回；拿不準就留。
    - 小改（改名、抽方法）：直接做，做完跑 L0 / L1 複驗。
    - 大改（動架構、跨模組）：列入 `harness/LOOP.md` 待辦，並以選擇題問人（本輪做 / 排下輪 / 不做，附建議），問到答案再動。
 4. **審查**：提示在新對話執行 `/review-loop`（審寫分離）。
-5. **收尾**：回填 `harness/LESSONS.md`；更新 `harness/LOOP.md`（Gate 設 REVIEW）。
+5. **收尾**：逐項對照 `harness/LESSONS.md` 事件表（E1–E5）回填；更新 `harness/LOOP.md`（Gate 設 REVIEW）。
 6. 經使用者同意後 commit（繁中 message，`feat/fix/refactor/docs:` 前綴）。
 
 ## Output

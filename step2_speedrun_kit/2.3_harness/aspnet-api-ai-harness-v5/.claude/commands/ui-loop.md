@@ -13,7 +13,7 @@ Input: `$ARGUMENTS`
 5. Token Check（`design-token-rules.md`）→ 修正 → 複驗。
 6. 驗證：L0（typecheck）即可；美學與版面標「待人工目視」，不推估。
 7. 任務完成且驗證通過（Token Check／人工確認）才在 TASKS 勾 `[x]`；commit 由使用者主導，未 commit 前在 LOOP.md 註記待補。
-8. 更新 `harness/LOOP.md`。雛形確認要轉正式功能時，提示改走 `/crud-loop`。
+8. 更新 `harness/LOOP.md`；逐項對照 `harness/LESSONS.md` 事件表（E1–E5），中的事件回填。雛形確認要轉正式功能時，提示改走 `/crud-loop`。
 
 ## Output
 

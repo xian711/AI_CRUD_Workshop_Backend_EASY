@@ -1,6 +1,6 @@
 # AI Harness v5 使用手冊（USER-GUIDE）
 
-低 token、SDD 優先的 ASP.NET Core API / CRUD / UI 雛形 AI Harness。
+低 token、SDD 優先的後端 API / CRUD / UI 雛形 AI Harness。核心規則與技術棧無關；棧細節（預設 ASP.NET Core＋Vue）集中在 `harness/CODE-RULES-*.md`、`templates/`、`scripts/`——換技術棧只換這三處，核心與 commands / modules 不動。
 
 > 核心說法：不是 AI 變聰明，而是 Harness 讓 AI 被正確約束。
 
@@ -67,6 +67,7 @@
 | `commands/review-loop.md` | 審查閘門：三維度（Completeness / Correctness / Coherence）＋雙向偵測（設計遺漏 DG＋過度設計 OE）、FR 覆蓋矩陣、❌/⚠️/💡 分級 | 必須在新對話執行（鐵律 3）；雙向偵測是因為 AI 不只會漏做、也會過度設計 |
 | `skills/aspnet-api-crud-sdd-loop/SKILL.md` | Mode 判斷與觸發、四條禁止 | 使用者忘記打指令時，AI 仍會依 skill 自動遵循流程 |
 | `skills/gis-frontend/SKILL.md` | GIS 前端角色：地圖規則與實戰坑，疊加在 crud / ui loop 之上 | skill 描述常駐一行、本文觸發才載入——專業領域規則零常駐成本 |
+| `hooks/session-start.sh`＋`settings.json` | SessionStart hook：開新對話／compact 後自動注入 Harness 提要（鐵律、路由、模型分級、完工三關、底線） | 長對話後早期規則會被壓縮或淡出（「聊久了不守規矩」）；hook 讓規則每次自動重灌，不靠 AI 記得。Windows 依賴 Git Bash（裝 git 就有） |
 
 ### `harness/`（每次任務的工作檔）
 
@@ -76,7 +77,7 @@
 | `TASKS.md` | 任務分解（WBS）：checkbox 條列，每條標對應 FR 與驗證方式；做完且驗證通過才勾；commit（由人主導）時勾選與產出放同一個 | `- [ ]` 機器可掃，review 一行就能判斷做完沒；分工＝TASKS 進度快照、git 完成證據、LOOP 只記活待辦 |
 | `CODE-RULES-api.md` | 後端規範：C# 分層命名、API envelope、表命名 / 審計欄位 / migration；附範本檔案清單 | AI 預設用通用風格，不會自動符合公司慣例；**按面向拆檔**讓純 UI 工作不必載入後端規則 |
 | `CODE-RULES-ui.md` | 前端規範：Vue 慣例、API 封裝、env、格式化；附範本檔案清單 | 同上——純後端工作不必載入前端規則 |
-| `LESSONS.md` | 錯誤防範庫：問題 → 原因 → 防範；回填時機（fix 兩輪才修好、review ❌、人工指正） | 同樣的坑 AI 會重複踩，除非把防範寫成「開工前必掃」的清單 |
+| `LESSONS.md` | 錯誤防範庫：問題 → 原因 → 防範；回填時機是五項事件表 E1–E5（fix 兩輪、review ❌、人工指正、驗證曾失敗含環境坑、建議項被否決），loop 結尾逐項對照 | 同樣的坑 AI 會重複踩，除非把防範寫成「開工前必掃」的清單；記不記用機械對照，不靠自由心證，未遂事件也留下紀錄 |
 | `LOOP.md` | loop 狀態：Gate、待辦、本輪決策——**只記待辦不記已完成** | 記已完成會吃掉上下文預算，還誘導 AI 自我滿足；階段完成不自行推測下一階段 |
 
 ### `modules/`（需要才載入的細節規則）

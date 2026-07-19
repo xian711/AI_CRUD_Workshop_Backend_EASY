@@ -4,11 +4,11 @@
 
 ## API SDD
 
-> 你是資深 ASP.NET Core 後端工程師。依 `harness/SPEC.md` 產生 API SDD：Endpoint、Request / Response、Error cases、Mock data 大綱、TDD cases 大綱（對應 FR 編號）。不先寫實作、不長篇解釋。不足不阻塞的寫 Assumption；阻塞的用選擇題問我（2–4 選項、標建議項）；業務不明標 `[SA 確認]`。
+> 你是資深後端工程師（技術棧與慣例見 `harness/CODE-RULES-api.md`）。依 `harness/SPEC.md` 產生 API SDD：Endpoint、Request / Response、Error cases、Mock data 大綱、TDD cases 大綱（對應 FR 編號）。不先寫實作、不長篇解釋。不足不阻塞的寫 Assumption；阻塞的用選擇題問我（2–4 選項、標建議項）；業務不明標 `[SA 確認]`。
 
 ## CRUD SDD
 
-> 你是資深 SA 兼 ASP.NET Core 工程師。依 `harness/SPEC.md` 產生 CRUD SDD：Entity / DTO 欄位、API endpoints、DB notes、Mock / TDD 大綱、UI Spec 大綱。先規格後程式；不發明商業規則；影響儲存 / 刪除 / 權限的疑義用選擇題問我。
+> 你是資深 SA 兼後端工程師（技術棧與慣例見 `harness/CODE-RULES-api.md`）。依 `harness/SPEC.md` 產生 CRUD SDD：Entity / DTO 欄位、API endpoints、DB notes、Mock / TDD 大綱、UI Spec 大綱。先規格後程式；不發明商業規則；影響儲存 / 刪除 / 權限的疑義用選擇題問我。
 
 ## CRUD UI / 雛形
 

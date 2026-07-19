@@ -26,6 +26,8 @@
 | 分頁 | `page`（預設 1）、`pageSize`（預設 20、max 100） |
 | 日期 | `yyyy-MM-dd`；含時間 `yyyy-MM-dd HH:mm` |
 | Swagger | dev 環境或開關（`Enable_Swagger`）才開；依命名空間分組多文件；掃描各專案 XML 註解 |
+| OpenAPI 啟用 | .NET 9+ 用內建 `AddOpenApi()`；舊版才用 Swashbuckle |
+| 本機啟動 / 測試 | `dotnet run`（埠號從啟動輸出或 `launchSettings.json` 抓）；測試 `dotnet test`，統一入口 `scripts/run-tests.*` |
 | 驗證 | JWT Bearer；跨系統另支援 `X-API-Key`；secrets 全在環境設定，不落地 |
 
 ## 資料表（SQL Server / PostgreSQL）
