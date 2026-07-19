@@ -171,7 +171,7 @@ public async Task&lt;IActionResult&gt; GetListAsync(
   <p>記住三個節奏：</p>
   <ol class="steps">
     <li><strong>平常</strong>：一個 loop 做一項任務，做完馬上驗，驗過才算數。</li>
-    <li><strong>段落收尾</strong>：<code>/milestone-loop</code> 讓文件跟上程式，順手掃冗餘。</li>
+    <li><strong>段落收尾</strong>：<code>/milestone-loop</code> 讓文件跟上程式，順手掃冗餘。收尾後下一段落建議<strong>開新對話</strong>——context 歸零省 token、規則不衰減，狀態由 <code>LOOP.md</code> 接手。</li>
     <li><strong>完工前</strong>：<strong>開新對話</strong>跑 <code>/review-loop</code>，全綠才能說「候選完工」——最後拍板的永遠是人。</li>
   </ol>
 </section>
@@ -248,8 +248,9 @@ public async Task&lt;IActionResult&gt; GetListAsync(
     <div class="kv"><span class="k ex">舉例</span><span class="v"><code>- [ ] T7 curl smoke（FR-01～03）｜驗證: L2</code>——沒勾之前誰都不能說做完了。決定不做的要經你用選擇題核可、標 <code>[-]</code>，不准默默消失。</span></div>
   </div>
   <div class="item"><h4><code>LOOP.md</code>——目前狀態</h4>
-    <div class="kv"><span class="k what">是什麼</span><span class="v">現在進行到哪、這輪的待辦和決策。<strong>只記待辦，不記已完成。</strong></span></div>
+    <div class="kv"><span class="k what">是什麼</span><span class="v">現在進行到哪、這輪的待辦和決策。<strong>只記待辦，不記已完成。</strong>也是新對話續作的接手點。</span></div>
     <div class="kv"><span class="k why">為什麼</span><span class="v">記已完成會吃掉對話額度，還誘導 AI 自我感覺良好。進度看 TASKS、證據看 git、這裡只放還沒解決的事。</span></div>
+    <div class="kv"><span class="k ex">舉例</span><span class="v">昨天做到一半今天開新對話，說「繼續上次的進度」——AI 照路由表「接續上次進度」先讀本檔的 Next 欄，直接延續，<strong>不重新規劃</strong>、不從頭再問一遍需求。</span></div>
   </div>
   <div class="item"><h4><code>LESSONS.md</code>——踩坑紀錄</h4>
     <div class="kv"><span class="k what">是什麼</span><span class="v">踩過的坑，固定格式「問題 → 原因 → 防範」，一行一坑；每個 loop 開工前 AI 先掃一遍。</span></div>

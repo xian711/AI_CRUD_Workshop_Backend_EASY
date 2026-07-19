@@ -67,7 +67,7 @@
 | `commands/api-loop.md` | API 開發固定流程：SPEC 併入 → 產出（引用編號）→ 輸出前四檢查（SPEC 對應 / 完整性 / 安全 / 可測試）→ L0/L1 → L2 smoke → 回填 LESSONS | 一句 `/api-loop` 觸發固定流程，避免每次 prompt 品質不一；四檢查放在輸出前，便宜的自我把關先於昂貴驗證 |
 | `commands/crud-loop.md` | API 流程＋UI Spec 先行、Token Check、缺件超過 3 個以選擇題熔斷 | 畫面返工成本高——先審 UI Spec 再產碼；批量建元件的副作用需要人先點頭 |
 | `commands/ui-loop.md` | 雛形流程：UI Spec → Page Draft（綁 mock、標 `// TODO: DEV 串接`）→ Token Check → 人工目視 | 無後端情境走 crud-loop 會產生多餘產物；美學判斷 AI 不可靠，標「待人工目視」 |
-| `commands/milestone-loop.md` | 段落收尾：文件同步（程式為準）、UML 圖更新、重構掃描＋冗餘註解清理（功能型指令前後計數防誤刪；小改直接做並複驗、大改選擇題問人） | 程式迭代文件必掉隊；重構與註解衛生集中在收尾處理，避免每輪順手大改 |
+| `commands/milestone-loop.md` | 段落收尾：文件同步（程式為準）、UML 圖更新、重構掃描＋冗餘註解清理（功能型指令前後計數防誤刪；小改直接做並複驗、大改選擇題問人）；收尾後提示下一段落開新對話 | 程式迭代文件必掉隊；重構與註解衛生集中在收尾處理；換新對話 context 歸零、規則不衰減 |
 | `commands/review-loop.md` | 審查閘門：三維度（Completeness / Correctness / Coherence）＋雙向偵測（設計遺漏 DG＋過度設計 OE）、FR 覆蓋矩陣、❌/⚠️/💡 分級、申辯重審（附依據、每條限一次）；建議以 Opus 執行 | 必須在新對話執行（鐵律 3）；雙向偵測是因為 AI 不只會漏做、也會過度設計；申辯防一個誤判卡死整條線 |
 | `skills/aspnet-api-crud-sdd-loop/SKILL.md` | Mode 判斷與觸發、四條禁止 | 使用者忘記打指令時，AI 仍會依 skill 自動遵循流程 |
 | `skills/gis-frontend/SKILL.md` | GIS 前端角色：地圖規則與實戰坑，疊加在 crud / ui loop 之上 | skill 描述常駐一行、本文觸發才載入——專業領域規則零常駐成本 |
@@ -82,7 +82,7 @@
 | `CODE-RULES-api.md` | 後端規範：C# 分層命名、API envelope、表命名 / 審計欄位 / migration；附範本檔案清單 | AI 預設用通用風格，不會自動符合公司慣例；**按面向拆檔**讓純 UI 工作不必載入後端規則 |
 | `CODE-RULES-ui.md` | 前端規範：Vue 慣例、API 封裝、env、格式化；附範本檔案清單 | 同上——純後端工作不必載入前端規則 |
 | `LESSONS.md` | 錯誤防範庫：問題 → 原因 → 防範；回填時機是五項事件表 E1–E5（fix 兩輪、review ❌、人工指正、驗證曾失敗含環境坑、建議項被否決），loop 結尾逐項對照 | 同樣的坑 AI 會重複踩，除非把防範寫成「開工前必掃」的清單；記不記用機械對照，不靠自由心證，未遂事件也留下紀錄 |
-| `LOOP.md` | loop 狀態：Gate、待辦、本輪決策——**只記待辦不記已完成** | 記已完成會吃掉上下文預算，還誘導 AI 自我滿足；階段完成不自行推測下一階段 |
+| `LOOP.md` | loop 狀態：Gate、待辦、本輪決策——**只記待辦不記已完成**；新對話續作的接手點（路由表「接續上次進度」） | 記已完成會吃掉上下文預算，還誘導 AI 自我滿足；階段完成不自行推測下一階段 |
 
 ### `modules/`（需要才載入的細節規則）
 

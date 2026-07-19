@@ -90,7 +90,7 @@
     <tr><td>純畫面雛形（無後端）</td><td>UI　<code>/ui-loop</code></td><td>UI Spec、Page Draft（綁 mock、<code>// TODO: DEV 串接</code>）、待人工目視清單</td></tr>
   </table>
   <div class="flow">SPEC → BUILD → MILESTONE（/milestone-loop）→ REVIEW（/review-loop，新對話）→ DONE</div>
-  <p><strong>Milestone 閘門（段落收尾）</strong>：文件同步（程式為準，SPEC / README / UML 圖跟上）＋重構掃描（含冗餘註解清理；小改直接做並複驗、大改以選擇題問人）。<strong>為什麼</strong>：程式迭代文件必掉隊、過時的圖比沒圖更糟；重構集中處理避免每輪順手大改。</p>
+  <p><strong>Milestone 閘門（段落收尾）</strong>：文件同步（程式為準，SPEC / README / UML 圖跟上）＋重構掃描（含冗餘註解清理；小改直接做並複驗、大改以選擇題問人）；收尾後下一段落建議開新對話——context 歸零、規則不衰減，狀態由 LOOP.md／TASKS.md 接手。<strong>為什麼</strong>：程式迭代文件必掉隊、過時的圖比沒圖更糟；重構集中處理避免每輪順手大改。</p>
   <p><strong>Review 閘門（審寫分離）</strong>：三維度（Completeness / Correctness / Coherence）＋雙向偵測——設計遺漏（DG）與過度設計（OE）同等重要；修正方有依據可對單一 ❌ 申辯重審（限一次）。<strong>為什麼</strong>：AI 不只會漏做，也會過度設計；審查者也會看走眼，申辯防一個誤判卡死整條線。</p>
   <div class="quote"><strong>完工判斷（三關）</strong>：① TASKS.md 無 <code>- [ ]</code> 殘留 → ② SPEC Done Criteria 逐條成立 → ③ Review 無 ❌。三關過後 AI 回報「候選完工」，由人最終核可——AI 不自我宣告完工。</div>
 </section>
@@ -141,7 +141,7 @@
     <tr><td><code>CODE-RULES-api.md</code></td><td>後端規範：C# 分層命名、API envelope、表命名 / 審計欄位 / migration；附範本清單</td><td>AI 不會自動符合公司慣例；<strong>按面向拆檔</strong>，純 UI 工作不載入後端規則</td></tr>
     <tr><td><code>CODE-RULES-ui.md</code></td><td>前端規範：Vue 慣例、API 封裝、env、格式化；附範本清單</td><td>同上——純後端工作不載入前端規則</td></tr>
     <tr><td><code>LESSONS.md</code></td><td>錯誤防範庫：問題 → 原因 → 防範；回填時機是五項事件表 E1–E5，loop 結尾逐項對照</td><td>同樣的坑 AI 會重複踩，防範要寫成「開工前必掃」的清單；記不記用機械對照，不靠自由心證</td></tr>
-    <tr><td><code>LOOP.md</code></td><td>loop 狀態：Gate、待辦、本輪決策——只記待辦不記已完成</td><td>記已完成會吃掉上下文，還誘導 AI 自我滿足；階段完成不自行推測下一階段</td></tr>
+    <tr><td><code>LOOP.md</code></td><td>loop 狀態：Gate、待辦、本輪決策——只記待辦不記已完成；新對話續作的接手點（路由表「接續上次進度」）</td><td>記已完成會吃掉上下文，還誘導 AI 自我滿足；階段完成不自行推測下一階段</td></tr>
   </table>
 
   <h3>modules/（需要才載入的細節規則）</h3>
