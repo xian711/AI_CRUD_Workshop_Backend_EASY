@@ -109,6 +109,13 @@ AI 逐任務做完後，換你上場驗收。**三路驗收，缺一不可**：
 |---|---|---|
 | **swagger** | 開 `http://localhost:5080/swagger`，五條路由各打一次 | GET 全量 24 筆、GET 單筆／404、POST 201＋Location、PUT 200／404、DELETE 204／404 |
 | **測試** | 在 `my-equipment-api` 跑 `dotnet test` | 全綠；測試數以 `docs/TASKS.md` 為準 |
+
+> **想看參考解生出來的 delta 文件長什麼樣？** 在本資料夾的 `docs/`：
+> [`SRS-裝備物資API-delta.md`](docs/SRS-裝備物資API-delta.md)（需求差異：新資源、欄位表、行為規則）、
+> [`SDD-裝備物資API-delta.md`](docs/SDD-裝備物資API-delta.md)（設計差異：狀態碼矩陣、資料表綱要、編碼取號）、
+> [`TASKS.md`](docs/TASKS.md)（任務清單）。
+> **建議你自己先生一份再打開對照**——直接抄等於跳過這一步最重要的練習。
+> 這三份也是講師 checkpoint 會複製進學員專案的文件。
 | **psql** | 用絕對路徑連 `ai_crud_equipment`，`SELECT count(*) FROM equipment_item` | 24 列，`code` 與前端種子一致 |
 
 現成的收工檢查指令（含 psql 絕對路徑寫法）在 [`PROMPTS.md`](PROMPTS.md) 的【收工檢查 prompt】。

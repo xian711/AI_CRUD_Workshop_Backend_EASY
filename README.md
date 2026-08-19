@@ -13,7 +13,8 @@ cd step0_course_intro
 ```
 
 照 `step0 → step1 → step2 → step3 → step4 → step5` 順序走，每個資料夾都有 README 帶路，**不要跳步**。
-想看圖文版完整流程：[HANDBOOK/HANDBOOK.md](HANDBOOK/HANDBOOK.md)（或用瀏覽器開 `HANDBOOK/HANDBOOK.html`）。
+step6 是**課後練習**，課堂不做。
+想看圖文版完整流程：用瀏覽器開 [HANDBOOK/HANDBOOK.html](HANDBOOK/HANDBOOK.html)（雙擊即可，免安裝、免連網，有目錄與深淺色切換）。
 
 ## 課程地圖
 
@@ -25,6 +26,7 @@ cd step0_course_intro
 | [step3_new_module/](step3_new_module/) | 複製範本開發新模組：真實 PRD → AI 釐清選擇題 → SRS/SDD delta／API／Migration／測試 → 驗收 | 40 分 |
 | [step4_loop_e2e/](step4_loop_e2e/) | 加速技：後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E | 20 分 |
 | [step5_wrapup/](step5_wrapup/) | 課程總結、評量量表（RUBRIC）、回去公司怎麼用 | 5 分 |
+| [step6_survey_api/](step6_survey_api/) | **課後練習**：把前端課問卷那行 `// TODO: DEV 串接 POST /api/survey` 變成真的 API | 課後 |
 | [HANDBOOK/](HANDBOOK/) | step-by-step 圖文學習手冊 | 課後自學 |
 | [instructor/](instructor/) | 講師專用：時間軸手冊、SCOPE 答案、checkpoint 套用腳本（學員請勿先看） | 講師 |
 
@@ -38,6 +40,14 @@ cd step0_course_intro
 | 參考解（含裝備物資模組 API） | `step3_new_module/solution-api/` | 同上 → http://localhost:5080/swagger |
 
 兩個 API 都用 **port 5080**，**一次只跑一個**。首跑會自動還原套件、建資料庫並 Migrate＋Seed。
+
+> **為什麼參考解沒有 harness 四件？**
+> `sample-api`（範本正本）的專案根目錄有 `CLAUDE.md`／`AGENTS.md`／`CODE-RULES-api-本專案.md`／
+> `contract-conventions-summary.md`／`使用說明-複製範本開發新API模組.md`，複製開新模組時會一起帶走。
+> **參考解 `solution-api` 刻意不放這五份**——它是拿來「跑起來看、對照結果」的，
+> **不要在裡面開 AI Agent 工作**。你的 AI 該工作的地方是你自己的 `my-equipment-api`，
+> 那裡的規則是從範本帶過去的。這也是為什麼 step4 的 `run-e2e.ps1` 預設驗你自己的作品，
+> 官方解只能用 `-UseCheckpoint` 明示 fallback：**每一盞綠燈都必須來自你自己的作品。**
 
 step4 另有一份**前端成品** `step4_loop_e2e/fullchain-app/`（裝備物資雙模式版 Nuxt）。跑全鏈路有兩種模式，**用途不同、埠號也不同**：
 
@@ -57,6 +67,7 @@ step3 的 PRD 是從**某防救災系統的真實頁面**（中心裝備物資�
 ## 與其他版本的關係
 
 - **與前端 EASY 版的關係**：本課是 `AI_CRUD_Workshop_Frontend_EASY` 的**續集**。前端課把裝備物資模組做成 mock（記憶體假資料），本課把它接上真的 API 與資料庫。沒上過前端課也能上——step4 附現成前端成品。
+  前端課的課後驗收題（課程回饋問卷）刻意留了一行 `// TODO: DEV 串接 POST /api/survey`，**本課的 [step6_survey_api/](step6_survey_api/) 就是把那一行變成真的**——需求沿用同一份 [PRD-課程回饋問卷.md](PRD-課程回饋問卷.md)，不另外寫。
 - **與 Backend Live 版的關係**：本 EASY 版是 `AI_CRUD_Workshop_Backend_Live` 的簡化教學版：拿掉雙 Track 對照、完整 TDD 紅綠燈治理、QA mutation 等進階內容，聚焦「harness＋範本＝快速完工」一條主線。上完 EASY 想深入，再去 Live 版。
 
 ---

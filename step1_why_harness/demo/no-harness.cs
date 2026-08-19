@@ -1,76 +1,94 @@
 // ============================================================
-//  沒有 harness：AI 憑一句話自由發揮的典型產出
-//  「幫我用 .NET 寫一個新增裝備的 API」
-//  能跑，但每一處決策都是 AI 隨興決定的——放到團隊裡就是災難
+//  沒有 harness：只給一句話，AI 自由發揮的產出
+//  實跑日期 2026-08-19｜模型 Claude Opus 5｜prompt 見 PROMPT.md 版本 A
+//  注意：它做得又快又整齊——分層、注入、EF Core、DTO 驗證、201+Location 全都對。
+//  問題不在「醜」，在於**每一個決定都是它自己做的**，跟你們團隊的規矩無關。
+//  （教學展示：真專案會拆成多個檔，這裡併成一份方便並排看）
 // ============================================================
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
+using Microsoft.EntityFrameworkCore;
 
-namespace EquipmentApi.Controllers;
+namespace EquipmentApi;
 
+// ---------- 它自己決定的請求 DTO ----------
+public record CreateEquipmentRequest(
+    [property: Required(ErrorMessage = "Category is required")]
+    [property: StringLength(50)] string Category,
+
+    [property: Required(ErrorMessage = "Name is required")]
+    [property: StringLength(100)] string Name,
+
+    [property: Range(0, int.MaxValue, ErrorMessage = "Quantity must be >= 0")]
+    int Quantity,
+
+    [property: Required][property: StringLength(20)] string Unit,
+    [property: StringLength(200)] string? Specification,
+    [property: StringLength(50)] string? Keeper,
+    [property: EnumDataType(typeof(EquipmentStatus))] EquipmentStatus Status
+);
+
+// ---------- 它自己決定的回應形狀 ----------
+public record EquipmentResponse(
+    Guid Id, string Category, string Name, int Quantity,
+    string Unit, string? Specification, string? Keeper,
+    string Status, DateTimeOffset CreatedAt);
+
+public enum EquipmentStatus { Normal, Maintenance, Scrapped }
+
+// ---------- Controller：薄委派、注入相依，這些它自己就做對了 ----------
 [ApiController]
-[Route("api")]
-public class EquipmentController : ControllerBase
+[Route("api/[controller]")]
+[Produces("application/json")]
+public class EquipmentController(IEquipmentService service) : ControllerBase
 {
-    // 連線字串硬編碼在 Controller 裡，帳密全都攤在原始碼
-    private string connstr = "Host=localhost;Port=5432;Database=ai_crud_equipment;Username=postgres;Password=12345";
-
-    // 路由亂取、動詞塞進 URL、欄位命名到處不一致（Name/item_name/qty1/spec）
-    [HttpPost("addEquipment")]
-    public IActionResult AddEquipment(string categoryKey, string Name, int qty1,
-        string unit, string spec, string keeper, string status)
+    /// <summary>新增一筆裝備</summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(EquipmentResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<EquipmentResponse>> Create(
+        [FromBody] CreateEquipmentRequest request, CancellationToken ct)
     {
-        try
-        {
-            // 完全沒有驗證：空字串、負數量、亂填的 status 通通照收
-            // 連線與 SQL 全塞在 Controller，資料存取沒有分層
-            var conn = new NpgsqlConnection(connstr);
-            conn.Open();
-
-            // 編碼直接用時間戳硬湊，不保證唯一、也不符合「前綴-流水3碼」規則
-            string code = "IT-" + DateTime.Now.Ticks;
-
-            // 字串拼接組 SQL —— 典型 SQL Injection 破口（keeper 打個單引號就爆或被注入）
-            string sql = "INSERT INTO equipment_item (code, category_key, name, qty, unit, spec1, keeper, status) VALUES (" +
-                "'" + code + "','" + categoryKey + "','" + Name + "'," + qty1 + ",'" + unit + "','" +
-                spec + "','" + keeper + "','" + status + "')";
-
-            var cmd = new NpgsqlCommand(sql, conn);
-            cmd.ExecuteNonQuery();
-            conn.Close();
-
-            // 不管成功失敗都回 200；訊息中英夾雜
-            return Ok(new { msg = "add equipment 成功!", code = code });
-        }
-        catch (Exception ex)
-        {
-            // blanket try/catch 把所有例外吞掉，DB 斷線也照樣回 200
-            // 還把 ex.Message 直接外露給前端（洩漏連線字串、資料表結構）
-            return Ok(new { msg = "有錯誤: " + ex.Message });
-        }
+        var created = await service.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    // 查詢也塞在同一個 Controller，一樣硬開連線、一樣裸物件
-    [HttpGet("getEquipmentList")]
-    public IActionResult GetList()
+    // 需求沒有要「查單筆」，它自己加了一個端點
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<EquipmentResponse>> GetById(Guid id, CancellationToken ct)
+        => throw new NotImplementedException();
+}
+
+// ---------- Service：商業邏輯與資料存取，分層也對 ----------
+public class EquipmentService(AppDbContext db) : IEquipmentService
+{
+    public async Task<EquipmentResponse> CreateAsync(CreateEquipmentRequest req, CancellationToken ct)
     {
-        var conn = new NpgsqlConnection(connstr);
-        conn.Open();
-        var cmd = new NpgsqlCommand("SELECT * FROM equipment_item", conn);
-        var reader = cmd.ExecuteReader();
-        var list = new List<object>();
-        while (reader.Read())
+        var entity = new Equipment
         {
-            // 欄位用索引硬取，順序一改就整包錯位
-            list.Add(new
-            {
-                Id = reader[0],
-                itemCode = reader[1],
-                item_name = reader[3],
-                Qty = reader[4],
-            });
-        }
-        conn.Close();
-        return Ok(list);
+            Id = Guid.NewGuid(),
+            Category = req.Category,
+            Name = req.Name,
+            Quantity = req.Quantity,
+            Unit = req.Unit,
+            Specification = req.Specification,
+            Keeper = req.Keeper,
+            Status = req.Status
+        };
+
+        db.Equipments.Add(entity);
+        await db.SaveChangesAsync(ct);          // EF Core 參數化，沒有 SQL 拼接
+
+        return new EquipmentResponse(entity.Id, entity.Category, entity.Name,
+            entity.Quantity, entity.Unit, entity.Specification, entity.Keeper,
+            entity.Status.ToString(), entity.CreatedAt);
     }
 }
+
+// ---------- Program.cs：DI、連線字串走設定檔、全域例外處理，全部自己做對 ----------
+// builder.Services.AddDbContext<AppDbContext>(o =>
+//     o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+// builder.Services.AddProblemDetails();
+// builder.Services.AddExceptionHandler<GlobalExceptionHandler>();   // 沒有 blanket try/catch
+// builder.Services.AddSwaggerGen();                                 // 它自己加的

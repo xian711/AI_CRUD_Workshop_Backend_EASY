@@ -45,6 +45,7 @@
 | step3 | 複製範本開發新模組（真實 PRD → AI 生成 SRS/SDD delta／API／Migration／測試 → 反覆修正） | 40 分 |
 | step4 | 加速技：後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E | 20 分 |
 | step5 | 課程總結、評量量表、回去公司怎麼用 | 5 分 |
+| step6 | **課後練習**（課堂不做）：把前端課問卷的 `// TODO: DEV 串接 POST /api/survey` 變成真的 API | 課後 |
 
 ## 進行方式
 

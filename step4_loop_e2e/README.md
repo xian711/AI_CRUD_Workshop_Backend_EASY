@@ -38,6 +38,10 @@
 | 編碼 `PW-GEN-003` 誰算 | 前端算 | **後端**在交易內算（前端只做預覽） |
 | 測試怎麼證明 | 看畫面就夠 | 看畫面 **＋** 直接打 API 拿 JSON 對證 |
 
+> **想知道「切開關」在程式裡是怎麼做到的？** 看 [`fullchain-app/FULLCHAIN_NOTES.md`](fullchain-app/FULLCHAIN_NOTES.md)。
+> 它記錄了這包跟前端課成品的完整差異：`nuxt.config.ts` 加一條 devProxy、`useEquipmentItems.ts` 加一個 API 分支——
+> **呼叫端（`pages/equipment/crud/*.vue`）一行都沒改**。這就是「前端留接縫」的實作證據。
+
 所以這 6 條測試裡，好幾條都故意「**做一個動作 → reload → 再斷言**」——reload 是試金石：
 mock 會掉回種子，持久化才會留下。最後 E6 更直接用 Playwright 的 `request` 打 `/api/equipment/items`，
 在後端 JSON 裡找到前端剛新增的那一筆，這是「資料真的進了資料庫」的鐵證。

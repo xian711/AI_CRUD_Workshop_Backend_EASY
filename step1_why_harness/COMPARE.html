@@ -141,36 +141,36 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>為什麼要 harness？<small>同一句「幫我寫一個新增裝備的 API」，有沒有給團隊規矩，AI 產出天差地遠</small></h1>
+    <h1>為什麼要 harness？<small>同一句「幫我寫一個新增裝備的 API」，有沒有給團隊規矩，AI 的<b>決定</b>從哪裡來</small></h1>
     <button class="theme-btn" id="themeBtn" type="button">切換深／淺色</button>
   </header>
 
   <div class="lede">
     左邊是<b>沒有 harness</b>、AI 憑一句話自由發揮的產出；右邊是<b>附上團隊規矩</b>後的產出。
-    兩份都是「新增裝備」API，功能目標一樣——差的不是「有沒有做出來」，是「能不能安全上線、像不像同一個資深後端寫的」。
-    紅底是違規、綠底是合規，滑到程式碼看每一行的白話註解。
+    <b>先講清楚：左邊那版寫得很好。</b>分層、注入、EF Core 參數化、DTO 驗證、201＋Location，它自己全都做對了——
+    這就是為什麼<b>綠底在左邊也會出現</b>。真正的差別不是「品質好不好」，是<b>每一個決定是誰做的</b>：
+    回應長什麼樣、編碼怎麼產、欄位叫什麼、訊息用哪國語言——沒 harness 的那版全部自己發明，跟你們團隊無關。
+    滑到程式碼看每一行的白話註解。
   </div>
 
-  <h2>12 項差異總表</h2>
+  <h2>三項差異（2026-08-19 用現在的模型實跑後重寫）</h2>
   <table class="diff-table">
     <thead>
       <tr><th class="n">#</th><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>對應規矩</th></tr>
     </thead>
     <tbody>
-      <tr><td class="n">1</td><td>分層架構</td><td class="bad">全塞 Controller，查詢／SQL／商業邏輯攪一起</td><td class="good">Controller 薄委派 → Service 處理</td><td><span class="tag">分層</span></td></tr>
-      <tr><td class="n">2</td><td>相依取得</td><td class="bad">方法內 new 連線、連線字串＋帳密硬編碼</td><td class="good">建構式注入 DbContext / Mapper</td><td><span class="tag">分層</span></td></tr>
-      <tr><td class="n">3</td><td>SQL 安全</td><td class="bad">字串拼接組 SQL，SQL Injection 破口</td><td class="good">EF Core 查詢，參數化、無拼接</td><td><span class="tag">資料存取</span></td></tr>
-      <tr><td class="n">4</td><td>請求驗證</td><td class="bad">散裝參數、零驗證，空值負數亂填照收</td><td class="good">DTO ＋ DataAnnotations 宣告式驗證</td><td><span class="tag">DTO</span></td></tr>
-      <tr><td class="n">5</td><td>狀態碼</td><td class="bad">不管成敗一律回 200</td><td class="good">201 建立 / 400 驗證 / 404 查無</td><td><span class="tag">契約</span></td></tr>
-      <tr><td class="n">6</td><td>回應封裝</td><td class="bad">裸匿名物件，每支 API 格式各異</td><td class="good">統一 ModelResult 封裝</td><td><span class="tag">契約</span></td></tr>
-      <tr><td class="n">7</td><td>錯誤鍵命名</td><td class="bad">無錯誤鍵；欄位 PascalCase 混亂</td><td class="good">框架回 400，錯誤鍵 camelCase</td><td><span class="tag">DTO</span></td></tr>
-      <tr><td class="n">8</td><td>例外處理</td><td class="bad">blanket try/catch 吞例外，DB 斷線也回 200</td><td class="good">只轉預期失敗，未預期上拋 500</td><td><span class="tag">例外</span></td></tr>
-      <tr><td class="n">9</td><td>編碼產生</td><td class="bad">時間戳硬湊，不符規則、不保證唯一</td><td class="good">交易內同前綴 MAX+1 ＋唯一索引</td><td><span class="tag">編碼</span></td></tr>
-      <tr><td class="n">10</td><td>Location 標頭</td><td class="bad">無；前端拿不到新資源位置</td><td class="good">201 + CreatedAtAction 帶 Location</td><td><span class="tag">契約</span></td></tr>
-      <tr><td class="n">11</td><td>對外訊息</td><td class="bad">中英夾雜，還把 ex.Message 直接外露</td><td class="good">全繁中、可安全外露，不夾例外細節</td><td><span class="tag">例外</span></td></tr>
-      <tr><td class="n">12</td><td>欄位命名一致性</td><td class="bad">Name／qty1／item_name／Qty 各處不同</td><td class="good">全對齊契約 camelCase 欄位</td><td><span class="tag">契約</span></td></tr>
+      <tr><td class="n">1</td><td>回應格式從哪來</td><td class="bad">自己發明一個 <code>EquipmentResponse</code> record，每支 API 各長各的</td><td class="good">統一 <code>ModelResult&lt;T&gt;</code>（<code>success/message/data</code>）</td><td><span class="tag">契約</span></td></tr>
+      <tr><td class="n">2</td><td>業務規則與對外訊息從哪來</td><td class="bad">id 用 <code>Guid</code>、<b>完全沒有 code 這個概念</b>、驗證訊息是英文、錯誤鍵預設 PascalCase、欄位自己取名（<code>Quantity</code>／<code>Specification</code>）</td><td class="good">照契約：<code>E-###</code>、code 為「前綴-流水3碼」交易內取號、繁中訊息、camelCase 錯誤鍵、13 欄逐字對齊前端</td><td><span class="tag">契約</span><span class="tag">編碼</span></td></tr>
+      <tr><td class="n">3</td><td>多出來的東西</td><td class="bad" colspan="2"><b>兩版都會自己多做。</b>實跑時它多加了一個沒人要的 <code>GetById</code> 端點、Swagger、<code>CreatedAt</code>／<code>UpdatedAt</code> 兩欄和一個索引。<b>harness 管「怎麼寫」，不管「做多少」</b>——範圍要靠 step3 的 SCOPE 六題管。</td><td><span class="tag">誠實揭露</span></td></tr>
     </tbody>
   </table>
+
+  <div class="lede">
+    <b>為什麼從 12 項收成 3 項？</b>舊版比的是「分層有沒有亂、有沒有拼 SQL、帳密有沒有硬編碼、例外有沒有吞掉」共 12 項。
+    2026-08-19 拿現在的模型實跑版本 A，<b>其中 8 項它自己就做對了</b>——那是舊模型才會犯的錯。
+    留著只會讓學員覺得這個對照不公平，harness 的說服力反而被削弱。
+    <b>對照基準會過期，每換一代模型就要實跑一次重寫。</b>
+  </div>
 
   <h2>程式碼並排（紅底＝違規／綠底＝合規）</h2>
   <div class="cols">
@@ -235,76 +235,117 @@ function render(tableId, lines, marks){
 
 // ---- 沒 harness 原始碼 ----
 var NO = [
-"// 沒有 harness：AI 憑一句話自由發揮的典型產出",
+"// ============================================================",
+"//  沒有 harness：只給一句話，AI 自由發揮的產出",
+"//  實跑日期 2026-08-19｜模型 Claude Opus 5｜prompt 見 PROMPT.md 版本 A",
+"//  注意：它做得又快又整齊——分層、注入、EF Core、DTO 驗證、201+Location 全都對。",
+"//  問題不在「醜」，在於**每一個決定都是它自己做的**，跟你們團隊的規矩無關。",
+"//  （教學展示：真專案會拆成多個檔，這裡併成一份方便並排看）",
+"// ============================================================",
+"using System.ComponentModel.DataAnnotations;",
 "using Microsoft.AspNetCore.Mvc;",
-"using Npgsql;",
+"using Microsoft.EntityFrameworkCore;",
 "",
+"namespace EquipmentApi;",
+"",
+"// ---------- 它自己決定的請求 DTO ----------",
+"public record CreateEquipmentRequest(",
+"    [property: Required(ErrorMessage = \"Category is required\")]",
+"    [property: StringLength(50)] string Category,",
+"",
+"    [property: Required(ErrorMessage = \"Name is required\")]",
+"    [property: StringLength(100)] string Name,",
+"",
+"    [property: Range(0, int.MaxValue, ErrorMessage = \"Quantity must be >= 0\")]",
+"    int Quantity,",
+"",
+"    [property: Required][property: StringLength(20)] string Unit,",
+"    [property: StringLength(200)] string? Specification,",
+"    [property: StringLength(50)] string? Keeper,",
+"    [property: EnumDataType(typeof(EquipmentStatus))] EquipmentStatus Status",
+");",
+"",
+"// ---------- 它自己決定的回應形狀 ----------",
+"public record EquipmentResponse(",
+"    Guid Id, string Category, string Name, int Quantity,",
+"    string Unit, string? Specification, string? Keeper,",
+"    string Status, DateTimeOffset CreatedAt);",
+"",
+"public enum EquipmentStatus { Normal, Maintenance, Scrapped }",
+"",
+"// ---------- Controller：薄委派、注入相依，這些它自己就做對了 ----------",
 "[ApiController]",
-"[Route(\"api\")]",
-"public class EquipmentController : ControllerBase",
+"[Route(\"api/[controller]\")]",
+"[Produces(\"application/json\")]",
+"public class EquipmentController(IEquipmentService service) : ControllerBase",
 "{",
-"    // 連線字串硬編碼在 Controller 裡，帳密全都攤在原始碼",
-"    private string connstr = \"Host=localhost;...;Username=postgres;Password=12345\";",
-"",
-"    // 路由亂取、動詞塞進 URL、欄位命名到處不一致（Name/qty1/spec）",
-"    [HttpPost(\"addEquipment\")]",
-"    public IActionResult AddEquipment(string categoryKey, string Name, int qty1,",
-"        string unit, string spec, string keeper, string status)",
+"    /// <summary>新增一筆裝備</summary>",
+"    [HttpPost]",
+"    [ProducesResponseType(typeof(EquipmentResponse), StatusCodes.Status201Created)]",
+"    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]",
+"    public async Task<ActionResult<EquipmentResponse>> Create(",
+"        [FromBody] CreateEquipmentRequest request, CancellationToken ct)",
 "    {",
-"        try",
-"        {",
-"            // 完全沒有驗證：空字串、負數量、亂填的 status 通通照收",
-"            var conn = new NpgsqlConnection(connstr);",
-"            conn.Open();",
-"",
-"            // 編碼直接用時間戳硬湊，不保證唯一、也不符合「前綴-流水3碼」規則",
-"            string code = \"IT-\" + DateTime.Now.Ticks;",
-"",
-"            // 字串拼接組 SQL —— 典型 SQL Injection 破口",
-"            string sql = \"INSERT INTO equipment_item (code, category_key, name, qty, ...) \" +",
-"                \"VALUES ('\" + code + \"','\" + categoryKey + \"','\" + Name + \"',\" + qty1 + \")\";",
-"            var cmd = new NpgsqlCommand(sql, conn);",
-"            cmd.ExecuteNonQuery();",
-"            conn.Close();",
-"",
-"            // 不管成功失敗都回 200；訊息中英夾雜",
-"            return Ok(new { msg = \"add equipment 成功!\", code = code });",
-"        }",
-"        catch (Exception ex)",
-"        {",
-"            // blanket try/catch 吞掉所有例外，還把 ex.Message 直接外露",
-"            return Ok(new { msg = \"有錯誤: \" + ex.Message });",
-"        }",
+"        var created = await service.CreateAsync(request, ct);",
+"        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);",
 "    }",
 "",
-"    [HttpGet(\"getEquipmentList\")]",
-"    public IActionResult GetList()",
+"    // 需求沒有要「查單筆」，它自己加了一個端點",
+"    [HttpGet(\"{id:guid}\")]",
+"    public async Task<ActionResult<EquipmentResponse>> GetById(Guid id, CancellationToken ct)",
+"        => throw new NotImplementedException();",
+"}",
+"",
+"// ---------- Service：商業邏輯與資料存取，分層也對 ----------",
+"public class EquipmentService(AppDbContext db) : IEquipmentService",
+"{",
+"    public async Task<EquipmentResponse> CreateAsync(CreateEquipmentRequest req, CancellationToken ct)",
 "    {",
-"        var conn = new NpgsqlConnection(connstr);",
-"        conn.Open();",
-"        var cmd = new NpgsqlCommand(\"SELECT * FROM equipment_item\", conn);",
-"        var reader = cmd.ExecuteReader();",
-"        var list = new List<object>();",
-"        while (reader.Read())",
+"        var entity = new Equipment",
 "        {",
-"            // 欄位用索引硬取，順序一改就整包錯位；命名 item_name/Qty 混亂",
-"            list.Add(new { Id = reader[0], itemCode = reader[1],",
-"                item_name = reader[3], Qty = reader[4] });",
-"        }",
-"        return Ok(list);",
+"            Id = Guid.NewGuid(),",
+"            Category = req.Category,",
+"            Name = req.Name,",
+"            Quantity = req.Quantity,",
+"            Unit = req.Unit,",
+"            Specification = req.Specification,",
+"            Keeper = req.Keeper,",
+"            Status = req.Status",
+"        };",
+"",
+"        db.Equipments.Add(entity);",
+"        await db.SaveChangesAsync(ct);          // EF Core 參數化，沒有 SQL 拼接",
+"",
+"        return new EquipmentResponse(entity.Id, entity.Category, entity.Name,",
+"            entity.Quantity, entity.Unit, entity.Specification, entity.Keeper,",
+"            entity.Status.ToString(), entity.CreatedAt);",
 "    }",
-"}"
+"}",
+"",
+"// ---------- Program.cs：DI、連線字串走設定檔、全域例外處理，全部自己做對 ----------",
+"// builder.Services.AddDbContext<AppDbContext>(o =>",
+"//     o.UseNpgsql(builder.Configuration.GetConnectionString(\"DefaultConnection\")));",
+"// builder.Services.AddScoped<IEquipmentService, EquipmentService>();",
+"// builder.Services.AddProblemDetails();",
+"// builder.Services.AddExceptionHandler<GlobalExceptionHandler>();   // 沒有 blanket try/catch",
+"// builder.Services.AddSwaggerGen();                                 // 它自己加的"
 ];
 var NO_MARKS = {
-  10: {t:"b", msg:"#2 連線字串＋帳密硬編碼在 Controller"},
-  13: {t:"b", msg:"#1 路由把動詞塞進 URL、非 RESTful"},
-  14: {t:"b", msg:"#4/#7/#12 直接收散裝參數、無 DTO（無 camelCase 錯誤鍵）；Name/qty1 命名混亂"},
-  20: {t:"b", msg:"#1/#2 方法內 new 連線，資料存取沒分層"},
-  24: {t:"b", msg:"#9 編碼用時間戳硬湊，不符規則、可能撞號"},
-  27: {t:"b", msg:"#3 字串拼接組 SQL：SQL Injection 破口"},
-  34: {t:"b", msg:"#5/#6/#10/#11 一律回 200（無 201+Location）、裸物件、訊息中英夾雜"},
-  39: {t:"b", msg:"#8/#11 blanket catch 吞例外＋外露 ex.Message，DB 斷線也回 200"},
-  54: {t:"b", msg:"#12 欄位用索引硬取，命名 item_name/Qty 各處不一致"}
+  16: {t:"b", msg:"【自己決定】對外驗證訊息是英文——你們的規矩是一律繁體中文"},
+  17: {t:"b", msg:"【自己決定】欄位叫 Category，契約是 categoryKey"},
+  23: {t:"b", msg:"【自己決定】欄位叫 Quantity，契約是 qty"},
+  26: {t:"b", msg:"【自己決定】欄位叫 Specification，契約是 spec1"},
+  32: {t:"b", msg:"#1 【自己決定】發明一個回應形狀，不是你們的 ModelResult<T>"},
+  41: {t:"b", msg:"【自己決定】路由變成 /api/Equipment，契約是 /api/equipment/items"},
+  43: {t:"g", msg:"✅ 它自己就做對了：Controller 薄委派＋建構式注入"},
+  48: {t:"b", msg:"#2 錯誤鍵預設是 PascalCase（要另外掛 provider 才會變 camelCase）"},
+  53: {t:"g", msg:"✅ 它自己就做對了：201 + Location 標頭"},
+  57: {t:"b", msg:"#3 【多做】需求沒要求查單筆，它自己加了一個端點"},
+  63: {t:"g", msg:"✅ 它自己就做對了：商業邏輯分到 Service，相依注入"},
+  69: {t:"b", msg:"#2 【自己決定】id 用 Guid；契約要 E-### ＋ code「前綴-流水3碼」，它連 code 都沒有"},
+  80: {t:"g", msg:"✅ 它自己就做對了：EF Core 參數化，沒有 SQL 拼接"},
+  93: {t:"g", msg:"✅ 它自己就做對了：全域例外處理，沒有 blanket try/catch"},
+  94: {t:"b", msg:"#3 【多做】Swagger 也是它自己加的"}
 };
 
 // ---- 有 harness 原始碼 ----
@@ -383,19 +424,19 @@ var YES = [
 "}"
 ];
 var YES_MARKS = {
-  6:  {t:"g", msg:"#4/#12 請求收斂到 DTO，欄位對齊契約 camelCase"},
-  8:  {t:"g", msg:"#4/#7 DataAnnotations 宣告式驗證，錯誤鍵自動 camelCase"},
-  16: {t:"g", msg:"#4 [Range] 擋負數量"},
-  20: {t:"g", msg:"#4 [AllowedValues] 鎖 status 三值"},
-  25: {t:"g", msg:"#4 keeperPhone 選填、填了才驗"},
-  31: {t:"g", msg:"RESTful 路由對齊契約 /api/equipment/items"},
-  32: {t:"g", msg:"#1/#2 Controller 薄委派＋建構式注入相依，不硬編碼連線"},
-  39: {t:"g", msg:"#5/#10 201 + Location；驗證失敗框架回 400"},
-  44: {t:"g", msg:"#2 Service 注入 DbContext / Mapper"},
-  54: {t:"g", msg:"#3 EF Core 查詢，參數化、無 SQL 拼接"},
-  55: {t:"g", msg:"#9 交易內同前綴 MAX+1 產編碼＋唯一索引擋撞號"},
-  59: {t:"g", msg:"#6 統一 ModelResult 封裝回應"},
-  69: {t:"g", msg:"#8/#11 只轉預期失敗、繁中安全訊息；未預期上拋 500"}
+  6:  {t:"g", msg:"#2 請求收斂到 DTO，欄位逐字對齊契約（categoryKey / qty / spec1）"},
+  8:  {t:"g", msg:"#2 驗證訊息全繁中，錯誤鍵自動 camelCase"},
+  16: {t:"g", msg:"#2 [Range] 擋負數量——規則來自你們的 SRS，不是 AI 自己想的"},
+  20: {t:"g", msg:"#2 [AllowedValues] 鎖 status 三值"},
+  25: {t:"g", msg:"#2 keeperPhone 選填、填了才驗"},
+  31: {t:"g", msg:"#2 路由對齊契約 /api/equipment/items"},
+  32: {t:"g", msg:"✅ 薄委派＋建構式注入（這項兩版都做對，不是 harness 的功勞）"},
+  39: {t:"g", msg:"✅ 201 + Location（這項兩版都做對）"},
+  44: {t:"g", msg:"✅ Service 注入 DbContext / Mapper（這項兩版都做對）"},
+  54: {t:"g", msg:"✅ EF Core 參數化（這項兩版都做對）"},
+  55: {t:"g", msg:"#2 交易內同前綴 MAX+1 產 code ＋唯一索引擋撞號——這條規則沒寫下來，AI 生不出來"},
+  59: {t:"g", msg:"#1 統一 ModelResult 封裝回應"},
+  69: {t:"g", msg:"#2 只轉預期失敗、繁中安全訊息；未預期上拋 500"}
 };
 
 render("code-no", NO, NO_MARKS);

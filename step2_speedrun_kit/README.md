@@ -10,7 +10,7 @@
 |---|---|---|
 | [2.1 玩範本 API](2.1_play_template/) | 把人員 CRUD 範本跑起來、Swagger 打一輪、`dotnet test` 看 49 綠、重置資料 | 「範本本來就會動」的手感；跑 API／測試／重置的肌肉記憶 |
 | [2.2 系統文件](2.2_system_docs/) | 讀 SRS v1.2＋SDD v1.6 導讀，看契約狀態碼矩陣、`ModelResult`、SEQUENCE、第 11 章決策 | 知道「規格白紙黑字寫在哪」，Step 3 出 delta 時對得上正本 |
-| [2.3 Harness](2.3_harness/) | 認識後端 harness 四件＋給 Codex 的 `AGENTS.md`：AI 開發要遵守的規則入口 | 知道 AI 為什麼會照分層／命名／驗證／測試走——不是它乖，是規則綁著 |
+| [2.3 Harness](2.3_harness/) | 認識後端 harness 四件＋給 Codex 的 `AGENTS.md`：AI 開發要遵守的規則入口（實檔在 `2.5_sample_api/sample-api/` 專案根目錄，全庫只有一份） | 知道 AI 為什麼會照分層／命名／驗證／測試走——不是它乖，是規則綁著 |
 | [2.4 架構與資料庫](2.4_architecture_db/) | 看分層架構與 DB 綱要視覺化，學 psql 三招直查資料庫 | 「請求的一生」心智圖；能自己用 psql 驗證資料真的進了 PostgreSQL |
 | [2.5 範本正本](2.5_sample_api/) | 範本 API 的正本複本（根目錄含 harness 四件），Step 3 複製它當起點 | Step 3 準備工作區時要複製的來源 |
 

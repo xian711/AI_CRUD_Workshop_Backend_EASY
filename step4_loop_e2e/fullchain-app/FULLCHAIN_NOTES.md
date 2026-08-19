@@ -16,7 +16,8 @@
 | `composables/useEquipmentItems.ts` | 新增 API 分支（雙模式）：`useApi` 旗標、`ensureLoaded`、`fromDto` / `toRequestBody`、`unwrap` / `messageFromError` / `statusOf`、本地快取增量維護。**mock 分支原封不動保留。** | 讓學員後端做完後，前端切開關就接上真資料。樣式完全比照 `useTemplateMembers.ts`，呼叫端（`pages/equipment/crud/*.vue`）一行都不用改。 |
 | `FULLCHAIN_NOTES.md` | 本檔（新增） | 記錄這包與前端課的差異、怎麼切模式。 |
 
-> 根目錄 harness 檔（`CLAUDE.md`、`AGENTS.md`、`CODE-RULES-ui-本專案.md`、`SETUP.md`、`使用說明-複製範本開發新模組.md`）隨複製帶過來，未修改。
+> 根目錄前端 harness 檔（`CLAUDE.md`、`AGENTS.md`、`CODE-RULES-ui-本專案.md`、`SETUP.md`）隨複製帶過來，未修改。
+> 前端課原本還附一份「複製範本開發新模組」的操作手冊，本課用不到（那是教怎麼開新**前端**模組的，且埠號寫法已過期），2026-08-19 已移除。
 
 ## 怎麼切 API 模式
 

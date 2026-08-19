@@ -1,6 +1,7 @@
 # 講師手冊 — AI CRUD Workshop Backend（EASY）
 
-> 這份是講師專用。學員版路徑不要放這份，也不要放 `SCOPE-後端課堂範圍決策.md`（答案）。
+> 這份是講師專用。學員版路徑不要放這份，也不要放 `SCOPE-後端課堂範圍決策.md`（step3 答案）
+> 與 `SCOPE-問卷API範圍決策.md`（step6 課後練習答案）。
 
 ## 一、120 分鐘時間軸
 
@@ -9,7 +10,7 @@
 | 時間 | 段落 | 活動 | 可觀察產出 |
 |---:|---|---|---|
 | 0–10 | step0 課程介紹 | 目標、規則、`preflight.ps1` | preflight exit 0 截圖（.NET／PostgreSQL／5432／5080／psql 全綠） |
-| 10–20 | step1 為何要 harness | 後端版 harness A/B 對比 demo | 每組指出至少 3 個規則差異（分層、封裝、驗證） |
+| 10–20 | step1 為何要 harness | 後端版 harness A/B 對比 demo（三項：回應格式／業務規則與訊息／多做的東西） | 每組說得出三項差異，**並說得出「哪幾件事沒 harness 那版自己就做對了」**——這題答不出來代表他還停在「有 harness 比較漂亮」的誤解 |
 | 20–55 | step2 speedrun kit | 玩範本 API：跑起來、swagger CRUD、測試 49 綠、重置資料；讀系統文件、harness 四件、分層＋DB 綱要 | C/R/U/D/測試/重置 checklist 打勾；能口頭說明分層與 `ModelResult` 封裝 |
 | 55–95 | step3 新模組 | 只讀 PRD → 六題釐清裁決 → AI 出 SRS/SDD-delta＋任務清單 → 逐任務實作 → 三路驗收 | 六題答案＋每題一句理由；swagger 五路由＋psql 24 列 |
 | 95–115 | step4 全鏈路 LOOP | 前端切旗標接上後端；注入後端 bug → 紅 → 判因 → 修 → 綠 | e2e 綠／紅輸出＋修正理由 |
@@ -42,6 +43,14 @@
   - 前提：學員專案沿用範本命名空間 `CrudTemplate.Api`（工作坊複製範本時不改名），否則複製過去的檔案命名空間對不上、無法編譯（腳本會自動嘗試偵測 `src\`／`tests\` 下的專案資料夾，唯一才自動採用）。
 - **`restore-checkpoint.ps1`** 與 apply 對稱：把 `.checkpoint-backup\` 內備份的原始檔複製回學員專案對應位置，讓學員能回到套用前的樣子。
 - 套完看腳本結尾的四項 `[PASS]／[FAIL]` 摘要與 exit code：`exit 0`＝四項全過、已回到 solution baseline；`exit 1`＝有 `[FAIL]`（見紅字那項），排查後重跑，未回到 baseline 前別急著往 step4 走。
+
+## 二之二、step1 對照的維護責任（每換一代模型要重跑）
+
+step1 的「有／沒有 harness」A/B 是**拿模型當下的能力當基準**，模型會進步，基準就會過期。
+
+- **2026-08-19 已重跑一次**：原本 12 項對照，實跑後發現 8 項（分層、SQL 安全、帳密硬編碼、例外吞掉、狀態碼、Location、DTO 驗證、欄位命名）現在的模型自己就做對了，已刪除，收成 3 項。
+- **課堂上請主動講這件事**：學員如果覺得「沒 harness 那版看起來也不錯」，那是**對的反應**，不要否認他。順著講「所以差別不在品質，在誰做決定」。
+- **下次換模型時**：拿 `step1_why_harness/demo/PROMPT.md` 的版本 A 重跑一次，照 `step1_why_harness/README.md` 的計分表打分，把結果記進那份 README 的實測紀錄表，並更新 `COMPARE.html`。
 
 ## 三、故障分流表（五種）
 

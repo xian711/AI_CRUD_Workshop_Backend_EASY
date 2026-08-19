@@ -11,11 +11,36 @@
 | step3 複製範本開發新模組 | 開發新模組的正確順序是 **PRD → 讓 AI 提「需求釐清選擇題」→ 生成 SRS-delta/SDD-delta → 生成 API 程式碼與 migration → 人工檢視反覆修正**；六題裁決（編碼規則、id 產生、刪除策略、分頁位置、字典要不要建表、選填欄）就是把「模糊需求」變成「可以動手的契約」的關鍵一步。 |
 | step4 加速技：LOOP 工程 | 不用每一步都盯著 AI，可以讓它自己跑「改 → 跑測試／跑 E2E → 再改」循環——而且你親手經歷過後端的「紅 → 判因（是 API bug 還是資料庫 bug 還是測試本身寫錯）→ 修 → 綠」；收尾一定要有全鏈路 E2E（瀏覽器打到資料庫）把關，不能只靠 `dotnet test` 全綠就說做完了。 |
 
+## 三道 Gate（這門課真正的記憶點）
+
+五個 step、很多文件，不好記。回公司只要記三道 Gate——它同時就是你可以直接拿去用的 PR checklist：
+
+| Gate | 要做什麼 | 必交證據 |
+|---|---|---|
+| **1. 規格 Gate** | PRD → 六題裁決 → SRS/SDD-delta → TASKS | 六題答案＋每題一句理由、任務清單 |
+| **2. 程式 Gate** | 套 harness／範本，Entity→migration→DTO→Mapper→Service→Controller→seed→tests | build 0/0、測試全綠、Swagger 狀態碼、psql 資料 |
+| **3. 交付 Gate** | LOOP 紅→判因→修→綠，再跑你自己工作區的全鏈路 | 紅／根因／修法／綠、E2E 被測 path、DB name、6/6、截圖 |
+
+逐項的評分標準與提交格式見 [RUBRIC.md](RUBRIC.md)。
+
+## ⚠️ 這門課沒教到什麼（誠實講）
+
+今天做出來的東西**不是 production-ready**。以下四條是刻意為了教學簡化的，回公司一定要補：
+
+| 邊界 | 今天怎麼做 | 公司版該怎麼做 |
+|---|---|---|
+| 編碼併發 | `code` 用「同前綴 MAX+1 ＋唯一索引」，前提是**單一寫入者**；併發撞號會落到 500 | 改 per-prefix counter／advisory lock，或捕捉 unique violation 後有限重試回 409 |
+| 帳密與認證 | `postgres/12345` 寫在設定裡，沒有 JWT | 改用環境變數帶密碼；加認證授權 |
+| 資料量 | 全量 GET、前端分頁，假設 <1000 筆 | 訂一個啟用 server-side paging 的明確門檻 |
+| harness 的能力邊界 | harness 管「**怎麼寫**」（分層、封裝、命名、驗證、測試紀律） | 它**不管「做多少」**——範圍要靠 SCOPE 六題管，不是靠 harness 擋 |
+
+今天的成果，講得保守一點是「**可以進 code review、可以上測試環境**」，不是「敢上 production」。
+
 ## 回去公司怎麼用
 
 ### ① 把後端 harness 四件帶進你的專案
 
-把 `CLAUDE.md`（專案憲法）、`CODE-RULES-api-本專案.md`（後端程式碼規則）、`contract-conventions-summary.md`（契約慣例摘要）、`使用說明-複製範本開發新API模組.md` 四份文件複製到你專案的**根目錄**（`step2_speedrun_kit/2.3_harness/` 有現成一套），內容改成你們公司自己的規則（命名慣例、分層邊界、狀態碼與封裝慣例、禁止事項、migration 審查流程）。用 Codex 就再放一份 `AGENTS.md` 指向 CLAUDE.md。這是 AI 生成的 API 「像同一個團隊寫的」的關鍵，不是靠 AI 自己猜。
+把 `CLAUDE.md`（專案憲法）、`CODE-RULES-api-本專案.md`（後端程式碼規則）、`contract-conventions-summary.md`（契約慣例摘要）、`使用說明-複製範本開發新API模組.md` 四份文件複製到你專案的**根目錄**（現成一套在 `step2_speedrun_kit/2.5_sample_api/sample-api/` 的專案根目錄，那是全庫唯一的實檔），內容改成你們公司自己的規則（命名慣例、分層邊界、狀態碼與封裝慣例、禁止事項、migration 審查流程）。用 Codex 就再放一份 `AGENTS.md` 指向 CLAUDE.md。這是 AI 生成的 API 「像同一個團隊寫的」的關鍵，不是靠 AI 自己猜。
 
 ### ② 把既有 API 整理成範本——複製區 vs 共用區
 
@@ -41,5 +66,21 @@
 ## 前後端兩課合起來的全鏈路圖
 
 前端這堂課做出來的裝備物資模組，接上這堂課的 API 之後，完整動線就是一行：**瀏覽器 → Nuxt（devProxy）→ .NET API → PostgreSQL**——資料不再是 F5 就消失的 mock，而是真正落地在資料庫裡的一筆一筆紀錄。
+
+## 課後練習：把那一行 TODO 變成真的
+
+前端課的課後驗收題是做一份**課程回饋問卷**，資料存在瀏覽器，程式裡留了一行：
+
+```ts
+// TODO: DEV 串接 POST /api/survey
+```
+
+[step6_survey_api/](../step6_survey_api/) 就是把那一行變成真的。它跟 step3 的差別是：
+
+- 需求**沿用前端課的同一份 PRD**，沒有為後端改寫過一個字——真實工作就是這樣。
+- 端點名稱是**凍結的契約**（`POST /api/survey`、`GET /api/survey`），因為前端那一行已經那樣寫了。
+- 驗收多一路：跑 `verify-seam.ps1` 證明**前端只換 composable 內部實作，頁面一行都不用改**。
+
+沒上過前端課也能做——step6 附了接縫的 before／after 兩份 composable。
 
 > 想深入研究完整版 harness（`aspnet-api-ai-harness-v5`），見 step2 的課後附錄。

@@ -250,6 +250,7 @@
         <tr><td><b>step3</b></td><td>複製範本開發新模組（真實 PRD → AI 釐清選擇題 → 生成 SRS/SDD-delta／API／Migration／測試）<span class="star">重頭戲</span></td><td>40 分</td></tr>
         <tr><td><b>step4</b></td><td>後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E</td><td>20 分</td></tr>
         <tr><td><b>step5</b></td><td>課程總結、評量量表、回去怎麼用</td><td>5 分</td></tr>
+        <tr><td><b>step6</b></td><td><b>課後練習</b>：把前端課問卷那行 <code>// TODO: DEV 串接 POST /api/survey</code> 變成真的 API</td><td>課後</td></tr>
       </tbody>
     </table>
     </div>
@@ -343,47 +344,49 @@
       <div class="goal">
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
-          <li>用「同一句後端需求、只差有沒有附規矩」的兩個產出，親眼看出差別。</li>
-          <li>知道後端的差別比前端更貴：前端比「像不像同一個團隊做的」，後端比「<strong>敢不敢上線</strong>」。</li>
+          <li>用「同一句後端需求、只差有沒有附規矩」的兩個產出，看出差別在哪一層。</li>
+          <li>知道 harness 真正在管什麼：<strong>不是「AI 寫得好不好」，是「這些決定誰做」</strong>。</li>
+          <li>知道 harness 的邊界：它管「怎麼寫」，<strong>管不了「做多少」</strong>。</li>
         </ol>
       </div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES-api）＋系統文件（SRS／SDD）＋標準範本 API</strong>（薄 Controller → Service → EF Core 的既有寫法）。沒有它，AI 分層、驗證、狀態碼、例外處理全憑當下高興；有了它，產出從「路人硬湊、跑得起來但不敢上線」變成「像老手照團隊規矩寫、能直接進 code review」。</p>
+      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES-api）＋系統文件（SRS／SDD）＋標準範本 API</strong>（薄 Controller → Service → EF Core 的既有寫法）。</p>
+      <p><strong>先破除一個誤會：現在的模型不給規矩也寫得出漂亮的 API。</strong>2026-08-19 實跑沒 harness 那版，它自己就做出分層、建構式注入、EF Core 參數化、DTO 驗證、201＋Location、全域例外處理——一項都不用教。所以 harness 要解決的不是「寫得爛」。</p>
+      <p>它解決的是：<strong>回應包成什麼形狀、id 長什麼樣、有沒有「品項編碼」這個概念、欄位叫 <code>Quantity</code> 還是 <code>qty</code>、錯誤訊息用中文還是英文</strong>——沒 harness，這些全是 AI 當下自己發明的，跟你們團隊、跟前端已經做好的頁面完全對不上。</p>
+      <p>生活比喻：請一個很厲害的木工做櫃子。不給圖，他做得又快又漂亮，但抽屜高度、把手樣式、木料顏色全是他自己決定的，跟你家其他櫃子搭不起來。<strong>harness 就是那張圖</strong>——不是在管他手藝，是在管「尺寸照誰的」。</p>
       <ol>
         <li>打開 <code>step1_why_harness/demo/PROMPT.md</code>——確認兩版給 AI 的需求<strong>是同一句</strong>，只差有沒有附規矩。</li>
-        <li>雙擊 <code>step1_why_harness/COMPARE.html</code>（免安裝、免連網）：左右並排兩份程式碼，<strong>紅底＝違規、綠底＝合規</strong>，每行有白話註解，上方一張 12 項差異總表。</li>
-        <li>對照 <code>demo/no-harness.cs</code> 與 <code>demo/with-harness.cs</code>，照 12 項總表逐項比。</li>
+        <li>雙擊 <code>step1_why_harness/COMPARE.html</code>（免安裝、免連網）：左右並排兩份程式碼，每行有白話註解，上方一張 3 項差異總表。<strong>注意左邊那版也有綠底</strong>——那是它自己就做對的地方，我們誠實標出來。</li>
+        <li>對照 <code>demo/no-harness.cs</code> 與 <code>demo/with-harness.cs</code>，照 3 項總表逐項比。</li>
       </ol>
 
       <div class="block-title"><span class="ico">👀</span>你應該看到</div>
-      <p>兩份都是「新增裝備」的 API，功能一樣能動，差的是「會不會出事」。重點看這幾條後端最貴的坑：</p>
+      <p>兩份都是「新增裝備」的 API，功能一樣、品質也都不差。差的是<strong>每一個決定是誰做的</strong>：</p>
       <div class="table-scroll">
       <table>
         <thead><tr><th>#</th><th>觀察點</th><th>沒 harness</th><th>有 harness</th><th>會出什麼事</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>分層架構</td><td>SQL／商業邏輯全塞 Controller</td><td>Controller 薄委派 → Service</td><td>全攪一起沒人敢改，一動就連坐</td></tr>
-          <tr><td>2</td><td>相依取得</td><td>方法內 <code>new</code> 連線、帳密硬編碼</td><td>建構式注入 DbContext／Mapper</td><td>帳密寫死＝上 git 就外洩</td></tr>
-          <tr><td>3</td><td>SQL 安全</td><td>字串拼接組 SQL</td><td>EF Core 參數化查詢</td><td>拼字串＝SQL Injection 破口，<code>';DROP</code> 就砸表</td></tr>
-          <tr><td>4</td><td>請求驗證</td><td>散裝參數、零驗證</td><td>DTO ＋ DataAnnotations</td><td>空值、負數量、亂填 status 全進庫</td></tr>
-          <tr><td>5</td><td>狀態碼</td><td>一律回 200</td><td>201／400／404</td><td>前端無從判斷成敗，只能猜</td></tr>
-          <tr><td>8</td><td>例外處理</td><td>try/catch 吞例外，DB 斷線也回 200</td><td>只轉預期失敗，未預期上拋 500</td><td>資料沒存進去卻回「成功」，最難查的 bug</td></tr>
-          <tr><td>9</td><td>編碼產生</td><td>時間戳硬湊，不保證唯一</td><td>交易內同前綴 MAX+1 ＋唯一索引</td><td>編碼撞號，盤點對不上、出貨拿錯裝備</td></tr>
+          <tr><td>1</td><td><strong>回應格式從哪來</strong></td><td>自己發明一個 <code>EquipmentResponse</code> record</td><td>統一 <code>ModelResult&lt;T&gt;</code></td><td>每支 API 回傳長不一樣，前端要為每支寫一套解析</td></tr>
+          <tr><td>2</td><td><strong>業務規則與對外訊息從哪來</strong></td><td>id 用 <code>Guid</code>、<strong>完全沒有 code 這個概念</strong>、訊息是英文、錯誤鍵 PascalCase、欄位自己取名</td><td>照契約：<code>E-###</code>、code「前綴-流水3碼」交易內取號、繁中訊息、camelCase 錯誤鍵、13 欄對齊前端</td><td>編碼、欄位名、訊息語言全對不上前端，做出一支沒人能接的 API</td></tr>
+          <tr><td>3</td><td><strong>多出來的東西</strong></td><td colspan="2"><strong>兩版都會自己多做</strong>——實跑時它多加了一個沒人要的 <code>GetById</code> 端點、Swagger、兩個時間欄和一個索引</td><td><strong>harness 管「怎麼寫」，不管「做多少」</strong>；範圍要靠 step3 的 SCOPE 六題管</td></tr>
         </tbody>
       </table>
       </div>
+      <p><strong>它自己就做對了什麼（也要講）</strong>：分層、建構式注入（帳密沒寫死）、EF Core 參數化（沒拼 SQL）、DTO ＋ DataAnnotations 驗證、201＋Location、全域例外處理（沒有 blanket try/catch）。<strong>不要拿這幾項來說服人</strong>——學員一看就知道不公平。</p>
 
       <div class="warnbox">
         <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
         <ul>
-          <li><strong>別把 demo 那兩份 <code>.cs</code> 當「鐵證」</strong>——它們是用固定 prompt 各跑一次挑出來的策展成品，不是每次一字不差重現。要信，就自己拿 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次、照「A/B 違規計分表」逐項打分。</li>
-          <li>比的是「違規數的落差」，不是逐字內容。需求換難、規則換多，沒 harness 那版就會開始崩（尤其例外處理與 SQL 安全這種「跑得起來但會出事」的坑）。</li>
+          <li><strong>別把 demo 那兩份 <code>.cs</code> 當「鐵證」</strong>——它們是用固定 prompt 各跑一次的產出，不是每次一字不差重現。要信，就自己拿 <code>demo/PROMPT.md</code> 的兩版 prompt 各跑一次、照「A/B 決定來源計分表」逐項打分。</li>
+          <li><strong>這個對照的基準會過期。</strong>舊版有 12 項對照，2026-08-19 實跑後發現其中 8 項（分層、SQL 安全、帳密硬編碼、例外吞掉…）現在的模型自己就做對了，已刪除。<strong>每換一代模型都要重跑一次、重寫這張表</strong>，並把結果記進 <code>step1_why_harness/README.md</code> 的實測紀錄表。</li>
+          <li>比的是「AI 自己決定了幾項」的落差，不是逐字內容。</li>
         </ul>
       </div>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>harness 不是限制 AI，是讓 AI 像你團隊的資深工程師。</strong> 沒 harness 那版能新增裝備，但它同時開了 SQL Injection、吞掉例外、帳密寫死——這才是後端最貴的坑。同一句需求，差的不是 AI 智商，是你給不給規矩。
+        <strong>harness 不是讓 AI 寫得更好，是讓 AI 的決定變成你們團隊的決定。</strong> 沒 harness 那版做得又快又整齊，但它發明的回應形狀、id 格式、欄位名稱、訊息語言，跟你們前端已經做好的頁面完全對不上——接不起來的好程式，等於白做。同一句需求，差的不是 AI 智商，是規格從誰那裡來。
       </div>
     </div>
   </section>
@@ -707,9 +710,43 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       </table>
       </div>
 
+      <div class="block-title"><span class="ico">🚪</span>三道 Gate（這門課真正的記憶點）</div>
+      <p>五個 step、很多文件，不好記。回公司只要記三道 Gate——它同時就是你可以直接拿去用的 PR checklist：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Gate</th><th>要做什麼</th><th>必交證據</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. 規格 Gate</strong></td><td>PRD → 六題裁決 → SRS/SDD-delta → TASKS</td><td>六題答案＋每題一句理由、任務清單</td></tr>
+          <tr><td><strong>2. 程式 Gate</strong></td><td>套 harness／範本，Entity→migration→DTO→Mapper→Service→Controller→seed→tests</td><td>build 0/0、測試全綠、Swagger 狀態碼、psql 資料</td></tr>
+          <tr><td><strong>3. 交付 Gate</strong></td><td>LOOP 紅→判因→修→綠，再跑你自己工作區的全鏈路</td><td>紅／根因／修法／綠、E2E 被測 path、DB name、6/6、截圖</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>逐項的評分標準與提交格式見 <code>step5_wrapup/RUBRIC.md</code>（六面向 100 分、70 分及格；需求釐清、API 契約、LOOP 三項不得為零）。</p>
+
+      <div class="soul">
+        <h2>⚠️ 這門課沒教到什麼（誠實講）</h2>
+        <p>今天做出來的東西<strong>不是 production-ready</strong>。以下四條是刻意為了教學簡化的，回公司一定要補：</p>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>邊界</th><th>今天怎麼做</th><th>公司版該怎麼做</th></tr></thead>
+          <tbody>
+            <tr><td>編碼併發</td><td><code>code</code> 用「同前綴 MAX+1 ＋唯一索引」，前提是<strong>單一寫入者</strong>；併發撞號會落到 500</td><td>改 per-prefix counter／advisory lock，或捕捉 unique violation 後有限重試回 409</td></tr>
+            <tr><td>帳密與認證</td><td><code>postgres/12345</code> 寫在設定裡，沒有 JWT</td><td>改用環境變數帶密碼；加認證授權</td></tr>
+            <tr><td>資料量</td><td>全量 GET、前端分頁，假設 &lt;1000 筆</td><td>訂一個啟用 server-side paging 的明確門檻</td></tr>
+            <tr><td>harness 的能力邊界</td><td>harness 管「<strong>怎麼寫</strong>」（分層、封裝、命名、驗證、測試紀律）</td><td>它<strong>不管「做多少」</strong>——範圍要靠 SCOPE 六題管，不是靠 harness 擋</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <ul class="note">
+          <li>測試全綠 ≠ 可上線。<code>dotnet test</code> 全綠只代表「符合寫測試的人當初想到的情境」。</li>
+          <li>今天的成果，講得保守一點是「<strong>可以進 code review、可以上測試環境</strong>」，不是「敢上 production」。</li>
+        </ul>
+      </div>
+
       <div class="block-title"><span class="ico">🧳</span>回去怎麼用（三步驟）</div>
       <ol>
-        <li><strong>把後端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code> 複製到你專案根目錄（<code>step2_speedrun_kit/2.3_harness/</code> 有現成一套），內容改成你們公司的規則（命名、分層邊界、狀態碼與封裝、禁止事項、migration 審查流程）。用 Codex 再放一份 <code>AGENTS.md</code> 指向 CLAUDE.md。</li>
+        <li><strong>把後端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code> 複製到你專案根目錄（現成一套在 <code>step2_speedrun_kit/2.5_sample_api/sample-api/</code> 的專案根目錄，那是全庫唯一的實檔），內容改成你們公司的規則（命名、分層邊界、狀態碼與封裝、禁止事項、migration 審查流程）。用 Codex 再放一份 <code>AGENTS.md</code> 指向 CLAUDE.md。</li>
         <li><strong>把既有 API 整理成範本</strong>——挑最成熟的 CRUD API，拆成「複製區」（Entity、DTO、驗證、Controller、migration）與「共用區」（<code>ModelResult</code> 封裝、統一錯誤處理、DbContext 基礎設定、測試 fixture）。新模組只換實體，共用區完全不動。</li>
         <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本 API。</li>
       </ol>
@@ -744,7 +781,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <p>全部打勾，代表你真的走完了：</p>
       <ul class="checklist">
         <li>前置檢查 <code>preflight.ps1</code> 全數通過（含 WARN）</li>
-        <li>並排看過 no-harness 與 with-harness 兩份 <code>.cs</code>，說得出至少三個後端差別（分層、SQL 安全、例外處理）</li>
+        <li>並排看過 no-harness 與 with-harness 兩份 <code>.cs</code>，說得出三項差異（回應格式、業務規則與訊息、多做的東西），也說得出「哪幾件事沒 harness 那版自己就做對了」</li>
         <li>範本人員 CRUD API 在本機跑起來（port 5080），Swagger 五路由都通、<code>dotnet test</code> 49 綠</li>
         <li>看過後端 harness 四件與分層架構，知道 Controller 薄、Service 厚、Common 不改</li>
         <li>讀懂 PRD，理解「後端服從前端已定好的契約，欄名一個都不能改」</li>
@@ -763,6 +800,60 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
         <li><strong>整範本</strong>：挑最成熟的 CRUD API，拆「複製區 vs 共用區」。</li>
         <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。</li>
       </ol>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="step" id="step6">
+    <div class="step-head">
+      <div class="step-num">6</div>
+      <h2>課後練習：把那一行 TODO 變成真的</h2>
+      <span class="t">課後</span>
+    </div>
+    <div class="step-body">
+      <div class="goal">
+        <div class="block-title"><span class="ico">🎯</span>這一關要做到</div>
+        <ol>
+          <li>用<strong>前端課那份沒改過的 PRD</strong>，生出 <code>POST /api/survey</code> 與 <code>GET /api/survey</code>。</li>
+          <li>把前端的資料層換成打你的 API，而且<strong>頁面一行都不用改</strong>——並且要證明得出來。</li>
+        </ol>
+      </div>
+
+      <p>前端課的課後驗收題是做一份<strong>課程回饋問卷</strong>。學員做出來了，但資料存在瀏覽器 <code>localStorage</code>，換一台電腦就看不到。程式裡留了一行：</p>
+      <div class="flow">// TODO: DEV 串接 POST /api/survey</div>
+      <p><strong>這一關就是把那一行變成真的。</strong>完整說明在 <code>step6_survey_api/README.md</code>，起手 prompt 在 <code>step6_survey_api/PROMPTS.md</code>。</p>
+
+      <div class="block-title"><span class="ico">🔍</span>跟 step3 差在哪</div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>step3 裝備物資</th><th>step6 問卷 API</th></tr></thead>
+        <tbody>
+          <tr><td>需求從哪來</td><td>課程準備好的後端 PRD</td><td><strong>前端課的 PRD，沒有為後端改寫過一個字</strong></td></tr>
+          <tr><td>端點名稱誰定</td><td>課程訂好的</td><td><strong>凍結</strong>——前端那行 TODO 怎麼寫就怎麼做</td></tr>
+          <tr><td>驗收幾路</td><td>三路（Swagger／test／psql）</td><td><strong>四路</strong>，多一路「接縫驗證」</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="block-title"><span class="ico">👀</span>怎麼證明「呼叫端一行不用改」</div>
+      <p>這句話不是口號，它有可機器判定的定義：<strong>對外匯出的東西一個字都沒變</strong>。跑這支腳本，它會比對接縫 before／after 兩版的四樣東西——匯出的名字、契約欄位、composable 回傳的 key、每個 function 的簽章：</p>
+      <div class="flow">powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1</div>
+      <p>四樣完全相同才 <code>exit 0</code>。有你自己前端專案的話，跑完再看 <code>git diff --stat</code>——<strong><code>pages/survey/</code> 必須是 0 行變更</strong>。</p>
+
+      <div class="warnbox">
+        <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
+        <ul>
+          <li><strong>不要另外寫一份後端 PRD。</strong>真實工作拿到的需求就是別人寫的，不會為你重寫。你的工作是把它翻譯成後端契約，模糊處用選擇題問人。</li>
+          <li><strong>不要改端點名稱。</strong>AI 很愛把 <code>/api/survey</code> 改成 <code>/api/survey/responses</code>。契約以<strong>已經存在的那一端</strong>為準，不是以「哪個比較漂亮」為準。</li>
+          <li><strong>SCOPE 六題先自己答完再看答案。</strong>答案在 <code>instructor/</code>，直接抄等於跳過這一關最重要的練習。</li>
+        </ul>
+      </div>
+
+      <div class="why">
+        <div class="block-title"><span class="ico">💡</span>為什麼</div>
+        <strong>「留接縫」不是寫一行 TODO 註解就算數。</strong>真正的接縫是「把會變的東西關進一個檔案裡，讓外面的人看不到它變過」。前端課把 localStorage 的細節全關在 <code>useSurveyResponses.ts</code> 裡，只對外露出三個名字——所以今天換成打 API，外面完全無感。<br><br>
+        生活比喻：家裡的插座。你換冷氣、換冰箱、換烤箱，插頭形狀都一樣，<strong>牆壁一次都沒敲過</strong>。插座規格就是接縫；定好接縫，兩邊才能各自換。
+      </div>
     </div>
   </section>
 

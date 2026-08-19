@@ -47,8 +47,9 @@ finally {
     Pop-Location
 }
 
-# 評估報告本身記錄了錯誤示範原文，掃描時必須排除，否則永遠紅燈
-$excluded = @('EVALUATION_REPORT_2026-07-15.md')
+# 若有教材刻意記錄「錯誤示範原文」，把檔名加進這裡，否則永遠紅燈
+# （2026-08-19：原本排除的 EVALUATION_REPORT_2026-07-15.md 已併入 BUILD_LOG.md，新檔不含錯誤示範原文）
+$excluded = @()
 
 $files = $tracked |
     Where-Object { $excluded -notcontains (Split-Path $_ -Leaf) } |
