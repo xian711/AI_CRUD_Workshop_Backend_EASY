@@ -17,6 +17,7 @@ test-results/
 
 # === 學員工作區（上課時各自產生，不進版控）===
 step3_new_module/my-equipment-api/
+step6_survey_api/my-survey-api/
 
 # === 執行期產物 / checkpoint 備份 ===
 .checkpoint-backup/
