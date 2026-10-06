@@ -1,8 +1,9 @@
-# SDD 差異說明 — 中心裝備物資 API（相對於範本 SDD）
+# 設計文件 delta — 中心裝備物資 API（相對於範本設計文件）
 
-> 只寫與範本 `SDD-CRUD後端標準-v1.6` 不同之處。分層架構、Mapperly、統一封裝、
+> 只寫與範本 `DESIGN-CRUD後端標準-v1.6` 不同之處。分層架構、Mapperly、統一封裝、
 > 例外分類（D11）、SEQUENCE 取號、snake_case 命名轉換等通則沿用不重述。
 > 對應實作：`step3_new_module/solution-api/`（與本文同源）。
+> 圖在同資料夾 `DIAGRAMS-裝備物資API.html`（用瀏覽器開）：分層架構、資料表、POST 新增循序、狀態碼矩陣。
 
 ## 1. 狀態碼矩陣（含 equipment 列）
 
@@ -46,9 +47,9 @@
 |---|------|------|------|
 | Q1 | **code 後端產生**（偏離範本 D6 單一 SEQUENCE） | `EquipmentService.NextCodeAsync` + `AppDbContext`（唯一索引） | 「每前綴各自計數」單一 SEQUENCE 做不到 → 改「同前綴掃 MAX+1」；唯一索引 `ux_equipment_item_code` 為最後防線 |
 | Q2 | **id 沿用範本 D6** | `EquipmentService.NextSequenceValueAsync` + SEQUENCE | `equipment_item_seq` 起 25 → `E-{n:D3}`；種子顯式 id，seed 後 RESTART 25 |
-| Q3 | **硬刪除** | `EquipmentService.Delete` | `Remove` + 204／404，與範本 D5/D9 一致 |
-| Q4 | **分頁/篩選/排序前端做** | `GetAll` 回全量（id 升冪） | 記入 SRS-delta 限制 |
-| Q5 | **分類不建表** | `EquipmentEnums`（常數 + 兩份字典） | `categoryKey ∈ 10 類` 以常數驗證；`name` 不驗標準項目 |
+| Q3 | **分類不建表** | `EquipmentEnums`（常數 + 兩份字典） | `categoryKey ∈ 10 類` 以常數驗證；`name` 不驗標準項目 |
+| Q4 | **硬刪除** | `EquipmentService.Delete` | `Remove` + 204／404，與範本 D5/D9 一致 |
+| Q5 | **分頁/篩選/排序前端做** | `GetAll` 回全量（id 升冪） | 記入 SRS-delta 限制（資料量 < 1000 筆前提） |
 | Q6 | **purchaseDate 可 null、選填欄** | `EquipmentItemRequest`（nullable + Validate） | 選填空白→null；purchaseDate 非 null 不晚於今天 |
 
 ### 3.1 編碼取號偏離 D6 的記錄（Q1 教學點）

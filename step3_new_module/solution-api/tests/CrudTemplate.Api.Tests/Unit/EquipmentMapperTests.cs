@@ -5,7 +5,7 @@ using CrudTemplate.Api.Models;
 namespace CrudTemplate.Api.Tests.Unit;
 
 /// <summary>
-/// 裝備物資 Mapperly 映射單元測試（SDD-delta §9.2）。
+/// 裝備物資 Mapperly 映射單元測試（DESIGN-delta §9.2）。
 /// </summary>
 public class EquipmentMapperTests
 {

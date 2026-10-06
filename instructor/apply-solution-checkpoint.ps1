@@ -14,7 +14,7 @@
         Migration 快照 ModelSnapshot、appsettings.Development.json 連線字串）。
       - 【測試】複製 Equipment 單元／整合測試（新增），並覆蓋整合測試 factory
         CustomWebAppFactory.cs（改用 ai_crud_equipment_test）。
-      - 【文件】把 SRS-delta／SDD-delta／TASKS 複製進學員專案 docs\（供三路驗收比對）。
+      - 【文件】把 SRS-delta／DESIGN-delta／DIAGRAMS／TASKS 複製進學員專案 docs\（供三路驗收比對）。
       - 覆蓋前一律把學員原檔備份到 <Target>\.checkpoint-backup\（保留相對路徑結構，
         只在第一次備份，重複執行 apply 不會覆蓋掉「套用前的原始檔」），可用
         restore-checkpoint.ps1 對稱還原。
@@ -101,7 +101,8 @@ $testFiles = @(
 # 相對 docs\（來源＝step3_new_module\docs\，不在 solution-api 底下）
 $docFiles = @(
     'SRS-裝備物資API-delta.md',
-    'SDD-裝備物資API-delta.md',
+    'DESIGN-裝備物資API-delta.md',
+    'DIAGRAMS-裝備物資API.html',
     'TASKS.md'
 )
 

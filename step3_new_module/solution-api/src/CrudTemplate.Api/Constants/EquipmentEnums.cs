@@ -2,11 +2,11 @@ namespace CrudTemplate.Api.Constants;
 
 /// <summary>
 /// 裝備物資枚舉字面值與編碼字典（逐字對齊前端 useEquipmentItems.ts 的
-/// EQUIPMENT_CATEGORIES / ITEM_CODE_MAP / EQUIPMENT_STATUS_OPTIONS，SDD-delta §5）。
+/// EQUIPMENT_CATEGORIES / ITEM_CODE_MAP / EQUIPMENT_STATUS_OPTIONS，DESIGN-delta §5）。
 /// </summary>
 /// <remarks>
 /// 集中允許值於單一來源：DTO 的 <c>[AllowedValues]</c> 與 DB CHECK constraint 共用此處字面值。
-/// <para>SCOPE Q5：分類不建表，改以常數清單驗證 <c>categoryKey ∈ 10 類</c>；
+/// <para>SCOPE Q3：分類不建表，改以常數清單驗證 <c>categoryKey ∈ 10 類</c>；
 /// 類別碼（2 碼）與項目碼（3 碼）兩份字典搬到後端，供服務層產生品項編碼。
 /// <c>name</c> 不驗證是否屬於該分類的標準項目（「其他」可自填、字典演進不動後端）。</para>
 /// </remarks>

@@ -29,8 +29,6 @@ dotnet run --urls http://localhost:5080
 
 瀏覽器開 <http://localhost:5080/swagger>。逐一操作五個端點，每個確認「你應該看到什麼」。
 
-<!-- 截圖 placeholder：Swagger 首頁五個端點總覽 → ../../HANDBOOK/images/step2_backend_swagger_overview.png -->
-
 | # | 端點 | 操作 | 你應該看到什麼 |
 |---|---|---|---|
 | 1 | **GET** `/api/template/members` | Try it out → Execute | 200，`data` 陣列 24 筆，id 從 M-001 升冪；外層有 `success:true` |
@@ -51,11 +49,7 @@ POST 範例 body（可直接貼）：
 }
 ```
 
-<!-- 截圖 placeholder：POST 成功回 201 + Location 標頭 → ../../HANDBOOK/images/step2_backend_post_201.png -->
-
 **加分：故意觸發驗證錯誤** — POST 時把 `phone` 改成 `123`（不合格式）→ Execute → 應回 **400**，`errors` 裡有 `phone` 的繁中訊息（欄位鍵是 camelCase）。這就是範本「驗證失敗回 400 帶欄位訊息」的行為。
-
-<!-- 截圖 placeholder：驗證失敗 400 errors camelCase → ../../HANDBOOK/images/step2_backend_400.png -->
 
 ## 步驟三：跑測試（49 條全綠）
 
@@ -67,8 +61,6 @@ dotnet test
 ```
 
 應看到 `Passed!` 且測試數 **49**（單元 + 整合）。整合測試每輪自己重建測試庫，不會污染你剛剛玩的開發資料。
-
-<!-- 截圖 placeholder：dotnet test 49 passed → ../../HANDBOOK/images/step2_backend_test_green.png -->
 
 ## 步驟四：玩完重置資料
 

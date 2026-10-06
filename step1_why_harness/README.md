@@ -2,7 +2,7 @@
 
 ## harness 是什麼（三句話）
 
-- harness 就是你交給 AI 的一套「規矩」：**專案規則**（CODE-RULES-api）＋**系統文件**（SRS／SDD）＋**標準範本 API**（薄 Controller → Service → EF Core 的既有寫法）。
+- harness 就是你交給 AI 的一套「規矩」：**專案規則**（CODE-RULES-api）＋**系統文件**（SRS／設計文件 DESIGN）＋**標準範本 API**（薄 Controller → Service → EF Core 的既有寫法）。
 - **它不是用來讓 AI 寫得比較好看**——現在的模型不給規矩也寫得出漂亮、能跑、分層正確的 API。
 - 它是用來決定「**這些決定誰做**」：回應長什麼樣、編碼怎麼產、欄位叫什麼、訊息用哪國語言。沒 harness，這些全是 AI 當下自己發明的，跟你們團隊無關。
 

@@ -4,11 +4,11 @@ using CrudTemplate.Api.Constants;
 namespace CrudTemplate.Api.Models;
 
 /// <summary>
-/// 新增 / 更新人員的請求 DTO（SDD §5）。
+/// 新增 / 更新人員的請求 DTO（DESIGN §5）。
 /// </summary>
 /// <remarks>
 /// BR-B-06：本 DTO 刻意「不宣告」id / updatedAt——body 帶了也被繫結忽略，杜絕外部竄改。
-/// 驗證分工（SDD §5 實作規定）：
+/// 驗證分工（DESIGN §5 實作規定）：
 ///   - 單欄位允許值一律用內建 <c>[AllowedValues]</c>（gender/idType/positionCode/status）。
 ///   - <see cref="Validate"/> 放物件層級/條件規則：① nationalId 依 idType 相依驗證；② email 非空才驗格式；
 ///     ③ qualifications 規則（BR-B-10）；④ bloodType 非 null 時須 ∈ {A,B,AB,O}（BR-B-11，Contract v2）。
@@ -30,7 +30,7 @@ public class MemberRequest : IValidatableObject
 
     // 注意：value type（DateOnly）的 [Required] 對「省略欄位」無效——JSON 未帶欄位時模型繫結
     // 會默默填入 default(DateOnly)（0001-01-01）而非觸發驗證失敗，形成必填漏洞。
-    // 改用 DateOnly? 讓「省略」繫結為 null，[Required] 才能真正攔下（SDD §5 H1 裁決）。
+    // 改用 DateOnly? 讓「省略」繫結為 null，[Required] 才能真正攔下（DESIGN §5 H1 裁決）。
     [Required(ErrorMessage = "出生日期為必填")]
     public DateOnly? BirthDate { get; set; }
 
@@ -102,7 +102,7 @@ public class MemberRequest : IValidatableObject
         set => _bloodType = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 
-    /// <summary>跨欄位 / 條件驗證（SDD §5：僅兩條）。</summary>
+    /// <summary>跨欄位 / 條件驗證（DESIGN §5：僅兩條）。</summary>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         // ① BR-B-02：nationalId 依 idType 相依驗證
@@ -139,7 +139,7 @@ public class MemberRequest : IValidatableObject
         }
 
         // ④ BR-B-11：bloodType 選填；非 null 時必須 ∈ {A, B, AB, O}（setter 已將空白正規化為 null）。
-        //    回應 JSON key 為 camelCase「bloodType」（仿 phone 檢查，SDD §3.4）。
+        //    回應 JSON key 為 camelCase「bloodType」（仿 phone 檢查，DESIGN §3.4）。
         if (BloodType is not null && !MemberEnums.BloodTypes.Contains(BloodType))
         {
             yield return new ValidationResult(

@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 namespace CrudTemplate.Api.Mapping;
 
 /// <summary>
-/// 人員映射設定（Mapperly source generator，映射碼於編譯期產生，SDD §6）。
+/// 人員映射設定（Mapperly source generator，映射碼於編譯期產生，DESIGN §6）。
 /// </summary>
 /// <remarks>
 /// <c>RequiredMappingStrategy.Target</c>：目標有欄位未被映射 → 編譯期警告（本範本設為錯誤，見 csproj）。

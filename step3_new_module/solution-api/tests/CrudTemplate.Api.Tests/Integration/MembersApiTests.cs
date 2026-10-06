@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.TestHost;
 namespace CrudTemplate.Api.Tests.Integration;
 
 /// <summary>
-/// 端到端整合測試（SDD §9.3：I1-I15）。打 PostgreSQL 測試 DB。
+/// 端到端整合測試（DESIGN §9.3：I1-I15）。打 PostgreSQL 測試 DB。
 /// </summary>
 [Collection("Api")]
 public class MembersApiTests(DatabaseFixture fixture)

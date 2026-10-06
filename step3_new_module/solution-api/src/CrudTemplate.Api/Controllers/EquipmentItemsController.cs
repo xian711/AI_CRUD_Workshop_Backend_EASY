@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CrudTemplate.Api.Controllers;
 
 /// <summary>
-/// 裝備物資 CRUD 控制器（SDD-delta §2 / §3）。薄委派：委派 Service → 依 Success 對映狀態碼。
+/// 裝備物資 CRUD 控制器（DESIGN-delta §2 / §3）。薄委派：委派 Service → 依 Success 對映狀態碼。
 /// </summary>
 /// <remarks>
 /// 禁止查詢 / 組路徑 / 商業判斷（皆在 Service）。狀態碼對映與範本一致（201+Location / 400 / 404 / 204）。

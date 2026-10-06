@@ -196,6 +196,7 @@
       <a href="#step4">Step 4</a>
       <a href="#step5">Step 5</a>
       <a href="#done">完課檢核</a>
+      <a href="#step6">Step 6</a>
     </nav>
   </div>
 </header>
@@ -247,8 +248,8 @@
         <tr><td><b>step0</b></td><td>課程說明、前置檢查（11 項）</td><td>10 分</td></tr>
         <tr><td><b>step1</b></td><td>為什麼要 harness（同一句後端需求，有／沒有 harness 的產出對比）</td><td>10 分</td></tr>
         <tr><td><b>step2</b></td><td>後端快速完工秘笈（玩範本 API → 系統文件 → harness 四件 → 分層架構＋DB → 範本程式）</td><td>35 分</td></tr>
-        <tr><td><b>step3</b></td><td>複製範本開發新模組（真實 PRD → AI 釐清選擇題 → 生成 SRS/SDD-delta／API／Migration／測試）<span class="star">重頭戲</span></td><td>40 分</td></tr>
-        <tr><td><b>step4</b></td><td>後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E</td><td>20 分</td></tr>
+        <tr><td><b>step3</b></td><td>複製範本開發新模組（真實 PRD → AI 釐清選擇題 → SRS-delta、設計文件-delta 和圖 → API／Migration／測試）<span class="star">重頭戲</span></td><td>40 分</td></tr>
+        <tr><td><b>step4</b></td><td>LOOP 工程：貼一個指令，AI 自己跑前後端全鏈路 E2E 修到綠，再開子代理對抗審查</td><td>20 分</td></tr>
         <tr><td><b>step5</b></td><td>課程總結、評量量表、回去怎麼用</td><td>5 分</td></tr>
         <tr><td><b>step6</b></td><td><b>課後練習</b>：把前端課問卷那行 <code>// TODO: DEV 串接 POST /api/survey</code> 變成真的 API</td><td>課後</td></tr>
       </tbody>
@@ -351,7 +352,7 @@
       </div>
 
       <div class="block-title"><span class="ico">👣</span>跟著做</div>
-      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES-api）＋系統文件（SRS／SDD）＋標準範本 API</strong>（薄 Controller → Service → EF Core 的既有寫法）。</p>
+      <p>harness 就是你交給 AI 的一套「規矩」：<strong>專案規則（CODE-RULES-api）＋系統文件（SRS／設計文件 DESIGN）＋標準範本 API</strong>（薄 Controller → Service → EF Core 的既有寫法）。</p>
       <p><strong>先破除一個誤會：現在的模型不給規矩也寫得出漂亮的 API。</strong>2026-08-19 實跑沒 harness 那版，它自己就做出分層、建構式注入、EF Core 參數化、DTO 驗證、201＋Location、全域例外處理——一項都不用教。所以 harness 要解決的不是「寫得爛」。</p>
       <p>它解決的是：<strong>回應包成什麼形狀、id 長什麼樣、有沒有「品項編碼」這個概念、欄位叫 <code>Quantity</code> 還是 <code>qty</code>、錯誤訊息用中文還是英文</strong>——沒 harness，這些全是 AI 當下自己發明的，跟你們團隊、跟前端已經做好的頁面完全對不上。</p>
       <p>生活比喻：請一個很厲害的木工做櫃子。不給圖，他做得又快又漂亮，但抽屜高度、把手樣式、木料顏色全是他自己決定的，跟你家其他櫃子搭不起來。<strong>harness 就是那張圖</strong>——不是在管他手藝，是在管「尺寸照誰的」。</p>
@@ -415,7 +416,7 @@
         <thead><tr><th>資料夾</th><th>是什麼</th><th>在這裡做什麼</th></tr></thead>
         <tbody>
           <tr><td><code>2.1_play_template</code></td><td>玩一輪範本 API</td><td>跑起來、Swagger 玩 CRUD、<code>dotnet test</code>、重置資料</td></tr>
-          <tr><td><code>2.2_system_docs</code></td><td>範本的 SRS／SDD</td><td>需要時查規格（SRS v1.2、SDD v1.6）</td></tr>
+          <tr><td><code>2.2_system_docs</code></td><td>範本的 SRS／設計文件（DESIGN）</td><td>需要時查規格（SRS v1.2、設計文件 v1.6）</td></tr>
           <tr><td><code>2.3_harness</code></td><td>AI 的規矩四件</td><td>讀懂 AI 每次會遵守的鐵律</td></tr>
           <tr><td><code>2.4_architecture_db</code></td><td>架構視覺化＋psql 入門</td><td>看「請求的一生」圖、學 psql 三招</td></tr>
           <tr><td><code>2.5_sample_api</code></td><td>人員 CRUD 範本（正本）</td><td>安裝啟動、對照分層資料夾</td></tr>
@@ -480,7 +481,7 @@ dotnet run --urls http://localhost:5080</code></pre>
         <ol>
           <li>讀懂 PRD，理解「後端不是重新發明需求，是<strong>服從前端已經定好的契約</strong>」。</li>
           <li>把需求丟給 AI，讓它<strong>先出選擇題釐清範圍</strong>（SCOPE 六題），你拍板。</li>
-          <li>讓 AI 依範本分層生出 SRS-delta／SDD-delta／API／Migration／測試，再三路驗收。</li>
+          <li>讓 AI 照最小樣板交出 SRS-delta、設計文件-delta 和圖，你說「開工」後再依範本分層生出 API／Migration／測試，最後三路驗收。</li>
         </ol>
       </div>
 
@@ -488,33 +489,40 @@ dotnet run --urls http://localhost:5080</code></pre>
       <p>要長出的新模組是<strong>中心裝備物資</strong>（路由 <code>api/equipment/items</code>），用的是跟 step2 同一套範本＋harness。</p>
 
       <h3>⓪ 準備工作區（3.0）</h3>
-      <p>在工作坊根目錄執行，把範本複製成自己的工作專案，<strong>只把 PRD 放進去，別的都不搬</strong>：</p>
+      <p>在工作坊根目錄執行，把範本複製成自己的工作專案，<strong>只把 PRD 和最小樣板放進去，別的都不搬</strong>：</p>
       <pre><code># 1. 複製範本 API 成你的工作專案（harness 四件在範本根目錄，會一起帶走）
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_api\sample-api step3_new_module\my-equipment-api
 
-# 2. 只把 PRD 放進專案（AI 才讀得到需求）——不複製任何答案檔
+# 2. 把 PRD 和最小樣板放進專案（AI 才讀得到需求和交件格式）——不複製任何答案檔
 Copy-Item step3_new_module\PRD-中心裝備物資-後端.md step3_new_module\my-equipment-api\
+Copy-Item step3_new_module\SRS-設計文件-最小樣板.md step3_new_module\my-equipment-api\
 
 # 3. 進入專案資料夾，在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
 cd step3_new_module\my-equipment-api</code></pre>
-      <blockquote><strong><code>solution-api</code>（參考解）與 <code>instructor/</code>（範圍答案）都不進工作區</strong>——答案在手邊，釐清練習就沒了。複製完可確認 harness 四件有跟過來：<code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code>，外加給 Codex 用的 <code>AGENTS.md</code>。</blockquote>
+      <blockquote><strong><code>solution-api</code>（參考解）、<code>step3_new_module/docs/</code>（參考解的文件）與 <code>instructor/</code>（範圍答案）都不進工作區</strong>——答案在手邊，釐清練習就沒了。複製完可確認 harness 四件有跟過來：<code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code>，外加給 Codex 用的 <code>AGENTS.md</code>。</blockquote>
 
       <h3>① 讀 PRD（3.1）</h3>
       <p>打開 <code>step3_new_module/PRD-中心裝備物資-後端.md</code>。這份 PRD 從<strong>前端課的成品逆向整理</strong>而來——記的是「現況契約」，連缺口都照實記。核心觀念：<strong>前端的型別欄位叫什麼、哪些必填，後端就照著做；欄位名一個都不能改，改了前端就接不上。</strong> 契約是 13 欄（必填 6：<code>categoryKey</code>、<code>name</code>、<code>qty</code>、<code>unit</code>、<code>spec1</code>、<code>status</code>；選填 5；系統產生 2：<code>id</code>、<code>code</code>），回應另加 <code>updatedAt</code>、一律 camelCase。標「待釐清」的地方＝待你決策。</p>
 
       <h3>② 貼起手 prompt，讓 AI 先問問題（3.2）</h3>
-      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔、跑指令）。從 <code>step3_new_module/PROMPTS.md</code> 複製【起手 prompt】整段貼上——這段同時交代「先依序讀 CLAUDE.md → AGENTS.md → 其餘 harness 規則 → PRD、先別寫程式、要用選擇題問範圍」。</p>
+      <p>用 <strong>Agent 模式</strong>跟 AI 對話（它需要能自己讀檔、改檔、跑指令）。整段複製貼上（<code>step3_new_module/PROMPTS.md</code> 也有同一段）：</p>
+      <pre><code>用 .NET CRUD 範本（人員 API）做新模組「中心裝備物資」的後端 API，走規格驅動開發（SDD）：先文件，再程式。
+先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔，和 PRD-中心裝備物資-後端.md，先不要寫程式。
+PRD 第 5 節的待釐清點和其他沒寫清楚的地方，用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 SRS-delta、設計文件-delta、UML 圖和任務清單；等我說「開工」才寫程式，每做完一個回報一行。</code></pre>
+      <blockquote><strong>模型怎麼選：</strong>文件階段（選擇題、SRS、設計文件、圖）用 <strong>Opus 5.5</strong>、effort High（effort＝讓 AI 想得多深的設定）。說「開工」寫程式前，把模型切成 <strong>Sonnet 5.5</strong>——有 harness 和範本，寫程式不用最貴的模型。</blockquote>
+      <p>庫名、build 零警告、不准刪測試這些鐵律，已經寫在 <code>CLAUDE.md</code> 和 PRD 第 6 節，AI 會自己讀，prompt 不用重講。流程一句話記：<strong>貼 prompt → AI 問 → 你答 → AI 出文件、圖和任務 → 你確認 → AI 逐項做並回報。</strong>這就是 SDD（規格驅動開發）：先文件，再程式。</p>
       <div class="flow">你：貼【起手 prompt】
       ▼
 AI：依序讀 CLAUDE.md → AGENTS.md → 其餘 harness 規則 → PRD
       ▼
-AI：先不寫程式，改用「選擇題」問你範圍（5-7 題，每題附建議＋理由）
+AI：先不寫程式，改用「選擇題」問你範圍（六題＋追加題，每題附建議＋理由）
       ▼
 你：一題一題拍板（可採納建議，但先想清楚為什麼）
       ▼
-AI：輸出 SRS-delta／SDD-delta（寫進 docs/）＋任務清單（T1、T2…），停下等你確認
+AI：照最小樣板交出<b>「SRS-delta、設計文件-delta、圖、任務清單」</b>（寫進 docs/），停下等你確認
       ▼
-你：說「開工」
+你：把模型切成 Sonnet 5.5，說<b>「開工」</b>
       ▼
 AI：依範本分層逐任務開發（Entity → migration → DTO → Mapper → Service → Controller → seed → 測試），每完成一個回報一行</div>
 
@@ -535,8 +543,9 @@ AI：依範本分層逐任務開發（Entity → migration → DTO → Mapper �
       </div>
       <blockquote><strong>本手冊不給六題答案</strong>——答案（課堂裁決）由講師在你完成釐清問答後才發放（<code>instructor/SCOPE-後端課堂範圍決策.md</code>）。這一步的重點就是你親自跟 AI 把範圍釐清出來，答案先進工作區等於直接抄，練習就沒了。每一題都想一下<strong>為什麼</strong>，課後跟講師答案比對自己的裁決。</blockquote>
 
-      <h3>④ 確認任務清單、說「開工」</h3>
-      <p>AI 產出 SRS-delta／SDD-delta（只記「與人員範本的差異」，不動範本正本）與任務清單後停下。順序合理就回「開工」；覺得少了什麼先補一句再放行。</p>
+      <h3>④ 確認文件與任務清單、說「開工」</h3>
+      <p>拍板後，AI 先交出 SRS-delta、設計文件-delta、圖（<code>docs/DIAGRAMS-裝備物資API.html</code>，用瀏覽器開，看圖就好），再列小到能單獨驗收的任務清單（<code>docs/TASKS.md</code>）。這些文件只記「與人員範本的差異」，不動範本正本。文件看得懂、任務順序合理，就回「開工」；覺得少了什麼先補一句再放行。</p>
+      <blockquote><strong>SRS、設計文件和圖不要用「有檔案就打勾」驗收。</strong>打開 <code>step3_new_module/SRS-設計文件-最小樣板.md</code>——那份把最低門檻定死：SRS-delta 四段（<strong>已拍板決策、需求追溯、範圍外、待定與風險</strong>）；設計文件-delta 四段（<strong>檔案責任（分層）、資料模型、關鍵決策實作、harness 證據</strong>）＋<strong>圖四張</strong>（分層架構、資料表 ER、POST 新增循序、狀態碼矩陣）。缺一樣就退回去補。裡面也用白話解釋了 SDD（規格驅動開發）這套流程，以及你只要親自核哪幾段。<br>想看<strong>填好的</strong>長什麼樣，<code>step3_new_module/docs/</code> 裡有參考解的 <code>SRS-裝備物資API-delta.md</code>、<code>DESIGN-裝備物資API-delta.md</code>、<code>DIAGRAMS-裝備物資API.html</code> 與任務清單 <code>TASKS.md</code>——一樣是<strong>先自己做，卡住再開</strong>。</blockquote>
 
       <h3>⑤ 三路驗收（3.3）</h3>
       <p>AI 說做完後，先貼 <code>PROMPTS.md</code> 的【收工檢查 prompt】讓它自己跑一輪證據，<strong>然後換你親自驗</strong>（AI 說的不算，親眼看到才算）：</p>
@@ -558,19 +567,24 @@ dotnet test
         <li>AI <strong>先出釐清選擇題</strong>（不急著寫程式）——這代表 harness 在運作。</li>
         <li>生完之後：Swagger 五路由通、<code>dotnet test</code> 全綠（參考解 <code>solution-api</code> 是 <strong>89 條全綠</strong>＝Members 49＋Equipment 40；你自己生的數量以 <code>docs/TASKS.md</code> 為準）。</li>
         <li><strong>psql 查 <code>equipment_item</code> 表有 24 列</strong>，<code>code</code> 與前端種子一致（<code>E-001</code>~<code>E-024</code>，maintenance 3 筆、scrapped 2 筆）。這是「資料真的進了 PostgreSQL」的鐵證，也是這堂課跟前端課最大的差別。</li>
+        <li>AI 另外會交出 <strong>SRS-delta、設計文件-delta、圖</strong>（都在 <code>docs/</code>）：對照你的六題裁決有沒有漏、有沒有多。</li>
+        <li><strong>圖</strong>：用瀏覽器開 <code>docs/DIAGRAMS-裝備物資API.html</code>，四張圖都出得來，不看程式也看得懂分層怎麼走、資料表長什麼樣、新增怎麼跑、會回哪些狀態碼。</li>
       </ul>
 
       <div class="warnbox">
         <div class="block-title"><span class="ico">⚠️</span>常見坑（照 PROMPTS.md 歪樓對照表打斷）</div>
         <ul>
-          <li><strong>AI 沒提問就直接動工</strong>：立刻打斷「停，先不要寫程式、不要建檔案，請先以選擇題形式提 5-7 題釐清問題」。</li>
+          <li><strong>AI 沒提問就直接動工</strong>：立刻打斷「停，先不要寫程式、不要建檔案。先用選擇題逐題問我 PRD 第 5 節的六題，我拍板後再產出文件和任務清單，等我說『開工』」。</li>
           <li><strong>AI 想自作主張幫分類字典建表</strong>：那是釐清題之一，回「請把它列成選擇題（建表 vs 程式常數）讓我選」。</li>
-          <li><strong>AI 想改範本的 SRS／SDD 正本</strong>：回「正本不可改，差異一律寫進 docs/ 下的 delta」。</li>
+          <li><strong>AI 想改範本的 SRS／設計文件正本</strong>（<code>docs/baseline/</code>）：回「正本不可改，差異一律寫進 docs/ 下的 delta」。</li>
+          <li><strong>文件少段落、沒有圖</strong>：回「照 SRS-設計文件-最小樣板.md 補齊：SRS-delta 四段、設計文件-delta 四段、圖四張」。</li>
           <li><strong>AI 測試紅了想刪測試或放寬 assertion</strong>：回「不准刪測試、不准放寬斷言，先回報是哪條紅、原因是程式錯還是測試錯」。</li>
-          <li><strong>Q1 偏離範本 SEQUENCE 不算違規</strong>：範本 SEQUENCE 產不出「每前綴各自計數」的流水號，需求逼你偏離——只要把「為什麼偏離、偏離成什麼」寫進 SDD-delta，就是正確的工程判斷。</li>
+          <li><strong>Q1 偏離範本 SEQUENCE 不算違規</strong>：範本 SEQUENCE 產不出「每前綴各自計數」的流水號，需求逼你偏離——只要把「為什麼偏離、偏離成什麼」寫進設計文件-delta，就是正確的工程判斷。</li>
         </ul>
         <p style="margin:10px 0 0"><strong>修正心法</strong>：用「看到什麼／期望什麼／只改這個」三段式，一次只提一個問題，兩次修不好就換個說法重新描述。</p>
       </div>
+
+      <p><strong>做完之後還是會有小修改。</strong>驗收時發現的小落差（某個狀態碼不對、某欄忘了驗證），一次講一件，AI 改、你再驗。這段「你看 → 你講 → AI 改」的來回，就是 step4 要交給 AI 自己跑的事：先給它一套會亮紅綠燈的驗收標準（全鏈路 E2E），它就能自己看、自己改，這就是 LOOP。</p>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
@@ -591,17 +605,49 @@ dotnet test
       <div class="goal">
         <div class="block-title"><span class="ico">🎯</span>這一步要做到</div>
         <ol>
-          <li>理解 LOOP 工程：<strong>先給 AI 一個會給出紅／綠的自動驗證，再叫它自己修到綠。</strong></li>
-          <li>跑一次 <strong>6 條全鏈路 E2E</strong>（瀏覽器 → 前端 → 後端 → PostgreSQL），看到全綠，而且<strong>綠燈來自你自己的 <code>my-equipment-api</code></strong>。</li>
-          <li>親手經歷一整圈「紅 → 判因 → 修 → 綠」，記住兩條規則：兩次停損、修測試不修 App。</li>
+          <li>說得出 LOOP 是什麼：<strong>先給 AI 一個會給出紅／綠的自動驗證，再叫它自己修到綠。</strong></li>
+          <li>貼<strong>一個 prompt</strong>，讓 AI 把<strong>你自己的 <code>my-equipment-api</code></strong> 修到 <strong>6 條全鏈路 E2E</strong> 全綠（瀏覽器 → 前端 → 後端 → PostgreSQL），<strong>再自己開子代理對抗審查</strong>。</li>
+          <li>驗收 AI 交回的報告，記住兩條鐵律：兩次停損、不准作弊（修 App，不修測試）。</li>
         </ol>
       </div>
 
-      <h3>① 跑全鏈路 E2E（一支腳本自管整條鏈路）</h3>
-      <p>前端 mock 課要你另開視窗手動起服務；這一課鏈路較長（資料庫＋後端＋前端），<code>run-e2e.ps1</code> 自己把整條拉起來、跑完、再拆乾淨：</p>
+      <div class="block-title"><span class="ico">📖</span>LOOP 是什麼</div>
+      <p>一句話：<strong>先給 AI 一個「可自動執行、會給出綠/紅」的驗證，再叫它自己修到綠。</strong></p>
+      <blockquote><strong>比喻：一問一答，就像主管手把手帶新人。</strong>每一步都要交代、要盯，主管的時間全耗在教。<br>LOOP 的做法是先把規矩（harness）和示範樣本（範本）放好，再給一個會亮紅綠燈的驗收標準（E2E）。<strong>你下一個指令，AI 就照公司規定自己做、自己驗，還會叫出另一個分身（子代理）挑錯；你只看最後的報告。</strong><br>LOOP 會留兩種紀錄：紀錄 MD（<code>LOOP-LOG.md</code>）是給機器看的流水帳；報告 HTML（<code>LOOP-REPORT.html</code>）才是給人看的，圖文並茂。子代理審查分兩段：先用 HTTP 實打 API（狀態碼、回應形狀），再用 Playwright 真的開瀏覽器，逐頁截圖來看。</blockquote>
+      <p><strong>關鍵前提：要先有可自動執行的驗證</strong>（本課是 6 條全鏈路 <strong>E2E 測試</strong>——<strong>E2E 就是讓程式自動開一個真的瀏覽器，照使用者的操作順序點一遍，一路打到後端和資料庫，點完自己判定對不對</strong>；exit 0＝全綠、1＝有紅）。沒有這個，LOOP 就退化成 AI 自說自話。</p>
+      <p><strong>流程圖（一圈 LOOP 怎麼轉）：</strong></p>
+      <div class="flow"> 你：貼 LOOP prompt（只貼這一次）
+          │
+          ▼
+ ┌── AI 跑 run-e2e ──► 6 條全綠？ ──是──► <b>子代理對抗審查（HTTP 實打 → Playwright 截圖）</b>
+ │        ▲                 │                   │
+ │        │                否（有紅）        App 的問題 → 回去修、再跑
+ │        │                 ▼               測試的問題 → 寫進報告，交你裁決
+ │        │       AI 判因（API？資料庫？環境？測試本身？）  ▼
+ │        │                 │              AI 交件 ──► <b>你驗收</b>
+ │        │                 ▼              ＋ 紀錄 MD、報告 HTML、測試報告、文件同步
+ │        └──── AI 修 API → build／test → 再跑
+ │                          │
+ └──────────────────────────┘
+             │
+             │ 同一問題連修 2 次仍紅
+             ▼
+      <b>停損：AI 停下來回報，換人判斷</b></div>
+
+      <h3>① 貼 LOOP prompt（正式流程）</h3>
+      <p><strong>你只做兩件事：貼 prompt、驗收報告。</strong>紅燈不用刻意製造——你在 step3 用自己的 AI 生成的 <code>my-equipment-api</code>，本來就可能跟驗收規格有落差；<strong>這 6 條測試就是可執行的驗收規格</strong>。</p>
+      <p>在工作坊根目錄開 AI Agent，整段複製貼上。<strong>子代理</strong>＝AI 自己叫出來的分身，專門做一件事；這裡專門挑錯。受測服務不用你先開：<strong>AI 自己啟動 API 和前端，埠被占就換，前端的 API 位址跟著改</strong>，用了哪個埠會寫在報告裡。鐵律、埠、對抗審查、要交哪些檔，都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>，AI 會自己讀，prompt 只要一句「照它做」。</p>
+      <pre><code>你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做，自己跑完，中途不要問我。
+受測：step3_new_module/my-equipment-api（API）＋ step4_loop_e2e/fullchain-app（前端）。先在背景把兩個都啟動（埠被占就自己換，前端的 API 位址要跟著改），跑 step4_loop_e2e 的 run-e2e，修到 6 條全綠。
+全綠後開一個子代理做對抗審查：先用 HTTP 實打 API 的 201／400／404，再用 Playwright 開瀏覽器逐頁截圖，對照 PRD 和契約挑問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html、測試報告，並更新 SRS-delta、設計文件-delta 和圖。</code></pre>
+      <p><strong>模型：開發 Sonnet 5.5、審查子代理 Opus 5.5。</strong>審查的模型要比開發的高一級（規矩檔已寫明，AI 會照做）。有規矩和範本，開發不用最強的模型；<strong>token 夠的話，審的要比寫的強。</strong></p>
+
+      <h3>② run-e2e 在做什麼（AI 會替你跑）</h3>
+      <p>前端 mock 課要你另開視窗手動起服務；這一課鏈路較長（資料庫＋後端＋前端），<code>run-e2e.ps1</code> 自己把一套 E2E 專用服務拉起來、跑完、再拆乾淨。LOOP prompt 會叫 AI 跑它；你想自己先跑一次看看也可以：</p>
       <pre><code>cd step4_loop_e2e
 powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
-      <p>它依序做：重建 <code>_e2e</code> 專用資料庫 → 背景起後端（:5080，連 <code>_e2e</code> 庫）→ 背景起前端 fullchain-app（強制 <strong>:3199</strong>，<code>NUXT_PUBLIC_USE_API=true</code>）→ 跑 6 條 Playwright 測試 → 無論成敗都 teardown 釋放埠。Exit code <code>0</code>＝恰好 6 條全綠。</p>
+      <p>它依序做：重建 <code>_e2e</code> 專用資料庫 → 背景起後端（:5080，連 <code>_e2e</code> 庫）→ 背景起前端 fullchain-app（<strong>:3199</strong>，<code>NUXT_PUBLIC_USE_API=true</code>）→ 跑 6 條 Playwright 測試、寫出測試報告 <code>e2e/playwright-report/index.html</code> → 無論成敗都 teardown 釋放埠。Exit code <code>0</code>＝恰好 6 條全綠。</p>
       <blockquote>
         <strong>【本課最重要的一件事】被測 API 綁「你自己的作品」。</strong> <code>run-e2e.ps1</code> <strong>預設</strong>把被測後端指向 <code>..\step3_new_module\my-equipment-api</code>——這門課的綠燈要證明<strong>你自己生成的 API</strong> 過關，不是官方解偷跑。腳本開頭與報告最後都會印出<strong>被測 API 的絕對路徑</strong>與<strong>被測 DB 名稱</strong>，一眼看出這盞綠燈屬於誰。
         <ul>
@@ -611,7 +657,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
         </ul>
       </blockquote>
 
-      <h3>② 六條測試在驗什麼：持久化 vs mock</h3>
+      <h3>③ 六條測試在驗什麼：持久化 vs mock</h3>
       <p>同一套前端頁面，資料層切一個開關（<code>NUXT_PUBLIC_USE_API</code>）就從 mock 換成真後端。好幾條測試都故意「<strong>做一個動作 → reload → 再斷言</strong>」——<strong>reload 是試金石：mock 會掉回種子，持久化才會留下。</strong></p>
       <div class="table-scroll">
       <table>
@@ -627,16 +673,24 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       </table>
       </div>
 
-      <h3>③ 動手練習：紅 → 判因 → 修 → 綠（LOOP 的完整一圈）</h3>
-      <p>看到綠只是起點。真正要學會的是<strong>當測試變紅時，你怎麼判斷是哪一層壞、怎麼修</strong>。練習包在 <code>step4_loop_e2e/lab-red-to-green/</code>（改壞<strong>後端</strong>一條驗證規則）。一句話流程：<strong>基準綠 → 注入 bug（拿掉後端數量下限驗證）→ 跑 <code>dotnet test</code> 看到 EV4 紅 → 判因（後端 bug？測試 bug？資料庫 bug？）→ 修 → 回到綠</strong>，過程留下四項證據。啟動 LOOP 的 prompt 一段話就夠：</p>
-      <pre><code>跑 step4_loop_e2e/run-e2e.ps1。
-若有紅字，找出原因、修正後再跑一次，直到 6 條全綠。
-規則：同一個問題連續修兩次還沒好就停下來回報（不要無限撞牆）。
-先分清楚紅的根因是「前端、後端、還是資料庫」，別急著改。
-若判斷是 App（前端或後端）真的有 bug，記下來回報，不要為了過測試放寬斷言。</code></pre>
-
-      <div class="block-title"><span class="ico">👀</span>你應該看到（全鏈路實拍，這五張就是證據鏈）</div>
-      <p>測試流程會對關鍵畫面主動截圖，存到 <code>e2e/screenshots/</code>。下面五張串起來，就是「資料真的落地」的完整故事：</p>
+      <div class="block-title"><span class="ico">👀</span>你應該看到</div>
+      <p>AI 交回的東西大多在 <code>step3_new_module/my-equipment-api/loop/</code> 資料夾。不用打任何指令，照這張表用眼睛核：</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>檢查點</th><th>怎麼核</th></tr></thead>
+        <tbody>
+          <tr><td>結果報告 <code>LOOP-REPORT.html</code></td><td>用瀏覽器開：結論在最前面、有 HTTP 實打結果和截圖</td></tr>
+          <tr><td>測試報告 <code>playwright-report/index.html</code></td><td>在 <code>step4_loop_e2e/e2e/</code> 底下，用瀏覽器開：6 條綠；<code>dotnet test</code> 的總數與通過數寫在 <code>LOOP-REPORT.html</code></td></tr>
+          <tr><td>每輪紀錄完整</td><td>打開 <code>LOOP-LOG.md</code>：紅了哪幾條、根因、修了哪個檔，一輪一段</td></tr>
+          <tr><td>根因說得通</td><td>「API 不符契約」就該修 API；說「測試有問題」的要有你的裁決紀錄</td></tr>
+          <tr><td>對抗審查有做</td><td>報告寫了子代理挑到什麼：App 的問題修了沒、測試的問題有沒有列給你裁決</td></tr>
+          <tr><td>文件同步</td><td><code>docs/</code> 的 SRS-delta、設計文件-delta、圖有標「step4 LOOP 後」：程式改了哪裡，文件就跟著改哪裡</td></tr>
+          <tr><td>畫面真的能用</td><td>打開報告寫的網址自己點一遍：新增一筆 → F5 → 那筆<strong>還在</strong></td></tr>
+          <tr><td>最終真的綠</td><td>報告附「E2E 全綠：6 條 passed」、exit 0 的總結行，而且被測 API 路徑是<strong>你自己的 <code>my-equipment-api</code></strong>。停在紅燈的話，報告要寫明停在哪一條、為什麼</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>全鏈路實拍（這五張就是證據鏈）：</strong>測試流程會對關鍵畫面主動截圖，存到 <code>e2e/screenshots/</code>。下面五張串起來，就是「資料真的落地」的完整故事：</p>
 
       <figure>
         <img src="images/01_list.png" alt="API 模式列表：共 24 筆，資料來自 PostgreSQL">
@@ -663,20 +717,30 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
         <figcaption><span class="hl">05：</span>刪除那一筆、再 reload，用編碼搜尋查無。<span class="hl">這張在證明「DELETE 是硬刪，真的從資料表移除了，不是只把畫面藏起來」。</span></figcaption>
       </figure>
 
-      <blockquote>另外 Playwright 設 <code>screenshot: 'only-on-failure'</code>——測試<strong>紅了</strong>會自動在 <code>e2e/test-results/</code> 存一張當下畫面，這是<strong>失敗診斷</strong>（不是視覺回歸）：一眼看出是「按鈕點不到」還是「畫面根本沒載出來」，AI 也看得懂截圖、能直接判斷 selector 怎麼改。服務起不來時，log 在 <code>.run-logs\</code>（<code>backend.err.log</code>、<code>frontend.err.log</code>）。</blockquote>
+      <blockquote>另外 Playwright 設 <code>screenshot: 'only-on-failure'</code>——測試<strong>紅了</strong>會自動在 <code>e2e/test-results/</code> 存一張當下畫面，這是<strong>失敗診斷</strong>（不是視覺回歸）：一眼看出是「按鈕點不到」還是「畫面根本沒載出來」。AI 判因時看的就是這張，你也可以直接打開來對。服務起不來時，log 在 <code>.run-logs\</code>（<code>backend.err.log</code>、<code>frontend.err.log</code>）。</blockquote>
+
+      <h3>④ 對抗審查與備案</h3>
+      <p><strong>對抗審查已經寫在 LOOP prompt 和規矩檔裡。</strong>寫程式的 AI 不適合審自己，所以全綠後由子代理挑錯：先用 HTTP 實打 API（201／400／404、<code>ModelResult</code> 回應形狀、錯誤鍵 camelCase、繁中訊息），再用 Playwright 逐頁截圖。<strong>App 的問題</strong>它修完再跑；<strong>測試本身的問題</strong>不准它改，寫進報告交給你（或講師）裁決。<br>備案：你用的 AI 工具不能開子代理，或想找別家的 AI 再審一次，就開第二個 AI（例如 Codex），貼這段：</p>
+      <pre><code>請盡力挑 step4_loop_e2e/e2e 這套全鏈路 E2E，和 step3_new_module/my-equipment-api 的毛病，不要誇獎。
+測試專找：假綠（只看畫面沒 reload、reload 後沒重新斷言）、只驗到前端快取沒驗到資料庫、共用 e2e 庫互相污染、猜的 selector。
+API 專找：測試沒抓到、但不符合 PRD-中心裝備物資-後端.md 或 contract-conventions-summary.md 的問題（狀態碼、錯誤鍵、訊息語言、code 格式）。
+每條附理由，能重現就附步驟；只回報，不改檔；找不到也說明你怎麼確認的。</code></pre>
+
+      <h3>⑤ 練習（選做）：紅 → 判因 → 修 → 綠</h3>
+      <p><strong>這是練習，正式流程用 ① 的 LOOP prompt。</strong>想親手體驗 AI 在 LOOP 裡做的事，練習包在 <code>step4_loop_e2e/lab-red-to-green/</code>（改壞<strong>後端</strong>一條驗證規則）。一句話流程：<strong>基準綠 → 注入 bug（拿掉後端數量下限驗證）→ 跑 <code>dotnet test</code> 看到 EV4 紅 → 判因（後端 bug？測試 bug？資料庫 bug？）→ 修 → 回到綠</strong>，過程留下四項證據。走過一圈，你看 AI 的報告時才看得懂它在判什麼因。</p>
 
       <div class="warnbox">
         <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
         <ul>
           <li><strong>測試之間「不」重置資料庫</strong>——那是 mock 思維。資料庫由 <code>run-e2e.ps1</code> 於「每一輪」重建成乾淨 24 筆，測試在同一個庫上依序累加。E1 斷言「恰好 24」，其餘一律<strong>動態讀當前筆數再比對增減</strong>，不寫死絕對值。</li>
-          <li><strong>埠號別搞混</strong>：一鍵 E2E 前端固定 <strong>3199</strong>（不是前端課的 3100）；後端 5080。dev 庫 <code>ai_crud_equipment</code> 全程不碰，E2E 只用 <code>_e2e</code> 庫。</li>
-          <li><strong>別讓寫測試的 AI 自己審自己</strong>：它傾向相信自己寫對了。收尾換第二個 AI（例如本機 Codex）用「盡力推翻它」的立場找假綠、猜的 selector、測試互相污染——交回原 AI 修 → 再跑 → 再審＝對抗式 LOOP。</li>
+          <li><strong>埠號別搞混</strong>：run-e2e 預設用 5080（後端）和 <strong>3199</strong>（前端），要換埠就設 <code>API_URL</code>／<code>BASE_URL</code>。AI 跑 run-e2e 一律加 <code>-ReuseRunning</code>：前端從頭開到尾直接沿用；受測 API 先停，讓 run-e2e 自己起一個連 <code>_e2e</code> 專用資料庫的乾淨 API（規矩檔第 1.2 節寫明了，AI 會照做）。</li>
+          <li><strong>別讓寫程式的 AI 自己審自己</strong>：它傾向相信自己寫對了。LOOP prompt 已經叫它全綠後開子代理（Opus 5.5）用「盡力推翻它」的立場審；你的工具不能開子代理，才用 ④ 的備案 prompt 找第二個 AI。</li>
         </ul>
       </div>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>兩次停損規則</strong>：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。<strong>先判因再修</strong>：全鏈路的紅可能來自前端／後端／資料庫三層，亂改一層會愈修愈亂。<strong>修測試不修 App</strong>：LOOP 很會「為了讓燈變綠」而作弊，用這條把它框住。<strong>LOOP 的核心是經歷紅到綠，不是看到綠</strong>——只跑出一次全綠只證明現在沒壞，真正學到的是變紅之後怎麼判因、怎麼修。
+        <strong>兩次停損規則</strong>：AI 很會在同一個坑裡鬼打牆、愈修愈亂，兩次修不好＝方向錯了，該讓人看。<strong>先判因再修</strong>：全鏈路的紅可能來自前端／後端／資料庫三層，亂改一層會愈修愈亂。<strong>修 App、不修測試</strong>：LOOP 很會「為了讓燈變綠」而作弊（放寬斷言、跳過測試），用這條把它框住；測試真的有問題，交人裁決。<strong>一個指令就夠</strong>：規矩（harness）和範本放好了，AI 自己就有 know-how，不用像帶新人那樣一問一答；你的心力花在最後驗收報告——燈亮不等於做對。
       </div>
     </div>
   </section>
@@ -702,10 +766,10 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <table>
         <thead><tr><th>Step</th><th>帶走的觀念</th></tr></thead>
         <tbody>
-          <tr><td>step1</td><td>同一句「幫我加一個 API」，有沒有附 harness 產出天差地遠——差的不是能不能動，是命名慣例、驗證邏輯、危險操作（例如直接刪表、SQL 拼接）有沒有守住團隊規矩。</td></tr>
-          <tr><td>step2</td><td>一個成熟後端模組＝範本 API（骨架）＋系統文件（SRS/SDD）＋後端 harness 四件（規矩）＋分層架構與 DB 綱要，缺一塊 AI 就會自由發揮出風險。</td></tr>
-          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS-delta/SDD-delta → 生成 API＋migration → 人工反覆修正；六題裁決就是把「模糊需求」變成「可動手的契約」的關鍵一步。</td></tr>
-          <tr><td>step4</td><td>可以讓 AI 自己跑「改→驗→再改」，但你要親手經歷後端的「紅 → 判因 → 修 → 綠」；收尾一定要有全鏈路 E2E（瀏覽器打到資料庫）把關，不能只靠 <code>dotnet test</code> 全綠就說做完。</td></tr>
+          <tr><td>step1</td><td>同一句「幫我加一個 API」，現在的模型不給規矩也寫得出分層乾淨的程式；差的是<strong>分層與契約這些決定由誰做</strong>——回應格式、id 與編碼規則、欄位名、訊息語言照不照團隊與前端的契約。harness 管「怎麼寫」，不管「做多少」。</td></tr>
+          <tr><td>step2</td><td>一個成熟後端模組＝範本 API（骨架）＋系統文件（SRS／設計文件 DESIGN）＋後端 harness 四件（規矩）＋分層架構與 DB 綱要，缺一塊 AI 就會自由發揮出風險。</td></tr>
+          <tr><td>step3</td><td>正確順序是 PRD → AI 提「釐清選擇題」→ 生成 SRS-delta、設計文件-delta 和圖 → 你說「開工」才生成 API＋migration → 人工反覆修正；這就是 SDD（規格驅動開發）：先文件、再程式。六題裁決就是把「模糊需求」變成「可動手的契約」的關鍵一步。</td></tr>
+          <tr><td>step4</td><td>一個指令，AI 自己跑「改→驗→再改」修到全鏈路 E2E 全綠，再叫子代理對抗審查（先 HTTP 實打 API、再 Playwright 截圖；審查的模型比開發的高一級）；不用像帶新人那樣一問一答。最後交出紀錄、報告、測試報告，文件同步（程式改了，文件跟著改）。收尾仍要有全鏈路 E2E（瀏覽器打到資料庫）和你的驗收把關，不能只靠 <code>dotnet test</code> 全綠就說做完。</td></tr>
         </tbody>
       </table>
       </div>
@@ -716,9 +780,9 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <table>
         <thead><tr><th>Gate</th><th>要做什麼</th><th>必交證據</th></tr></thead>
         <tbody>
-          <tr><td><strong>1. 規格 Gate</strong></td><td>PRD → 六題裁決 → SRS/SDD-delta → TASKS</td><td>六題答案＋每題一句理由、任務清單</td></tr>
+          <tr><td><strong>1. 規格 Gate</strong></td><td>PRD → 六題裁決 → SRS-delta、設計文件-delta、圖 → TASKS</td><td>六題答案＋每題一句理由、SRS／設計文件各四段＋圖四張、任務清單</td></tr>
           <tr><td><strong>2. 程式 Gate</strong></td><td>套 harness／範本，Entity→migration→DTO→Mapper→Service→Controller→seed→tests</td><td>build 0/0、測試全綠、Swagger 狀態碼、psql 資料</td></tr>
-          <tr><td><strong>3. 交付 Gate</strong></td><td>LOOP 紅→判因→修→綠，再跑你自己工作區的全鏈路</td><td>紅／根因／修法／綠、E2E 被測 path、DB name、6/6、截圖</td></tr>
+          <tr><td><strong>3. 交付 Gate</strong></td><td>貼 LOOP prompt：AI 把你自己工作區的全鏈路 E2E 修到綠，再開子代理對抗審查</td><td><code>LOOP-REPORT.html</code>（每輪根因、審查發現）、<code>LOOP-LOG.md</code>、測試報告 6/6、E2E 被測 path 與 DB name、文件標「step4 LOOP 後」</td></tr>
         </tbody>
       </table>
       </div>
@@ -748,7 +812,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <ol>
         <li><strong>把後端 harness 四件帶進你的專案</strong>——把 <code>CLAUDE.md</code>、<code>CODE-RULES-api-本專案.md</code>、<code>contract-conventions-summary.md</code>、<code>使用說明-複製範本開發新API模組.md</code> 複製到你專案根目錄（現成一套在 <code>step2_speedrun_kit/2.5_sample_api/sample-api/</code> 的專案根目錄，那是全庫唯一的實檔），內容改成你們公司的規則（命名、分層邊界、狀態碼與封裝、禁止事項、migration 審查流程）。用 Codex 再放一份 <code>AGENTS.md</code> 指向 CLAUDE.md。</li>
         <li><strong>把既有 API 整理成範本</strong>——挑最成熟的 CRUD API，拆成「複製區」（Entity、DTO、驗證、Controller、migration）與「共用區」（<code>ModelResult</code> 封裝、統一錯誤處理、DbContext 基礎設定、測試 fixture）。新模組只換實體，共用區完全不動。</li>
-        <li><strong>新需求走完整流程</strong>——PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本 API。</li>
+        <li><strong>新需求走完整流程（SDD：規格驅動開發）</strong>——PRD → 釐清選擇題 → SRS-delta、設計文件-delta 和圖 → 任務清單 → 生成 → LOOP 驗證；程式改了，文件跟著改。拿到新需求先寫一頁 PRD（可以很簡陋），丟給 AI 配上 harness 與範本 API。</li>
       </ol>
 
       <div class="block-title"><span class="ico">❓</span>常見問題</div>
@@ -756,7 +820,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <table>
         <thead><tr><th>問題</th><th>回答</th></tr></thead>
         <tbody>
-          <tr><td>我們不是用 .NET？</td><td>harness 方法不綁語言。四件換成你們技術棧的等價規則即可；「PRD → 釐清選擇題 → SRS/SDD → 生成 → LOOP」流程在任何後端語言都適用。</td></tr>
+          <tr><td>我們不是用 .NET？</td><td>harness 方法不綁語言。四件換成你們技術棧的等價規則即可；「PRD → 釐清選擇題 → SRS、設計文件和圖 → 生成 → LOOP」流程在任何後端語言都適用。</td></tr>
           <tr><td>沒有 PostgreSQL？</td><td>資料庫種類不是重點，重點是有沒有把 schema、migration 策略、id 產生方式寫成明確規則。換 MySQL／SQL Server 一樣要回答今天六題裁決。</td></tr>
           <tr><td>AI 生成的 migration 敢直接上 production 嗎？</td><td>不敢，任何人寫的 migration 都一樣。一定要先在測試庫跑過、人工看過 SQL（有沒有意外刪欄位、改型別），並有回滾腳本，這跟是不是 AI 寫的無關。</td></tr>
           <tr><td>測試全綠就能上線嗎？</td><td>不能。<code>dotnet test</code> 全綠只代表「符合寫測試的人想到的情境」，還要有 API 契約（swagger）與資料庫查表（psql）雙重人工驗收，這就是 step4 LOOP 要求紅→綠證據加全鏈路 E2E 的原因。</td></tr>
@@ -786,11 +850,11 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
         <li>看過後端 harness 四件與分層架構，知道 Controller 薄、Service 厚、Common 不改</li>
         <li>讀懂 PRD，理解「後端服從前端已定好的契約，欄名一個都不能改」</li>
         <li>貼起手 prompt，AI 有先出釐清選擇題（不是直接寫程式）</li>
-        <li>SCOPE 六題逐題拍板，確認 SRS/SDD-delta 與任務清單後才說「開工」</li>
+        <li>SCOPE 六題逐題拍板，確認 SRS-delta、設計文件-delta、圖（DIAGRAMS 用瀏覽器開，四張圖看得懂）與任務清單後才說「開工」</li>
         <li>三路驗收：Swagger 五路由、<code>dotnet test</code> 全綠、psql 查到 <code>equipment_item</code> 24 列</li>
-        <li><code>run-e2e.ps1</code> 跑出 6 條全綠、exit 0，而且報告印出的被測 API 路徑是<strong>你自己的 <code>my-equipment-api</code></strong></li>
-        <li>完成一次紅→判因→修→綠（留下四項證據）</li>
-        <li>說得出「兩次停損」與「修測試不修 App」兩條 LOOP 規則</li>
+        <li>貼一個 LOOP prompt，AI 把你的 <code>my-equipment-api</code> 修到 E2E 6 條全綠、exit 0（或停在紅燈、報告寫清楚原因），被測 API 路徑是<strong>你自己的 <code>my-equipment-api</code></strong>，並做過對抗審查（子代理或別家 AI）</li>
+        <li>驗收 <code>LOOP-REPORT.html</code>、<code>LOOP-LOG.md</code> 和測試報告（每輪紅了什麼／根因／修了哪個檔＋全綠總結行、文件同步）</li>
+        <li>說得出「兩次停損」與「不准作弊（修 App，不修測試）」兩條 LOOP 鐵律</li>
         <li>親眼確認：新增一筆 → F5 reload → 那筆<strong>還在</strong>（持久化鐵證，就是截圖 04 那件事）</li>
       </ul>
 
@@ -798,7 +862,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
       <ol>
         <li><strong>帶四件</strong>：CLAUDE.md ＋ CODE-RULES-api ＋ contract-conventions-summary ＋ 使用說明，複製進你的專案、改成公司規則。</li>
         <li><strong>整範本</strong>：挑最成熟的 CRUD API，拆「複製區 vs 共用區」。</li>
-        <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS/SDD-delta → 生成 → LOOP 驗證。</li>
+        <li><strong>走流程</strong>：PRD → 釐清選擇題 → SRS-delta、設計文件-delta 和圖 → 生成 → LOOP 驗證。</li>
       </ol>
     </div>
   </section>
@@ -821,7 +885,7 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
 
       <p>前端課的課後驗收題是做一份<strong>課程回饋問卷</strong>。學員做出來了，但資料存在瀏覽器 <code>localStorage</code>，換一台電腦就看不到。程式裡留了一行：</p>
       <div class="flow">// TODO: DEV 串接 POST /api/survey</div>
-      <p><strong>這一關就是把那一行變成真的。</strong>完整說明在 <code>step6_survey_api/README.md</code>，起手 prompt 在 <code>step6_survey_api/PROMPTS.md</code>。</p>
+      <p><strong>這一關就是把那一行變成真的。</strong>完整說明在 <code>step6_survey_api/README.md</code>，三段 prompt（起手、開工、LOOP）在 <code>step6_survey_api/PROMPTS.md</code>。</p>
 
       <div class="block-title"><span class="ico">🔍</span>跟 step3 差在哪</div>
       <div class="table-scroll">
@@ -830,28 +894,53 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1</code></pre>
         <tbody>
           <tr><td>需求從哪來</td><td>課程準備好的後端 PRD</td><td><strong>前端課的 PRD，沒有為後端改寫過一個字</strong></td></tr>
           <tr><td>端點名稱誰定</td><td>課程訂好的</td><td><strong>凍結</strong>——前端那行 TODO 怎麼寫就怎麼做</td></tr>
+          <tr><td>要交的文件</td><td>SRS-delta、設計文件-delta、圖、任務清單</td><td>照<strong>同一份最小樣板</strong>交：<code>SRS-問卷API-delta.md</code>、<code>DESIGN-問卷API-delta.md</code>、<code>DIAGRAMS-問卷API.html</code>，加上任務清單 <code>TASKS.md</code></td></tr>
           <tr><td>驗收幾路</td><td>三路（Swagger／test／psql）</td><td><strong>四路</strong>，多一路「接縫驗證」</td></tr>
         </tbody>
       </table>
       </div>
 
+      <div class="block-title"><span class="ico">👣</span>跟著做：同一套 SDD 流程</div>
+      <p>step6 跟 step3 走<strong>同一套 SDD（規格驅動開發）流程</strong>：先文件，再程式。準備工作區（複製範本，放進 PRD、<code>useSurveyResponses.before.ts</code>、最小樣板三個檔）見 README 第三節。</p>
+      <blockquote><strong>模型怎麼選：</strong>文件階段用 <strong>Opus 5.5</strong>；說「開工」寫程式前切成 <strong>Sonnet 5.5</strong>；LOOP 的對抗審查子代理用 <strong>Opus 5.5</strong>。</blockquote>
+
+      <h3>① 起手 prompt（在 <code>my-survey-api</code> 資料夾開 AI Agent 貼）</h3>
+      <pre><code>用 .NET CRUD 範本（人員 API）做「課程回饋問卷」的後端 API（POST／GET /api/survey），走規格驅動開發（SDD）：先文件，再程式。
+先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔、PRD-課程回饋問卷.md 和 useSurveyResponses.before.ts（前端現有的資料層：端點、欄位名、型別、中文單選值都以它為準），先不要寫程式。
+這份 PRD 是寫給前端的，後端要決定的事它沒寫：用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 docs/ 的 SRS-問卷API-delta.md、DESIGN-問卷API-delta.md、DIAGRAMS-問卷API.html 和 TASKS.md；等我說「開工」才寫程式，每做完一個回報一行。</code></pre>
+      <p>AI 先出選擇題，你拍板；它再照最小樣板交出四個檔，停下來等你說「開工」。開工那段 prompt 寫了「完成的定義」（10 欄、中文單選值、狀態碼），在 <code>PROMPTS.md</code> 第 2 段。</p>
+
+      <h3>② LOOP prompt（在工作坊根目錄開 AI Agent 貼）</h3>
+      <pre><code>你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做（step6 的差別在第 7 節），自己跑完，中途不要問我。
+受測：step6_survey_api/my-survey-api（API）。先在背景啟動它（埠被占就自己換），修到 dotnet build 0 警告、dotnet test 全綠。
+全綠後開一個子代理做對抗審查：先用 HTTP 實打 POST／GET /api/survey 的 201／400／200，再跑 verify-seam.ps1，對照 PRD 和 useSurveyResponses.before.ts 挑問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html，並更新 SRS-delta、設計文件-delta 和圖。</code></pre>
+      <p>step6 沒有 run-e2e，綠燈是 <code>dotnet build</code> 0 警告加 <code>dotnet test</code> 全綠。AI 修到綠、開子代理挑完錯，會在 <code>my-survey-api/loop/</code> 交回 <code>LOOP-LOG.md</code>（每輪的流水紀錄）和 <code>LOOP-REPORT.html</code>（給人看的報告，結論在最前面）。</p>
+
       <div class="block-title"><span class="ico">👀</span>怎麼證明「呼叫端一行不用改」</div>
-      <p>這句話不是口號，它有可機器判定的定義：<strong>對外匯出的東西一個字都沒變</strong>。跑這支腳本，它會比對接縫 before／after 兩版的四樣東西——匯出的名字、契約欄位、composable 回傳的 key、每個 function 的簽章：</p>
-      <div class="flow">powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1</div>
-      <p>四樣完全相同才 <code>exit 0</code>。有你自己前端專案的話，跑完再看 <code>git diff --stat</code>——<strong><code>pages/survey/</code> 必須是 0 行變更</strong>。</p>
+      <p>這句話不是口號，它有可機器判定的定義：<strong>對外匯出的東西一個字都沒變</strong>。跑這支腳本，它分兩關：第 1 關確認 before 就是前端課 survey-app 的真檔（逐字相同）；第 2 關比對 before／after 兩版的對外介面——匯出的名字、型別與單選值、契約欄位、常數、函式簽章、composable 回傳的 key：</p>
+      <pre><code># 前端課 repo 跟後端課 repo 放在同一層
+powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1
+
+# 前端課 repo 放在別的地方：加 -FrontendRepo
+powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1 -FrontendRepo D:\code\AI_CRUD_Workshop_Frontend_EASY</code></pre>
+      <p>全部相同才 <code>exit 0</code>；前端課 repo 不在同一層就加 <code>-FrontendRepo &lt;資料夾&gt;</code>。有你自己前端專案的話，換完再看 <code>git diff --stat</code>——只有 <code>composables/useSurveyResponses.ts</code> 和 <code>nuxt.config.ts</code>（加一條 devProxy）有變更，<strong><code>pages/survey/</code> 必須是 0 行</strong>。</p>
 
       <div class="warnbox">
         <div class="block-title"><span class="ico">⚠️</span>常見坑</div>
         <ul>
           <li><strong>不要另外寫一份後端 PRD。</strong>真實工作拿到的需求就是別人寫的，不會為你重寫。你的工作是把它翻譯成後端契約，模糊處用選擇題問人。</li>
           <li><strong>不要改端點名稱。</strong>AI 很愛把 <code>/api/survey</code> 改成 <code>/api/survey/responses</code>。契約以<strong>已經存在的那一端</strong>為準，不是以「哪個比較漂亮」為準。</li>
+          <li><strong>不要改欄位名，也不要把中文單選值換成英文。</strong>欄位照前端的 <code>SurveyResponse</code>（<code>respondentName</code>、<code>organization</code>、<code>rating</code>……），單選值是中文（「太簡單／剛好／太難」「是／否」），DTO 的 <code>[AllowedValues]</code> 也寫中文。</li>
+          <li><strong>前端的單選值是中文，<code>[AllowedValues]</code> 就用中文值，逐字照抄，含半形空格。</strong>前端送來的是 <code>"LOOP 驗證"</code>（中間一格半形空格）。寫成 <code>"LOOP驗證"</code> 或英文 key，前端送的問卷會被擋成 400。</li>
           <li><strong>SCOPE 六題先自己答完再看答案。</strong>答案在 <code>instructor/</code>，直接抄等於跳過這一關最重要的練習。</li>
         </ul>
       </div>
 
       <div class="why">
         <div class="block-title"><span class="ico">💡</span>為什麼</div>
-        <strong>「留接縫」不是寫一行 TODO 註解就算數。</strong>真正的接縫是「把會變的東西關進一個檔案裡，讓外面的人看不到它變過」。前端課把 localStorage 的細節全關在 <code>useSurveyResponses.ts</code> 裡，只對外露出三個名字——所以今天換成打 API，外面完全無感。<br><br>
+        <strong>「留接縫」不是寫一行 TODO 註解就算數。</strong>真正的接縫是「把會變的東西關進一個檔案裡，讓外面的人看不到它變過」。前端課把 localStorage 的細節全關在 <code>useSurveyResponses.ts</code> 裡，composable 只回傳 <code>responses</code>、<code>submit</code>、<code>clearAll</code> 三個名字——所以今天換成打 API，外面完全無感。<br><br>
         生活比喻：家裡的插座。你換冷氣、換冰箱、換烤箱，插頭形狀都一樣，<strong>牆壁一次都沒敲過</strong>。插座規格就是接縫；定好接縫，兩邊才能各自換。
       </div>
     </div>

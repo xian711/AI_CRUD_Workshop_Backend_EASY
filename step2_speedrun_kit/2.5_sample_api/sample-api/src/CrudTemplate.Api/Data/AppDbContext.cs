@@ -10,7 +10,7 @@ namespace CrudTemplate.Api.Data;
 /// </summary>
 /// <remarks>
 /// PascalCase 屬性以命名轉換映射為 snake_case 欄位（NFR-B-07，對齊原單位範本）。
-/// CHECK constraint 與 SEQUENCE 皆於此設定，隨 Migration 落地（SDD §4.2 / §4.3）。
+/// CHECK constraint 與 SEQUENCE 皆於此設定，隨 Migration 落地（DESIGN §4.2 / §4.3）。
 /// </remarks>
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
@@ -23,7 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         base.OnModelCreating(modelBuilder);
 
-        // ── 主鍵 SEQUENCE：從 25 起（24 筆種子之後），保證併發下唯一遞增（SDD §4.2）──
+        // ── 主鍵 SEQUENCE：從 25 起（24 筆種子之後），保證併發下唯一遞增（DESIGN §4.2）──
         modelBuilder.HasSequence<int>(MemberSequenceName)
             .StartsAt(25)
             .IncrementsBy(1);
@@ -33,7 +33,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.ToTable("template_member", table =>
             {
                 // CHECK constraint 的 SQL 由 Constants/MemberEnums.cs 常數陣列組出，
-                // 與 DTO 的 [AllowedValues] 共用同一份字面值來源，避免兩邊漂移（SDD §5）。
+                // 與 DTO 的 [AllowedValues] 共用同一份字面值來源，避免兩邊漂移（DESIGN §5）。
                 // PostgreSQL 一律 UTF-8，中文字面值不需 N'' 前綴（有別於舊 SQL Server 版）。
                 table.HasCheckConstraint("ck_template_member_gender", BuildCheckInSql("gender", MemberEnums.Genders));
                 table.HasCheckConstraint("ck_template_member_id_type", BuildCheckInSql("id_type", MemberEnums.IdTypes));
@@ -64,7 +64,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(e => e.BloodType).HasColumnType("text");
             entity.Property(e => e.UpdatedAt).HasColumnType("date").IsRequired();
 
-            // qualifications：EF primitive collection → PostgreSQL 原生 text[] 陣列欄位（SDD §4.3）
+            // qualifications：EF primitive collection → PostgreSQL 原生 text[] 陣列欄位（DESIGN §4.3）
             entity.PrimitiveCollection(e => e.Qualifications)
                 .HasColumnType("text[]")
                 .IsRequired()
@@ -80,7 +80,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     }
 
     /// <summary>
-    /// 組出 <c>col IN ('a', 'b', ...)</c> 形式的 CHECK constraint SQL（單一來源，SDD §5）。
+    /// 組出 <c>col IN ('a', 'b', ...)</c> 形式的 CHECK constraint SQL（單一來源，DESIGN §5）。
     /// 產出字串須與既有 Migration 逐字元一致，否則 EF 會判定 model 已變更。
     /// </summary>
     /// <param name="columnName">欄位名（snake_case）。</param>

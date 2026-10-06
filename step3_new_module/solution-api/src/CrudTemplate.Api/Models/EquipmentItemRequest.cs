@@ -5,7 +5,7 @@ using CrudTemplate.Api.Constants;
 namespace CrudTemplate.Api.Models;
 
 /// <summary>
-/// 新增 / 更新裝備物資的請求 DTO（SDD-delta §5）。
+/// 新增 / 更新裝備物資的請求 DTO（DESIGN-delta §5）。
 /// </summary>
 /// <remarks>
 /// 逐欄對齊前端 <c>pages/equipment/crud/[id].vue</c> 的驗證規則：

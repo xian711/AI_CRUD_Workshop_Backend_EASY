@@ -4,7 +4,7 @@
 > 目標：讀完後，你能把 sample-api 複製成一個全新、符合規範、可跑可測的 API 模組骨架。
 > 性質：操作手冊。全程以虛構的「**訪視紀錄 VisitRecord**」模組為例（與前端課的複製說明同一個例子）。
 >
-> 搭配閱讀：`CODE-RULES-api-本專案.md`（細則）、`contract-conventions-summary.md`（契約慣例）、`docs/baseline/`（SRS/SDD，工作區自包含複本）。本文只講「怎麼做」。
+> 搭配閱讀：`CODE-RULES-api-本專案.md`（細則）、`contract-conventions-summary.md`（契約慣例）、`docs/baseline/`（SRS／設計文件 DESIGN，工作區自包含複本）。本文只講「怎麼做」。
 
 ---
 

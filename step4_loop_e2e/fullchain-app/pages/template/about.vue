@@ -133,11 +133,11 @@ const demoSteps = [
 const docFiles = [
   { path: 'README.md', role: '入口與導覽' },
   { path: 'SRS-CRUD標準範本-v1.0.md', role: '需求規格（UC／FR-T／BR-T／NFR-T）' },
-  { path: 'SDD-CRUD標準範本-v1.1.md', role: '設計規格（v1.1 含審查修訂 13 項＋三段勘誤）' },
+  { path: 'DESIGN-CRUD標準範本-v1.1.md', role: '設計文件（v1.1 含審查修訂 13 項＋三段勘誤）' },
   { path: 'UML圖面-CRUD標準範本.html', role: '7 張大字級圖：用例／架構／類別／狀態／循序（投影可用）' },
   { path: '使用說明-複製範本開發新模組.md', role: '複製範本開發新模組的完整流程＋FAQ' },
   { path: '教育訓練教材.md', role: '課程教材：demo 腳本、檔案導讀、Clean Code 十講、陷阱七講' },
-  { path: '開發過程紀錄.md', role: 'AI 多代理開發全過程（SDD→審查→修正→E2E）' },
+  { path: '開發過程紀錄.md', role: 'AI 多代理開發全過程（設計文件→審查→修正→E2E）' },
   { path: '成果報告.md', role: '最終成果、驗收結果、已知問題、後續建議' },
 ]
 

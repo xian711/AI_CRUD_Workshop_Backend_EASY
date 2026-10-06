@@ -15,7 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
         "缺少連線字串 ConnectionStrings:Default（見 appsettings.Development.json 或環境變數）");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
-// ── Mapperly 映射器：編譯期產生、無狀態，以 singleton 註冊（SDD §6） ──
+// ── Mapperly 映射器：編譯期產生、無狀態，以 singleton 註冊（DESIGN §6） ──
 builder.Services.AddSingleton<MemberMapper>();
 
 // ── 服務註冊（建構子注入，NFR-B-06） ──
@@ -32,7 +32,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ── 驗證失敗（400）錯誤鍵改為 camelCase，對齊前端契約（D1 / SDD §3.4） ──
+// ── 驗證失敗（400）錯誤鍵改為 camelCase，對齊前端契約（D1 / DESIGN §3.4） ──
 // 預設 ValidationProblemDetails 的 errors 鍵為 CLR 屬性名（PascalCase），此處統一轉 camelCase。
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -77,7 +77,7 @@ using (var scope = app.Services.CreateScope())
     DbSeeder.Seed(db);
 }
 
-// ── Middleware 順序（顯式固定，沿用原單位範本，SDD §7） ──
+// ── Middleware 順序（顯式固定，沿用原單位範本，DESIGN §7） ──
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())

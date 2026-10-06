@@ -12,8 +12,8 @@
 | 0–10 | step0 課程介紹 | 目標、規則、`preflight.ps1` | preflight exit 0 截圖（.NET／PostgreSQL／5432／5080／psql 全綠） |
 | 10–20 | step1 為何要 harness | 後端版 harness A/B 對比 demo（三項：回應格式／業務規則與訊息／多做的東西） | 每組說得出三項差異，**並說得出「哪幾件事沒 harness 那版自己就做對了」**——這題答不出來代表他還停在「有 harness 比較漂亮」的誤解 |
 | 20–55 | step2 speedrun kit | 玩範本 API：跑起來、swagger CRUD、測試 49 綠、重置資料；讀系統文件、harness 四件、分層＋DB 綱要 | C/R/U/D/測試/重置 checklist 打勾；能口頭說明分層與 `ModelResult` 封裝 |
-| 55–95 | step3 新模組 | 只讀 PRD → 六題釐清裁決 → AI 出 SRS/SDD-delta＋任務清單 → 逐任務實作 → 三路驗收 | 六題答案＋每題一句理由；swagger 五路由＋psql 24 列 |
-| 95–115 | step4 全鏈路 LOOP | 前端切旗標接上後端；注入後端 bug → 紅 → 判因 → 修 → 綠 | e2e 綠／紅輸出＋修正理由 |
+| 55–95 | step3 新模組 | 只讀 PRD → 六題釐清裁決 → AI 出 SRS-delta、設計文件-delta、圖＋任務清單 → 說「開工」逐任務實作 → 三路驗收 | 六題答案＋每題一句理由；swagger 五路由＋psql 24 列 |
+| 95–115 | step4 全鏈路 LOOP | 學員貼一個 LOOP prompt：AI 自己跑 run-e2e 修到 6 條綠，再開子代理對抗審查（HTTP 實打＋Playwright 截圖）；有空再做 lab 紅→綠練習 | `loop/LOOP-REPORT.html`、`LOOP-LOG.md`、`playwright-report`、文件標「step4 LOOP 後」 |
 | 115–120 | step5 收尾 | RUBRIC 自評、Exit ticket | 一句帶回公司的導入做法 |
 
 > **step3 是全課核心（40 分）。** 若要讓每位學員都等 AI 從空白生成完整實作，時間會爆——用第二節的 checkpoint 政策控場。
@@ -37,7 +37,7 @@
 - **`apply-solution-checkpoint.ps1` 實際會做的事**：
   - 【原始碼】複製 Equipment 模組新增檔（Entities／Constants／Models／Mapping／Services／Controllers／SeedData／Migration）到學員專案；覆蓋改動檔（`Program.cs` 註冊、`AppDbContext` 的 DbSet／設定、`DbSeeder`、Migration 快照 `AppDbContextModelSnapshot.cs`、`appsettings.Development.json` 連線字串改指 `ai_crud_equipment`）。
   - 【測試】新增 Equipment 單元／整合測試，並覆蓋整合測試 factory `CustomWebAppFactory.cs`（改連測試庫 `ai_crud_equipment_test`）。
-  - 【文件】把 `SRS-delta`／`SDD-delta`／`TASKS.md` 複製進學員專案 `docs\`，供三路驗收比對。
+  - 【文件】把 `SRS-delta`／`DESIGN-delta`／`DIAGRAMS-裝備物資API.html`／`TASKS.md` 複製進學員專案 `docs\`，供三路驗收比對。
   - 覆蓋前一律把學員原檔備份到 `<Target>\.checkpoint-backup\`（保留相對路徑結構，只在第一次備份，重複執行 apply 不會覆蓋掉「套用前」的原始檔）。
   - 除非加 `-SkipVerify`，套用完自動依序跑四項驗收，並**以機器可判定的方式 fail-closed**：`dotnet build -p:TreatWarningsAsErrors=true`（警告視為錯誤，用 exit code 判零警告零錯誤，不看語系相關的摘要字串）→ `dotnet test` 輸出 **TRX** 並解析與語系無關的 invariant counters（預期 passed=89／failed=0，可用 `-ExpectedTestCount` 覆蓋）→ 啟動 API 驗 `GET /api/equipment/items` 筆數（預期 24，可用 `-ExpectedRowCount` 覆蓋）→ 讀套用後 `appsettings.Development.json` 的 `Database=` 比對（預期 `ai_crud_equipment`，可用 `-ExpectedDbName` 覆蓋）並用 psql 確認該庫可連。**四項全過腳本才 `exit 0`；任一項無法解析／數量不符／失敗都 `exit 1`**（可用在 CI／講師快速判斷）。
   - 前提：學員專案沿用範本命名空間 `CrudTemplate.Api`（工作坊複製範本時不改名），否則複製過去的檔案命名空間對不上、無法編譯（腳本會自動嘗試偵測 `src\`／`tests\` 下的專案資料夾，唯一才自動採用）。
@@ -89,4 +89,4 @@ dry run 要一併驗證：`apply-solution-checkpoint.ps1` 真的能套用並讓 
 
 **「Q1 為什麼要偏離範本的 SEQUENCE？這樣不是違反 harness 嗎？」**
 
-> 不違反。harness 要的是「決策有依據、偏離有記錄」，不是「永遠照抄範本」。範本 SEQUENCE 產不出「每前綴各自計數」的流水號，需求逼你偏離——只要把「為什麼偏離、偏離成什麼」寫進 SDD-delta，就是正確的工程判斷。這正是 step3 Q1 最想教的事。
+> 不違反。harness 要的是「決策有依據、偏離有記錄」，不是「永遠照抄範本」。範本 SEQUENCE 產不出「每前綴各自計數」的流水號，需求逼你偏離——只要把「為什麼偏離、偏離成什麼」寫進設計文件-delta（DESIGN），就是正確的工程判斷。這正是 step3 Q1 最想教的事。

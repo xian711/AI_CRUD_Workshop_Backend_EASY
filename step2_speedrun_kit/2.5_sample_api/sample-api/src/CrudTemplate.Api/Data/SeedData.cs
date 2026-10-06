@@ -3,13 +3,13 @@ using CrudTemplate.Api.Entities;
 namespace CrudTemplate.Api.Data;
 
 /// <summary>
-/// 24 筆種子字面量（逐欄位對齊前端 useTemplateMembers.ts 的 SEED，SDD §8）。
+/// 24 筆種子字面量（逐欄位對齊前端 useTemplateMembers.ts 的 SEED，DESIGN §8）。
 /// </summary>
 /// <remarks>
 /// 顯性、非產生器：id 為 M-001..M-024，對應前端 ensureSeeded 的 padStart(3) 序號。
 /// 種子為虛構測試資料（姓名/電話/地址/證號皆杜撰），非真實個資。
 /// Contract v2：各筆補 deterministic bloodType（A/B/AB/O 合理分佈：O 8、A 7、B 6、AB 3），
-/// 示範新欄位種子；既有 dev 庫升級不會回填，需 reset 後重啟才取得含血型種子（SDD §8 / D-V2-3）。
+/// 示範新欄位種子；既有 dev 庫升級不會回填，需 reset 後重啟才取得含血型種子（DESIGN §8 / D-V2-3）。
 /// </remarks>
 public static class SeedData
 {

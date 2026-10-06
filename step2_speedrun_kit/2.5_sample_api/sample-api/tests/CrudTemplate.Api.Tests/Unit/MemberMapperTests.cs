@@ -5,7 +5,7 @@ using CrudTemplate.Api.Models;
 namespace CrudTemplate.Api.Tests.Unit;
 
 /// <summary>
-/// Mapperly 映射單元測試（SDD §9.2：U6、U7）。
+/// Mapperly 映射單元測試（DESIGN §9.2：U6、U7）。
 /// </summary>
 public class MemberMapperTests
 {

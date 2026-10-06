@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace CrudTemplate.Api.Services;
 
 /// <summary>
-/// 人員服務。商業邏輯層（SDD §2 / §7）。
+/// 人員服務。商業邏輯層（DESIGN §2 / §7）。
 /// </summary>
 /// <remarks>
 /// 例外分類（D11）：只把「預期的業務失敗」（查無資料）轉成 <see cref="ModelResult"/> 失敗；
@@ -104,7 +104,7 @@ public class MemberService(
     private static ModelResult<MemberResult> NotFound(string id) =>
         new() { Success = false, Message = $"找不到人員 {id}" };
 
-    /// <summary>取 SEQUENCE 下一值（SDD §4.2）。</summary>
+    /// <summary>取 SEQUENCE 下一值（DESIGN §4.2）。</summary>
     /// <remarks>
     /// 以原生 DbCommand 執行 PostgreSQL 的 <c>nextval('seq')</c>（回傳 bigint，以
     /// <c>Convert.ToInt32</c> 收斂為 int），並掛入目前交易，確保取號與寫入同一交易語意。

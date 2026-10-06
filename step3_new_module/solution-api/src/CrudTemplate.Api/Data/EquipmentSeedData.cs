@@ -3,11 +3,11 @@ using CrudTemplate.Api.Entities;
 namespace CrudTemplate.Api.Data;
 
 /// <summary>
-/// 24 筆裝備物資種子字面量（逐欄對齊前端 useEquipmentItems.ts 的 SEED，SDD-delta §8）。
+/// 24 筆裝備物資種子字面量（逐欄對齊前端 useEquipmentItems.ts 的 SEED，DESIGN-delta §8）。
 /// </summary>
 /// <remarks>
 /// 顯性、非產生器：id 為 E-001..E-024，對應前端 ensureSeeded 的 padStart(3) 序號、code 逐字相同。
-/// <para>正規化決策（SDD-delta §5）：前端 SEED 的空字串選填欄位（keeper / keeperPhone / locationName /
+/// <para>正規化決策（DESIGN-delta §5）：前端 SEED 的空字串選填欄位（keeper / keeperPhone / locationName /
 /// specNote）於 DB 一律存 null；purchaseDate 空字串存 null——與 DTO setter 的空白→null 正規化一致。</para>
 /// <para>前端 EquipmentItem 無 updatedAt 欄位，種子的 <c>UpdatedAt</c> 統一設為固定基準日
 /// <c>2026-07-11</c>（顯性、決定性）。</para>

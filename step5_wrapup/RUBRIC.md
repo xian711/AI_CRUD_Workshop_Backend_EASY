@@ -10,7 +10,7 @@
 | 2 | API 契約正確性 | 20 | 路由、狀態碼（201+Location／404／204／400）、camelCase 驗證鍵、ModelResult 封裝與前端 `useEquipmentItems.ts` 期待的 13 欄一致，swagger 可實際打通 CRUD |
 | 3 | 資料庫與 migration | 15 | migration 可從乾淨資料庫跑到底、`equipment_item` 表結構（snake_case、CHECK、唯一索引）與種子 24 筆正確，psql 查表對得上前端 mock 內容 |
 | 4 | 測試與驗證 | 20 | `dotnet test` 測試數「恰好 N」且全綠、涵蓋 C／R／U／D 與驗證失敗情境，失敗案例要能讓測試 exit 1（不是假綠） |
-| 5 | LOOP 紅→綠實作 | 15 | 真實紅 → 判因（能分辨是測試本身寫錯、API bug、還是資料庫 bug）→ 修 → 綠，有前後輸出對照 |
+| 5 | LOOP 紅→綠實作 | 15 | 真實紅 → 判因（能分辨是測試本身寫錯、API bug、還是資料庫 bug）→ 修 → 綠，有前後輸出對照（AI 跑 LOOP 時，`LOOP-LOG.md` 每輪紀錄＋`LOOP-REPORT.html` 就是證據） |
 | 6 | 收工證據完整性 | 15 | 全鏈路 E2E（瀏覽器→Nuxt→API→PostgreSQL）跑過至少一次，前端切到真後端模式資料仍在（F5 不消失） |
 
 ## 二、及格門檻（硬性）
@@ -33,6 +33,6 @@ Step5 只有 5 分鐘，不夠當場逐項核對五份證據——這 5 分鐘�
 | 2. swagger 截圖 | 至少涵蓋 C／R／U／D 四種操作各一張，含請求與回應內容 | 2 |
 | 3. `dotnet test` 輸出 | 完整測試結果（含測試數與 exit code） | 4 |
 | 4. psql 查表輸出 | `SELECT * FROM equipment_item` 或等價查詢的實際輸出，證明資料真的落地 | 3、6 |
-| 5. 紅→綠前後輸出 | 紅燈輸出＋根因判讀（test bug／API bug／DB bug 三選一並說明）＋修正說明＋綠燈輸出 | 5 |
+| 5. 紅→綠前後輸出 | 紅燈輸出＋根因判讀（test bug／API bug／DB bug 三選一並說明）＋修正說明＋綠燈輸出；走 LOOP prompt 的話，交 `loop/LOOP-REPORT.html` 與 `LOOP-LOG.md` | 5 |
 
 > 講師用 `../instructor/SCOPE-後端課堂範圍決策.md` 對答面向 1；用 `../instructor/GUIDE.md` 的時間軸與 checkpoint 判斷是否需要救援。

@@ -38,7 +38,7 @@
 | API 埠 | 5080（範本正本與參考解共用，一次只跑一個） |
 | 前端埠 | 手動展示模式 3100（可加 `--port 3199` 對齊）；一鍵 E2E 模式固定 3199 |
 | DB 三庫 | `ai_crud_equipment`（開發）、`ai_crud_equipment_test`（整合測試）、`ai_crud_equipment_e2e`（一鍵 E2E，尾碼 `_e2e` 才准 DROP，防呆） |
-| id／code 產生 | 後端產生：`id` 用 SEQUENCE 產出 `E-###`；`code` 為同前綴 `MAX+1`（不同於範本 SEQUENCE，逼出「每前綴各自計數」的偏離決策，需記入 SDD-delta） |
+| id／code 產生 | 後端產生：`id` 用 SEQUENCE 產出 `E-###`；`code` 為同前綴 `MAX+1`（不同於範本 SEQUENCE，逼出「每前綴各自計數」的偏離決策，需記入設計文件-delta（DESIGN） |
 | 種子資料 | 24 筆 |
 | SCOPE 六題裁決 | 答案只在 `instructor/SCOPE-後端課堂範圍決策.md`；學生教材只出題不給答案 |
 
@@ -61,9 +61,9 @@
 
 | Gate | 學員要做什麼 | 必交證據 |
 |---|---|---|
-| 1. 規格 Gate | PRD → 六題裁決 → SRS/SDD delta → TASKS | 六題答案＋理由、任務清單 |
+| 1. 規格 Gate | PRD → 六題裁決 → SRS-delta、設計文件-delta、圖 → TASKS | 六題答案＋理由、任務清單 |
 | 2. 程式 Gate | 套用 harness／範本，完成 Entity→migration→DTO→Mapper→Service→Controller→seed→tests | build 0/0、測試全綠、Swagger 狀態碼、psql 資料 |
-| 3. 交付 Gate | LOOP 紅→判因→修→綠，再跑學生工作區全鏈路 | 紅／根因／修法／綠、E2E 被測 path、DB name、6/6、截圖 |
+| 3. 交付 Gate | 貼 LOOP prompt：AI 把學生工作區的全鏈路 E2E 修到綠，再開子代理對抗審查 | `LOOP-REPORT.html`（每輪根因、審查發現）、`LOOP-LOG.md`、測試報告 6/6、E2E 被測 path 與 DB name、文件標「step4 LOOP 後」 |
 
 評分細則見 `step5_wrapup/RUBRIC.md`（六面向 100 分、70 分及格、三項不得為零）。
 
@@ -120,4 +120,4 @@ powershell -ExecutionPolicy Bypass -File .\verify-doc-commands.ps1
 | 補入口 | RUBRIC、三道 Gate、誠實邊界進學員動線 |
 
 ---
-教材由 Claude（Fable 5）多代理協作產出、Codex（GPT-5.6）對抗審查、實跑驗證後發佈。
+教材由 Claude 多代理協作產出、Codex 對抗審查、實跑驗證後發佈。

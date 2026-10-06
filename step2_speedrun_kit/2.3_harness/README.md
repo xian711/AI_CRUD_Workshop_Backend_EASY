@@ -49,7 +49,7 @@ step2_speedrun_kit/2.5_sample_api/sample-api/
 
 ## 課後進階附錄：後端 API 完整 harness 參考包
 
-`aspnet-api-ai-harness-v5/` 是完整 harness 參考包 **v5.16**（SDD loop、六條鐵律、驗證分級、`/api-loop`／`/crud-loop` 等 command、樣板規則檔）。本課「四件」即從這套精煉、換成本專案實值。
+`aspnet-api-ai-harness-v5/` 是完整 harness 參考包 **v5.16**（SDD loop＝規格驅動開發的回圈：先規格、再程式；這包裡的 SDD 都是這個意思。另有六條鐵律、驗證分級、`/api-loop`／`/crud-loop` 等 command、樣板規則檔）。本課「四件」即從這套精煉、換成本專案實值。
 
 **這包課堂用不到。** 它的用途是「回公司做更大型後端時照這套走」。
 

@@ -1,4 +1,4 @@
-# SDD — CRUD 後端標準範本（Template CRUD Backend）v1.6
+# 設計文件 — CRUD 後端標準範本（Template CRUD Backend）v1.6
 
 | 項目 | 內容 |
 |------|------|
@@ -9,7 +9,7 @@
 | 落點 | 範本原始專案的 `sample-api/` |
 | 基底慣例 | 原單位 .NET API 範本（分層、ModelResult、Mapperly、DataAnnotations、GlobalExceptionHandler） |
 
-> SDD first：本文件為實作契約，實作者須嚴格照做。所有偏離原單位範本慣例之處集中於第 11 章「決策與偏離紀錄」。
+> 規格驅動開發（SDD：先文件、再程式）：本文件為實作契約，實作者須嚴格照做。所有偏離原單位範本慣例之處集中於第 11 章「決策與偏離紀錄」。
 
 ---
 
@@ -23,7 +23,7 @@
 - **§5**：新增 BR-B-11（bloodType 選填、非空才驗允許值，仿 email 選填模式）；`IValidatableObject.Validate()` 由三條增為四條。
 - **§9.2/§9.3**：新增 UB 系列單元測試與 IB1-IB3 整合測試。
 - **Migration**：新增 `AddBloodTypeContractV2`（只加欄位＋CHECK，不回填舊列）。既有 dev 庫升級後既有 24 列 `blood_type` 為 NULL 屬正常；要取得含血型的種子須跑 `reset_workshop_data.sql` 後重啟 API 重植。
-- 對外 API 契約其餘部分（路由、狀態碼、M-### 行為）不變；v1.5 保留於 `docs/SDD-CRUD後端標準-v1.5.md` 供對照。
+- 對外 API 契約其餘部分（路由、狀態碼、M-### 行為）不變；v1.5 保留於原始範本包的 `docs/` 供對照（不隨本課發佈）。
 
 ---
 
@@ -37,7 +37,7 @@
 - **§4.3 qualifications**：由 SQL Server 的單一 `nvarchar(max)` JSON 欄位改為 PostgreSQL 原生陣列 `text[]`（default `'{}'`），round-trip 語意不變（取捨見 §4.3）。
 - **CHECK constraint**：移除 `N''` unicode 前綴（PostgreSQL 一律 UTF-8）；`nvarchar(n)` 對應 `character varying(n)`。
 - **測試隔離**：測試庫更名 `ai_crud_template_test`（小寫 snake_case），`_Test` 結尾防呆改為 `_test`；新增 PostgreSQL 連線池獵區處置（`EnsureDeleted` 前 `NpgsqlConnection.ClearAllPools()`，見 §9.1）。
-- 完整逐版差異見 §13 修訂紀錄 v1.5 列。v1.4（SQL Server 版）保留於 `docs/SDD-CRUD後端標準-v1.4.md` 供對照。
+- 完整逐版差異見 §13 修訂紀錄 v1.5 列。v1.4（SQL Server 版）保留於原始範本包的 `docs/` 供對照（不隨本課發佈）。
 
 ---
 
@@ -419,7 +419,7 @@ DbSeeder.Seed：
 | D13 | **駁回** Codex C6「拆 TrainingDemo/ProductionStarter 兩 profile」；**backlog** C7 的 nationalId 唯一約束→409 | 教學範本以單一路徑降低認知負擔；正式化所需項目已於 §12 backlog 誠實列表＋複製警語。409 教學點需前端配套處理，列 backlog 首位 |
 | D14b | **bloodType 選填（nullable），非必填**（Contract v2，§0.b） | 欄位源自前端課 Lab；**選填理由＝跨課相容**：baseline 前端不送此欄，若必填會使 baseline 銜接直接 400。選填讓 baseline 與 Lab 成品前端同時相容。setter 自包含正規化（空字串/空白→null，仿 qualifications）、驗證走 IValidatableObject（仿 email 選填模式），DB 為 `text NULL`＋CHECK（NULL 自然放行）。既有 dev 庫升級後舊列 blood_type 為 NULL 屬正常 |
 
-> **§11 註（provider 抽換）**：v1.5 provider 由 `Microsoft.EntityFrameworkCore.SqlServer` 換為 `Npgsql.EntityFrameworkCore.PostgreSQL`（主專案與測試專案皆換）；`Microsoft.EntityFrameworkCore.Design` 保留供 Migrations。連線字串改 PostgreSQL 格式（`Host=...;Port=...;Database=...;Username=...;Password=...`）。Migration 三檔刪除重生（`InitialCreate`），生成物含 CHECK、`template_member_seq`（START 25）、`qualifications text[]`。以此案例作為 KM 教材（SDD-DELTA 留痕：D2 修訂、§4.2/§4.3 對應）。
+> **§11 註（provider 抽換）**：v1.5 provider 由 `Microsoft.EntityFrameworkCore.SqlServer` 換為 `Npgsql.EntityFrameworkCore.PostgreSQL`（主專案與測試專案皆換）；`Microsoft.EntityFrameworkCore.Design` 保留供 Migrations。連線字串改 PostgreSQL 格式（`Host=...;Port=...;Database=...;Username=...;Password=...`）。Migration 三檔刪除重生（`InitialCreate`），生成物含 CHECK、`template_member_seq`（START 25）、`qualifications text[]`。以此案例作為 KM 教材（設計文件 delta 留痕：D2 修訂、§4.2/§4.3 對應）。
 
 ---
 
@@ -448,7 +448,7 @@ DbSeeder.Seed：
 | 版本 | 日期 | 變更 |
 |------|------|------|
 | v1.0 | 2026-07-11 | 初版（Opus 起草）。定義 sample-api 結構、五端點契約、template_member 綱要、驗證/映射/錯誤處理/seed/測試計畫，及對前端契約與原單位範本慣例之決策與偏離 |
-| v1.1 | 2026-07-11 | 設計審查修正（Fable，審寫分離）：① I1 斷言改「至少 24 筆含 M-001~024」防測試間耦合；② 明定 `[AllowedValues]` 為單欄允許值機制、IValidatableObject 僅留兩條跨欄位規則、註記物件層級驗證僅在屬性驗證全過後執行；③ 誠實揭露 JSON 繫結錯誤為框架英文訊息（列入 §12 限制）。另裁決起草待決 5 點全數採預設（positionTitle 不落地、ModelResult 封裝＋前端 unwrap、驗證 regex 對齊前端、SEQUENCE 取代掃描+1、PUT 不 upsert） |
+| v1.1 | 2026-07-11 | 設計審查修正（另一個 AI 獨立審查，審寫分離）：① I1 斷言改「至少 24 筆含 M-001~024」防測試間耦合；② 明定 `[AllowedValues]` 為單欄允許值機制、IValidatableObject 僅留兩條跨欄位規則、註記物件層級驗證僅在屬性驗證全過後執行；③ 誠實揭露 JSON 繫結錯誤為框架英文訊息（列入 §12 限制）。另裁決起草待決 5 點全數採預設（positionTitle 不落地、ModelResult 封裝＋前端 unwrap、驗證 regex 對齊前端、SEQUENCE 取代掃描+1、PUT 不 upsert） |
 | v1.2 | 2026-07-11 | 併入 Codex CLI（gpt-5.6-sol）獨立審查裁決：採納 C1 例外分類（Service 不 blanket try/catch，D11）、C2 測試順序無關（I4 不斷言固定 M-025）、C3 SEQUENCE 措辭（唯一但允許缺號）＋seed 單實例假設、C7 qualifications 可實作規格；部分採納 C4（updatedAt 定位改「更新日期」，型別不動，D12）、C5（NFR-B-05 界定繁中範圍，見 SRS v1.1）；駁回 C6 雙 profile 拆分（D13）；nationalId 唯一→409 列 backlog 首位 |
 | v1.3 | 2026-07-11 | 併入實作後對抗審查（Claude R3＋Codex 實作審）：birthDate 改 `DateOnly?`（value type 必填漏洞）＋I15 回歸測試、CHECK SQL 改由 MemberEnums 常數組出、測試 DB `_Test` 結尾防呆＋env 覆蓋、I9/I11 補驗 404 body、launchSettings 埠對齊 5080、CORS/CancellationToken/測試隔離列 backlog、§5 三條物件層級規則同步 |
 | v1.4 | 2026-07-11 | **測試隔離重大修正**（E2E 髒資料揭發）：整合測試的組態覆蓋在 minimal hosting 下被 Development 設定反壓、實際打到開發 DB——改為 `ConfigureTestServices` 替換 DbContextOptions；`_Test` 防呆改查 host 實際生效連線。另補 §9.2 U8 列（BR-B-10，實作既有） |

@@ -6,6 +6,6 @@
 - 程式與資料表細則：`CODE-RULES-api-本專案.md`
 - 對外契約慣例（狀態碼矩陣、ModelResult、SEQUENCE、D 決策）：`contract-conventions-summary.md`
 - 複製範本開新模組：`使用說明-複製範本開發新API模組.md`
-- 完整規格：`docs/baseline/`（SRS v1.2、SDD v1.6，工作區自包含複本）
+- 完整規格：`docs/baseline/`（SRS v1.2、設計文件 DESIGN v1.6，工作區自包含複本）
 
 底線：台灣白話繁體中文、只在 blocker 用選擇題問人、完成前必跑 `dotnet build` ＋ `dotnet test` 全綠再回報。

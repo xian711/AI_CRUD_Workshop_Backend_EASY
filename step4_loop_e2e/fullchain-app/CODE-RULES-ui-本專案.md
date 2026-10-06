@@ -1,7 +1,7 @@
 # CODE-RULES-ui（防災協作平台前端程式規範）
 
 > 用途：本專案前端的實際程式規則，供 AI Harness CRUD / UI Mode 改碼前對照。**取代** harness 樣板內取自 原單位前端範本（Vite/Pinia/axios）的預設值。對應 harness 樣板：`harness/CODE-RULES-ui.md`。
-> 提煉自 `frontend/CLAUDE.md` + `SDD-CRUD標準範本-v1.1.md` UIUX 規範 + Clean Code 對照表。純後端工作不必讀本檔。
+> 提煉自 `frontend/CLAUDE.md` + 前端課 `DESIGN-CRUD標準範本-v1.1.md`（設計文件）UIUX 規範 + Clean Code 對照表。純後端工作不必讀本檔。
 
 | 項目 | 規範 |
 |---|---|
@@ -12,7 +12,7 @@
 | 匯入慣例 | `utils/` 下函式**顯式 import**（`import { exportCsv } from '~/utils/templateCsv'`）；`composables/`、`components/` 走 Nuxt auto-import。實作前先 grep 確認名稱無衝突 |
 | 資料層 | composable module-level `ref` 單例 + `ensureSeeded()`（一次性深拷貝種子）；CRUD 函式**全非同步回 Promise**，預留 `useFetch('/api/...')` 接縫；`getById` 回**深拷貝**防表單改到 store。本範本**無 Pinia**（前端記憶體單例即可）|
 | 跨檔匯入 | 一律 `~/` alias（`~/utils/…`、`~/composables/…`）|
-| 樣式 | 依 design token 三層（COMP→SYS→REF）與同資料夾 `design-system-summary.md`（token 實檔見工作坊 `step2_speedrun_kit/2.4_design_system/`）；**禁止**硬編碼 hex/px、禁止引用 REF、禁止 `<style scoped>` 蓋 Nuxt UI（改 `app.config.ts` 的 `ui`）、禁止 `!important` |
+| 樣式 | 依 design token 三層（COMP→SYS→REF）與同資料夾 `design-system-summary.md`（token 實檔見前端課工作坊 `step2_speedrun_kit/2.2_design_system/`）；**禁止**硬編碼 hex/px、禁止引用 REF、禁止 `<style scoped>` 蓋 Nuxt UI（改 `app.config.ts` 的 `ui`）、禁止 `!important` |
 | Token 別名 | 用 Tailwind 別名等同語意引用：`bg-primary`、`text-on-surface`、`border-outline-variant`、`p-lg`、`gap-md`、`rounded-lg`。有 COMP token 者用 `[var(--ui-comp-*)]` |
 | 表單互動 | 依 design-system-summary 之 Form/Table Rules：Label 在上、必填 `*`、欄位級錯誤紅字、危險操作二次確認且確認鈕寫明動作、送出防重複、分頁 props 給預設值、`focus-visible` 不可拿掉 |
 | 主要動作 | 一律 `Teleport to="#breadcrumb-actions"`（返回/次要用 `-left`），內容區不重複渲染；動作列按鈕統一 `size="md"` |
@@ -40,8 +40,8 @@
 | CSV 匯出 util | `utils/templateCsv.ts` |
 | 欄位元件（label+紅星+錯誤紅字）| `components/template/TemplateFormField.vue` |
 | 狀態 badge | `components/template/TemplateStatusBadge.vue` |
-| Design System 摘要 / Token 規則 | 同資料夾 `design-system-summary.md`；token 實檔見工作坊 `step2_speedrun_kit/2.4_design_system/` |
+| Design System 摘要 / Token 規則 | 同資料夾 `design-system-summary.md`；token 實檔見前端課工作坊 `step2_speedrun_kit/2.2_design_system/` |
 
-## Clean Code 對照（教學錨點，詳見 SDD §10）
+## Clean Code 對照（教學錨點，詳見設計文件（DESIGN）§10）
 
 抽取共用列表狀態（Extract Function）、查表取代條件（Replace Conditional with Lookup）、純函式驗證分離業務與 UI、後端接縫（針對介面而非實作）、字面量種子（顯性優於聰明）、Guard Clauses、防禦性深拷貝、具名常數、開放封閉（擴充 FormRow 而非改）、複用 AppAddressPicker、單檔行數預算、誠實標注抽象邊界（僅字串 filter）。

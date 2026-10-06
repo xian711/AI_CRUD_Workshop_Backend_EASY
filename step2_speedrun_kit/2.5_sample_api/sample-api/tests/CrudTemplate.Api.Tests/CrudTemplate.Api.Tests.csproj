@@ -15,7 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <!-- WebApplicationFactory 整合測試（SDD §9） -->
+    <!-- WebApplicationFactory 整合測試（DESIGN §9） -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9" />
     <!-- 整合測試以 EF Core 直接重建測試 DB（EnsureDeleted/Migrate/Seed） -->
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />

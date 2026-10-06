@@ -4,7 +4,7 @@
 |------|------|
 | 文件版本 | v1.2（v1.1 → v1.2：Contract v2 新增選填欄位 bloodType，欄位源自前端課 Lab、跨課契約對齊；新增 BR-B-11，§2 契約欄由 17 增為 18） |
 | 日期 | 2026-07-11 |
-| 狀態 | 已核准（供 SDD / 實作使用） |
+| 狀態 | 已核准（供設計文件 DESIGN／實作使用） |
 | 範圍 | 後端 REST API（.NET 10 + EF Core 10 + PostgreSQL），為既有前端 CRUD 標準範本補齊 PUT/DELETE 完整 CRUD |
 | 對應前端 | 範本原始專案的 `sample-app`（Nuxt 3，17 欄位人員管理，資料層已預留 RESTful 接縫） |
 | 後端基底慣例 | 原單位的 .NET API 範本，本文件明列相容與偏離處 |
@@ -22,7 +22,7 @@
 
 ### 1.1 設計原則（約束所有 FR）
 
-- **對齊前端契約**：JSON 契約採 camelCase、枚舉用中文字面值，最小化前端變更（見 SDD 決策紀錄）。
+- **對齊前端契約**：JSON 契約採 camelCase、枚舉用中文字面值，最小化前端變更（見設計文件決策紀錄）。
 - **相容原單位範本慣例**：分層、Mapperly、`ModelResult<T>`、GlobalExceptionHandler、DataAnnotations、xUnit 整合測試。
 - **補齊 CRUD 缺口**：原單位範本僅有 GET 與一支 POST upsert，本範本補齊 GET 單筆 / POST 新增 / PUT 全量更新 / DELETE。
 - **教學顯性**：SQL SEQUENCE 產生主鍵、primitive collection 存 JSON、本地時區日期組裝等皆為教學點，顯性優於聰明。

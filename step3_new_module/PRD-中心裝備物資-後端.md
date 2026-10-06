@@ -83,7 +83,7 @@
 
 歸納：**必填 6 欄** = `categoryKey`、`name`、`qty`、`unit`、`spec1`、`status`；**選填 5 欄** = `keeper`、`keeperPhone`、`locationName`、`purchaseDate`、`specNote`；**系統產生 2 欄** = `id`、`code`。
 
-> 逐欄的後端驗證對照（哪欄設 `[Required]`、哪欄 nullable、CHECK 約束）留給 AI 在 SDD-delta 裡寫清楚，並以本節為證據。
+> 逐欄的後端驗證對照（哪欄設 `[Required]`、哪欄 nullable、CHECK 約束）留給 AI 在設計文件-delta（`DESIGN-裝備物資API-delta.md`）裡寫清楚，並以本節為證據。
 
 ### 3.3 回應與請求形狀（比照人員範本慣例）
 
@@ -150,7 +150,7 @@
 | 項目 | 要求 |
 |------|------|
 | 回應格式 | 沿用人員範本慣例：`ModelResult` 封裝、camelCase、狀態碼語意一致 |
-| 資料量假設 | 課堂前提 < 1000 筆；此假設要記進 SDD-delta（影響 Q5 分頁的裁決） |
+| 資料量假設 | 課堂前提 < 1000 筆；此假設要記進設計文件-delta（影響 Q5 分頁的裁決） |
 | 連線 | 開發庫 `ai_crud_equipment`、測試庫 `ai_crud_equipment_test`；port 5080（一次只跑一支 API） |
 | 建置品質 | `dotnet build` 0 警告 0 錯誤、`dotnet test` 全綠；不得刪測試或放寬 assertion 來換綠燈 |
 | 種子一致性 | 24 筆與前端 mock 逐欄一致，可交叉比對 |

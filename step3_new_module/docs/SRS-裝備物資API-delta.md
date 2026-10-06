@@ -62,7 +62,7 @@
 
 - 五路由行為與狀態碼與範本一致：`GET/POST /api/equipment/items`、`GET/PUT/DELETE /api/equipment/items/{id}`
   → 201+Location／200／404／204／400（camelCase 驗證鍵）／ModelResult 封裝（DELETE 無封裝）。
-- **新增行為**：`code` 由後端於「新增／分類或項目變更時」產生（見 SDD-delta §6 六題裁決）。
+- **新增行為**：`code` 由後端於「新增／分類或項目變更時」產生（見 `DESIGN-裝備物資API-delta.md` §3 六題裁決）。
 
 ## 5. 已知限制（教學前提）
 

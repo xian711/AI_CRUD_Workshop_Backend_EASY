@@ -1,7 +1,7 @@
 namespace CrudTemplate.Api.Models;
 
 /// <summary>
-/// 裝備物資回應 DTO（camelCase，對齊前端 EquipmentItem 型別 + id/code/updatedAt，SDD-delta §3）。
+/// 裝備物資回應 DTO（camelCase，對齊前端 EquipmentItem 型別 + id/code/updatedAt，DESIGN-delta §3）。
 /// </summary>
 /// <remarks>
 /// 契約 14 欄。序列化採 ASP.NET 預設 camelCase；日期為 <see cref="DateOnly"/>，序列化即 yyyy-MM-dd。

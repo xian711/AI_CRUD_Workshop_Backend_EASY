@@ -63,7 +63,7 @@ sample-api/
 ## 更多
 
 - 環境設定、連線字串、常見問題：`SETUP.md`
-- 規格文件：`../2.2_system_docs/`（SRS v1.2、SDD v1.6）
+- 規格文件：`../2.2_system_docs/`（SRS v1.2、設計文件 DESIGN v1.6）
 - 架構視覺化與 psql 三招：`../2.4_architecture_db/`
 - 複製開新模組：根目錄 `使用說明-複製範本開發新API模組.md`
 

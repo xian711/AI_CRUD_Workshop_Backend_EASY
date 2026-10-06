@@ -36,7 +36,7 @@
 ## Design System
 
 - 一句話：顏色／間距／元件一律照 Design System 的 token 三層（COMP→SYS→REF），只能由下往上引用。
-- token 實檔在工作坊 `step2_speedrun_kit/2.4_design_system/tokens/`（重點摘要見同資料夾 `design-system-summary.md`）；主色品牌紅 `#C8232C`。
+- token 實檔在前端課工作坊 `step2_speedrun_kit/2.2_design_system/tokens/`（重點摘要見同資料夾 `design-system-summary.md`）；主色品牌紅 `#C8232C`。
 
 ## 開發流程
 

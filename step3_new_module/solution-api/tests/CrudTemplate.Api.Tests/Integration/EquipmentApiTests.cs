@@ -7,7 +7,7 @@ using CrudTemplate.Api.Models;
 namespace CrudTemplate.Api.Tests.Integration;
 
 /// <summary>
-/// 裝備物資端到端整合測試（SDD-delta §9.3）。打 PostgreSQL 測試 DB，與 Members 共用同一 fixture / collection。
+/// 裝備物資端到端整合測試（DESIGN-delta §9.3）。打 PostgreSQL 測試 DB，與 Members 共用同一 fixture / collection。
 /// </summary>
 [Collection("Api")]
 public class EquipmentApiTests(DatabaseFixture fixture)

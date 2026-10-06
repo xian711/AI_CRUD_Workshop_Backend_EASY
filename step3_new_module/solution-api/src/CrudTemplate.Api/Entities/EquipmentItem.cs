@@ -11,7 +11,7 @@ namespace CrudTemplate.Api.Entities;
 /// 具名唯一索引 <c>ux_equipment_item_code</c>（SCOPE Q1，偏離範本 D6 單一 SEQUENCE 的教學點）。
 /// </para>
 /// <para>選填欄位（keeper / keeperPhone / locationName / purchaseDate / specNote）以 nullable 型別承載；
-/// 空字串 / 純空白於 DTO 正規化為 null（SDD-delta §5，仿範本 BloodType）。</para>
+/// 空字串 / 純空白於 DTO 正規化為 null（DESIGN-delta §5，仿範本 BloodType）。</para>
 /// <para>日期欄位用 <see cref="DateOnly"/> ↔ SQL <c>date</c>，無時區概念（沿用範本 D7）。</para>
 /// </remarks>
 public class EquipmentItem

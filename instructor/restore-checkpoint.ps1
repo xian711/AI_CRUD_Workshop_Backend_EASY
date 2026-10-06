@@ -62,7 +62,8 @@ $testFiles = @(
 # 相對 docs\
 $docFiles = @(
     'SRS-裝備物資API-delta.md',
-    'SDD-裝備物資API-delta.md',
+    'DESIGN-裝備物資API-delta.md',
+    'DIAGRAMS-裝備物資API.html',
     'TASKS.md'
 )
 

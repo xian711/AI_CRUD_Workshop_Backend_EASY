@@ -2,7 +2,7 @@
 
 > 用途：本專案（CRUD 後端標準範本）的**實際**程式規則，供 AI 改後端碼前對照、review 對照。
 > **取代** harness 樣板取自原單位範本（SQL Server / Dapper / AutoMapper）的預設值。對應樣板：`aspnet-api-ai-harness-v5/harness/CODE-RULES-api.md`。
-> 提煉自 `SDD-CRUD後端標準-v1.6.md` 與 `SRS-CRUD後端標準-v1.2.md`（工作區自包含複本在 `docs/baseline/`）。純前端工作不必讀本檔。
+> 提煉自 `DESIGN-CRUD後端標準-v1.6.md`（設計文件）與 `SRS-CRUD後端標準-v1.2.md`（工作區自包含複本在 `docs/baseline/`）。純前端工作不必讀本檔。
 
 ## C# / ASP.NET Core
 

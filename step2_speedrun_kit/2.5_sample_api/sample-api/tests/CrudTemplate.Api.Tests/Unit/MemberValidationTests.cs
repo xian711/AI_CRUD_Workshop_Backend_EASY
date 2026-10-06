@@ -4,12 +4,12 @@ using CrudTemplate.Api.Models;
 namespace CrudTemplate.Api.Tests.Unit;
 
 /// <summary>
-/// DTO 驗證單元測試（SDD §9.2：U1-U5 + U8）。
+/// DTO 驗證單元測試（DESIGN §9.2：U1-U5 + U8）。
 /// </summary>
 /// <remarks>
 /// 以 <see cref="Validator.TryValidateObject(object, ValidationContext, ICollection{ValidationResult}, bool)"/>
 /// 復刻 MVC 行為：物件層級 IValidatableObject 僅在所有屬性層級 DataAnnotations 通過後才執行，
-/// 故失敗案例一次只錯一個欄位（SDD §5）。
+/// 故失敗案例一次只錯一個欄位（DESIGN §5）。
 /// </remarks>
 public class MemberValidationTests
 {

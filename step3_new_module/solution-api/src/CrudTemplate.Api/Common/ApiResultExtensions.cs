@@ -7,7 +7,7 @@ namespace CrudTemplate.Api.Common;
 /// </summary>
 /// <remarks>
 /// 避免「不論成功失敗一律回 200」：Success=false 時映射到適當的 4xx/5xx，
-/// 前端與監控才能靠 HTTP 狀態碼判斷可用性（SDD §7）。
+/// 前端與監控才能靠 HTTP 狀態碼判斷可用性（DESIGN §7）。
 /// </remarks>
 public static class ApiResultExtensions
 {

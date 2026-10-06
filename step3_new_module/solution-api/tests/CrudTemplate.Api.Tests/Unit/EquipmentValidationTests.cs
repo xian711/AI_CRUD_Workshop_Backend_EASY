@@ -4,7 +4,7 @@ using CrudTemplate.Api.Models;
 namespace CrudTemplate.Api.Tests.Unit;
 
 /// <summary>
-/// 裝備物資 DTO 驗證單元測試（SDD-delta §9.2）。逐欄對齊前端 [id].vue 驗證規則。
+/// 裝備物資 DTO 驗證單元測試（DESIGN-delta §9.2）。逐欄對齊前端 [id].vue 驗證規則。
 /// </summary>
 /// <remarks>
 /// 以 <see cref="Validator.TryValidateObject(object, ValidationContext, ICollection{ValidationResult}, bool)"/>

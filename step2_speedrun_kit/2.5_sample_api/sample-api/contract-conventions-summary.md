@@ -2,7 +2,7 @@
 
 > 一頁看懂 sample-api 對外契約的鐵律。前端接、AI 寫、review 對照，都以本頁為準。
 > 這是後端版的「design-system-summary」：前端統一走 token，後端統一走這套契約慣例。
-> 完整規格見 `docs/baseline/SDD-CRUD後端標準-v1.6.md`（工作區自包含複本）。
+> 完整規格見 `docs/baseline/DESIGN-CRUD後端標準-v1.6.md`（設計文件）（工作區自包含複本）。
 
 ## 1. 狀態碼矩陣
 
@@ -78,4 +78,4 @@ POST 進來
 | **D9** | PUT 不做 upsert（不存在回 404） | 對齊前端 `update()` 找不到即拋錯語意 |
 | **D11** | Service 不做 blanket try/catch | 分清「業務失敗→404」與「基礎設施故障→500」，別用一個布林同時代表兩者 |
 
-> 延伸：D2（用 PostgreSQL）、D7（DateOnly↔date 避時區陷阱）、D10（positionTitle 不落 DB）、D14b（bloodType 選填＝跨課相容）。完整 14 條見 SDD 第 11 章。
+> 延伸：D2（用 PostgreSQL）、D7（DateOnly↔date 避時區陷阱）、D10（positionTitle 不落 DB）、D14b（bloodType 選填＝跨課相容）。完整 14 條見設計文件第 11 章。

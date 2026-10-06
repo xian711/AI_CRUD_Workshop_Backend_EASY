@@ -13,10 +13,10 @@
 動手之前，先把範本 API 複製成你自己的工作專案，並確認 AI Agent 的工作目錄就是這個專案根目錄（不然 AI 讀不到題目文件與 harness 規則）。完整指令在 [`PROMPTS.md`](PROMPTS.md) 的 **3.0 準備工作區指令**，重點三步：
 
 1. 複製 `step2_speedrun_kit\2.5_sample_api\sample-api` → `step3_new_module\my-equipment-api`（harness 四件在範本根目錄，會一起帶走）。
-2. 只把 `PRD-中心裝備物資-後端.md` 複製進工作專案（AI 才讀得到需求）。
+2. 把 `PRD-中心裝備物資-後端.md` 和 `SRS-設計文件-最小樣板.md` 複製進工作專案（AI 才讀得到需求和交件格式）。
 3. 進 `my-equipment-api` 資料夾，在這裡開 AI Agent。
 
-> **範圍答案（SCOPE）由講師在你完成釐清問答後才發放，先別偷看。** 這一步的重點就是你親自跟 AI 把範圍釐清出來；答案先進工作區＝直接抄，練習就沒了。所以工作區「只放 PRD、不放 solution-api、不放 instructor」。
+> **範圍答案（SCOPE）由講師在你完成釐清問答後才發放，先別偷看。** 這一步的重點就是你親自跟 AI 把範圍釐清出來；答案先進工作區＝直接抄，練習就沒了。所以工作區「只放 PRD 和最小樣板，不放 solution-api、docs、instructor」。
 
 > 範本根目錄已自帶 harness 四件（`CLAUDE.md`、`CODE-RULES-api-本專案.md`、`contract-conventions-summary.md`、`使用說明-複製範本開發新API模組.md`）＋給 Codex 用的 `AGENTS.md`。複製走範本，harness 就跟著走——AI 一進來就讀得到全套規則。
 
@@ -65,16 +65,18 @@ AI：先不寫程式，改用「選擇題」問你 5-7 題範圍釐清（每題�
 你：一題一題拍板（可直接採納建議選項）
         │
         ▼
-AI：輸出 SRS-delta／SDD-delta 與任務清單，停下來等你確認
+AI：照最小樣板交出 SRS-delta、設計文件-delta、UML 圖（DIAGRAMS）與任務清單，停下來等你確認
         │
         ▼
-你：確認開工
+你：把模型切成 Sonnet 5.5，說「開工」
         │
         ▼
 AI：照分層順序逐任務開發（Entity→migration→DTO→Mapper→Service→Controller→seed→測試），每完成一個回報一行
 ```
 
-用一句話記：**貼 prompt → AI 問 → 你答 → AI 出 delta＋任務清單 → 你確認 → AI 逐項做並回報。**
+用一句話記：**貼 prompt → AI 問 → 你答 → AI 出文件、圖和任務清單 → 你確認 → AI 逐項做並回報。** 這就是規格驅動開發（SDD）：先文件、再程式。
+
+> **模型怎麼選：** 文件階段（選擇題、SRS、設計文件、圖）用 **Opus 5.5**、effort High（effort＝讓 AI 想得多深的設定）。說「開工」寫程式前，切成 **Sonnet 5.5**——有 harness 和範本，寫程式不用最貴的模型。
 
 ### 為什麼要讓 AI 先問問題？
 
@@ -109,14 +111,17 @@ AI 逐任務做完後，換你上場驗收。**三路驗收，缺一不可**：
 |---|---|---|
 | **swagger** | 開 `http://localhost:5080/swagger`，五條路由各打一次 | GET 全量 24 筆、GET 單筆／404、POST 201＋Location、PUT 200／404、DELETE 204／404 |
 | **測試** | 在 `my-equipment-api` 跑 `dotnet test` | 全綠；測試數以 `docs/TASKS.md` 為準 |
+| **psql** | 用絕對路徑連 `ai_crud_equipment`，`SELECT count(*) FROM equipment_item` | 24 列，`code` 與前端種子一致 |
 
-> **想看參考解生出來的 delta 文件長什麼樣？** 在本資料夾的 `docs/`：
+**文件和圖也要驗**：用瀏覽器開 `my-equipment-api/docs/DIAGRAMS-裝備物資API.html`，四張圖都出得來、看得懂（分層、資料表、新增怎麼跑、狀態碼）。SRS-delta、設計文件-delta 照 [`SRS-設計文件-最小樣板.md`](SRS-設計文件-最小樣板.md) 對一遍，缺段就退回。
+
+> **想看參考解的文件長什麼樣？** 在本資料夾的 `docs/`：
 > [`SRS-裝備物資API-delta.md`](docs/SRS-裝備物資API-delta.md)（需求差異：新資源、欄位表、行為規則）、
-> [`SDD-裝備物資API-delta.md`](docs/SDD-裝備物資API-delta.md)（設計差異：狀態碼矩陣、資料表綱要、編碼取號）、
+> [`DESIGN-裝備物資API-delta.md`](docs/DESIGN-裝備物資API-delta.md)（設計文件差異：狀態碼矩陣、資料表綱要、編碼取號）、
+> [`DIAGRAMS-裝備物資API.html`](docs/DIAGRAMS-裝備物資API.html)（四張圖，用瀏覽器開）、
 > [`TASKS.md`](docs/TASKS.md)（任務清單）。
 > **建議你自己先生一份再打開對照**——直接抄等於跳過這一步最重要的練習。
-> 這三份也是講師 checkpoint 會複製進學員專案的文件。
-| **psql** | 用絕對路徑連 `ai_crud_equipment`，`SELECT count(*) FROM equipment_item` | 24 列，`code` 與前端種子一致 |
+> 這四份也是講師 checkpoint 會複製進學員專案的文件。
 
 現成的收工檢查指令（含 psql 絕對路徑寫法）在 [`PROMPTS.md`](PROMPTS.md) 的【收工檢查 prompt】。
 
@@ -132,6 +137,8 @@ AI 逐任務做完後，換你上場驗收。**三路驗收，缺一不可**：
 
 修正 prompt 的現成句型見 [`PROMPTS.md`](PROMPTS.md) 的【修正 prompt 範本】。
 
+**做完之後還是會有小修改。** 驗收時發現的小落差（某個狀態碼不對、某欄忘了驗證），一次講一件，AI 改、你再驗。這段「你看 → 你講 → AI 改」的來回，就是 step4 要交給 AI 自己跑的事：先給它一套會亮紅綠燈的驗收標準（全鏈路 E2E），它就能自己看、自己改，這就是 LOOP。
+
 ---
 
 ## 產出物清單
@@ -140,7 +147,7 @@ AI 跑完這一輪，會交出三類東西：
 
 | 產出 | 是什麼 | 你要看什麼 |
 |---|---|---|
-| **SRS-delta／SDD-delta**（在 `docs/`） | 只記「與人員範本的差異」，含分頁前端做、資料量假設等限制 | 對照你的六題裁決有沒有漏、有沒有多；範本正本沒被動到 |
+| **SRS-delta、設計文件-delta、圖**（在 `docs/`） | 只記「與人員範本的差異」；照最小樣板：SRS 四段、設計文件四段、圖四張 | 對照你的六題裁決有沒有漏、有沒有多；圖用瀏覽器開看得懂；範本正本 `docs/baseline/` 沒被動到 |
 | **程式碼（一整套裝備模組）** | Entity→migration→DTO→Mapper→Service→Controller，加唯一索引與 seed | 分層有沒有照範本、`code`／`id` 有沒有後端產生 |
 | **測試** | 單元＋整合測試 | 全綠、沒有被刪或放寬；測試數以 `docs/TASKS.md` 為準 |
 
@@ -150,6 +157,6 @@ AI 跑完這一輪，會交出三類東西：
 
 ## 卡住怎麼辦？
 
-- AI 沒問就動工、想自建分類表、想改 SDD 正本、測試紅了想刪測試——回法都在 [`PROMPTS.md`](PROMPTS.md) 的【常見歪樓對照表】。
+- AI 沒問就動工、想自建分類表、想改範本正本、文件缺段、測試紅了想刪測試——回法都在 [`PROMPTS.md`](PROMPTS.md) 的【常見歪樓對照表】。
 - 環境類故障（5432 沒開、5080 被占、migration 失敗）——由講師處理，分流見講師手冊。
 - 生成落後太多——講師會在約第 85 分鐘視情況套參考解讓大家跟上驗收。

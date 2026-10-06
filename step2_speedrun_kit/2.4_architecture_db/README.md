@@ -15,4 +15,4 @@
 2. 再看分層架構圖與 POST 循序圖，理解 Controller／Service／EF 各自的職責。
 3. 玩過範本 API（見 `../2.1_play_template/`）後，用 `PSQL_QUICKSTART.md` 的三招下去查資料庫，把「畫面上的資料」和「資料庫裡的 row」對上。
 
-> 圖的內容對應 `../2.2_system_docs/SDD-CRUD後端標準-v1.6.md`。想深究某個決策（如 D11 為什麼不全包 try/catch），回去查 SDD 第 11 章。
+> 圖的內容對應 `../2.2_system_docs/DESIGN-CRUD後端標準-v1.6.md`（設計文件）。想深究某個決策（如 D11 為什麼不全包 try/catch），回去查設計文件第 11 章。

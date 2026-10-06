@@ -11,7 +11,7 @@ using Npgsql;
 namespace CrudTemplate.Api.Tests.Integration;
 
 /// <summary>
-/// 整合測試工廠（SDD §9.1）。連線字串預設指向 <c>ai_crud_template_test</c>，
+/// 整合測試工廠（DESIGN §9.1）。連線字串預設指向 <c>ai_crud_template_test</c>，
 /// 可被環境變數 <see cref="TestConnectionEnvVar"/> 覆蓋（多人/CI 環境隔離用）。
 /// </summary>
 /// <remarks>
@@ -61,7 +61,7 @@ public class CustomWebAppFactory : WebApplicationFactory<Program>
 }
 
 /// <summary>
-/// 資料庫夾具：每輪測試開始 EnsureDeleted → Migrate → seed，保證乾淨已知狀態（SDD §9.1）。
+/// 資料庫夾具：每輪測試開始 EnsureDeleted → Migrate → seed，保證乾淨已知狀態（DESIGN §9.1）。
 /// </summary>
 public sealed class DatabaseFixture : IDisposable
 {
@@ -74,7 +74,7 @@ public sealed class DatabaseFixture : IDisposable
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        // 防呆（SDD §9.1）：EnsureDeleted 會整庫刪除，因此不能只檢查「打算用的」連線字串常數
+        // 防呆（DESIGN §9.1）：EnsureDeleted 會整庫刪除，因此不能只檢查「打算用的」連線字串常數
         // ——這正是先前漏洞的成因：組態覆蓋沒生效，但字串檢查看的是覆蓋前的目標值，因而沒攔到。
         // 改為檢查 host 實際生效的連線（DI 容器組好後的 AppDbContext 真正連到的資料庫），
         // 若名稱不含 test 一律拒跑，避免誤刪開發／正式資料庫（PG 庫名小寫，故比對 _test）。

@@ -5,7 +5,7 @@ namespace CrudTemplate.Api.Constants;
 /// </summary>
 /// <remarks>
 /// 集中允許值於單一來源：DTO 的 <c>[AllowedValues]</c> 與 DB CHECK constraint 共用此處字面值，
-/// 避免兩邊漂移（SDD §5）。
+/// 避免兩邊漂移（DESIGN §5）。
 /// </remarks>
 public static class MemberEnums
 {

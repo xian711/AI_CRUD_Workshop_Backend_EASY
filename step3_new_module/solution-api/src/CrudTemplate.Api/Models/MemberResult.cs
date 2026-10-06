@@ -1,7 +1,7 @@
 namespace CrudTemplate.Api.Models;
 
 /// <summary>
-/// 人員回應 DTO（camelCase，對齊前端 TemplateMember 型別，SDD §3）。
+/// 人員回應 DTO（camelCase，對齊前端 TemplateMember 型別，DESIGN §3）。
 /// </summary>
 /// <remarks>
 /// 依 BR-B-05 / D10：無 positionTitle 欄位（由前端 positionCode 導出）。

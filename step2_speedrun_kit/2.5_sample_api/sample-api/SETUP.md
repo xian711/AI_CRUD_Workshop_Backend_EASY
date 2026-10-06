@@ -5,7 +5,7 @@
 
 > **指令慣例**：除非另有註明，以下指令區塊的起始工作目錄皆為**本檔案所在 `sample-api/` 的上一層目錄**（本範本包正本即 repo 根目錄；若為課程工作坊複製件，通常是 `05_solution/`）。每個區塊若需要切換目錄會自帶 `cd`。
 
-對應設計文件：`SDD-CRUD後端標準-v1.5.md`、`SRS-CRUD後端標準-v1.1.md`——本範本包正本在 `docs/`（`sample-api/` 上一層）；課程工作坊複製件則在 `02_source_materials/`（`05_solution/` 上一層）。
+對應文件：設計文件 `DESIGN-CRUD後端標準-v1.6.md`、需求規格 `SRS-CRUD後端標準-v1.2.md`——本專案的自包含複本在 `docs/baseline/`；工作坊另有一份在 `step2_speedrun_kit/2.2_system_docs/`。
 
 ## 1. 先決條件
 

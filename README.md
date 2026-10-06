@@ -22,9 +22,9 @@ step6 是**課後練習**，課堂不做。
 |--------|------|:---:|
 | [step0_course_intro/](step0_course_intro/) | 課程說明、前置檢查、大綱與預期效益 | 10 分 |
 | [step1_why_harness/](step1_why_harness/) | 為什麼要 harness：同一句後端需求，有／沒有 harness 的產出對比 demo | 10 分 |
-| [step2_speedrun_kit/](step2_speedrun_kit/) | 後端快速完工秘笈：玩範本 API → SRS/SDD → harness 四件 → 分層架構＋DB 綱要 → 範本程式 | 35 分 |
-| [step3_new_module/](step3_new_module/) | 複製範本開發新模組：真實 PRD → AI 釐清選擇題 → SRS/SDD delta／API／Migration／測試 → 驗收 | 40 分 |
-| [step4_loop_e2e/](step4_loop_e2e/) | 加速技：後端 LOOP 工程（紅→判因→修→綠）＋前後端全鏈路 E2E | 20 分 |
+| [step2_speedrun_kit/](step2_speedrun_kit/) | 後端快速完工秘笈：玩範本 API → SRS／設計文件（DESIGN）→ harness 四件 → 分層架構＋DB 綱要 → 範本程式 | 35 分 |
+| [step3_new_module/](step3_new_module/) | 複製範本開發新模組：真實 PRD → AI 釐清選擇題 → SRS-delta、設計文件-delta 和圖 → API／Migration／測試 → 驗收（規格驅動開發 SDD：先文件、再程式） | 40 分 |
+| [step4_loop_e2e/](step4_loop_e2e/) | LOOP 工程：貼一個指令，AI 自己跑前後端全鏈路 E2E 修到綠，再開子代理對抗審查，交回報告 | 20 分 |
 | [step5_wrapup/](step5_wrapup/) | 課程總結、評量量表（RUBRIC）、回去公司怎麼用 | 5 分 |
 | [step6_survey_api/](step6_survey_api/) | **課後練習**：把前端課問卷那行 `// TODO: DEV 串接 POST /api/survey` 變成真的 API | 課後 |
 | [HANDBOOK/](HANDBOOK/) | step-by-step 圖文學習手冊 | 課後自學 |
@@ -54,9 +54,9 @@ step4 另有一份**前端成品** `step4_loop_e2e/fullchain-app/`（裝備物�
 | 模式 | 怎麼跑 | 埠號 | 用途 |
 |---|---|---|---|
 | **手動展示模式** | 自己開兩個視窗：先 `dotnet run` 起 API（5080），再到 `fullchain-app` 設 `NUXT_PUBLIC_USE_API=true` 後 `pnpm dev`（預設 3100；要對齊下方一鍵模式的埠號可加 `--port 3199`） | 5080（API）＋前端預設 3100（可 `--port 3199`） | 課堂即時展示、手動點畫面驗證 |
-| **一鍵 E2E 模式** | `step4_loop_e2e/run-e2e.ps1`：自己建 `_e2e` 專用資料庫、背景起 API、背景起前端（強制 3199）、跑完 6 條 Playwright 測試、無論成敗都 teardown 釋放埠 | 5080（API）＋3199（前端，固定） | 自動化驗收／LOOP 紅→綠，不用另開視窗手動啟服務 |
+| **一鍵 E2E 模式** | `step4_loop_e2e/run-e2e.ps1`：自己建 `_e2e` 專用資料庫、背景起 API、背景起前端（預設 3199，可用 `BASE_URL` 換）、跑完 6 條 Playwright 測試、無論成敗都 teardown 釋放埠 | 5080（API）＋3199（前端，固定） | 自動化驗收／LOOP 紅→綠，不用另開視窗手動啟服務 |
 
-> 一鍵 E2E 模式的前端埠**固定 3199**（`run-e2e.ps1` 用 `--port 3199` 啟動），跟手動模式的預設埠 3100 不是同一個，兩者互不影響、也不需要同時開著。
+> 一鍵 E2E 模式的前端埠**預設 3199**（被占用就設 `BASE_URL` 換，API 用 `API_URL`），跟手動模式的預設埠 3100 不是同一個，兩者互不影響；加 `-ReuseRunning` 可以沿用已經開著的前端。
 
 > 測試數量、種子筆數等實測值以 `step3_new_module/docs/` 文件與 step4 實跑為準，本 README 不預先寫死。
 
@@ -71,4 +71,4 @@ step3 的 PRD 是從**某防救災系統的真實頁面**（中心裝備物資�
 - **與 Backend Live 版的關係**：本 EASY 版是 `AI_CRUD_Workshop_Backend_Live` 的簡化教學版：拿掉雙 Track 對照、完整 TDD 紅綠燈治理、QA mutation 等進階內容，聚焦「harness＋範本＝快速完工」一條主線。上完 EASY 想深入，再去 Live 版。
 
 ---
-教材由 Claude（Fable 5）多代理協作產出、Codex（GPT-5.6）對抗審查、實跑驗證後發佈。建置紀錄見 [BUILD_LOG.md](BUILD_LOG.md)。
+教材由 Claude 多代理協作產出、Codex 對抗審查、實跑驗證後發佈。建置紀錄見 [BUILD_LOG.md](BUILD_LOG.md)。

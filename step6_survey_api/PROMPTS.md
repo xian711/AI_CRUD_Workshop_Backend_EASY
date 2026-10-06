@@ -1,102 +1,80 @@
-# step6 起手 prompt（三段，照順序貼）
+# step6｜Prompt 包（三段，照順序貼）
 
-> **在哪裡貼**：`step6_survey_api/my-survey-api/` 資料夾底下開 AI Agent（要能讀檔改檔），
-> 工作目錄就是那個專案根目錄——這樣 AI 才會自動讀到 `CLAUDE.md`。
-> **貼之前先確認**：`PRD-課程回饋問卷.md` 已經複製進那個資料夾了。
+這一頁的 prompt 都可以整段複製貼上。用 **Agent 模式**跟 AI 對話（它要能自己讀檔、改檔、跑指令）。
 
----
+順序：
 
-## 第 1 段：先問問題，不要寫程式
+1. 照 README 第三節「準備工作區」把檔案放好。
+2. 在 `my-survey-api` 資料夾開 AI Agent，貼【第 1 段：起手】。
+3. AI 出選擇題，你一題一題回答（SCOPE 六題，見 README 第五節）。
+4. AI 照最小樣板交出 SRS-delta、設計文件-delta、圖和任務清單，你確認。
+5. 把模型切成 Sonnet 5.5，貼【第 2 段：開工】。AI 逐項寫程式，每做完一個回報一行。
+6. 在工作坊根目錄開一個新的 AI Agent，貼【第 3 段：LOOP】。AI 自己修到綠、自己開子代理挑錯，最後交回紀錄和報告。
 
-```
-你是這個 .NET CRUD 專案的後端工程師。
+> **貼之前先確認**：`my-survey-api` 根目錄看得到 `PRD-課程回饋問卷.md`、`useSurveyResponses.before.ts`、`SRS-設計文件-最小樣板.md` 三個檔（見 README 第三節）。
+> 工作目錄要是 `my-survey-api` 專案根目錄，AI 才會自動讀到 `CLAUDE.md`。
 
-先讀這些檔（不要跳過，也不要只讀一部分）：
-- CLAUDE.md（專案憲法：技術棧鎖定、10 條程式規則、契約要點）
-- CODE-RULES-api-本專案.md（程式與資料表細則）
-- contract-conventions-summary.md（狀態碼矩陣、ModelResult、SEQUENCE、D 決策）
-- docs/baseline/SRS-CRUD後端標準-v1.2.md 與 SDD-CRUD後端標準-v1.6.md（範本規格）
-- PRD-課程回饋問卷.md（本次需求）
-
-任務背景：
-PRD 是「寫給前端」的，前端已經做好了，資料存在瀏覽器 localStorage，
-資料層留了一行 `// TODO: DEV 串接 POST /api/survey`。
-現在要把那一行變成真的：做出 POST /api/survey 與 GET /api/survey。
-
-端點名稱是凍結的契約，必須逐字使用 /api/survey，不准改成 /api/survey/responses
-或任何你覺得比較漂亮的寫法——因為前端那一行已經那樣寫了。
-
-【現在請你做的事，只有這一件】
-這份 PRD 是寫給前端的，所以有些後端必須決定的事它沒有寫。
-請列出 5～7 題「需求釐清選擇題」問我，每題 2～4 個選項、標明你建議哪一個並說明理由。
-
-【嚴格禁止】
-- 不准開始寫任何程式碼、Entity、migration 或測試。
-- 不准自己替我決定，然後才「順便告訴我」。
-- 不准發明 PRD 裡沒有的欄位或商業規則。
-- 出完題就停下來等我回答。
-```
-
-**你應該看到**：AI 回你 5～7 題選擇題，涵蓋 id 產生、時間戳、選項值存法、後端要不要重驗、
-清空／匯出誰做、GET 要不要保護分頁。**如果它直接開始寫 Entity，代表它沒讀規則——重貼一次。**
+**模型怎麼選：** 文件階段（選擇題、SRS、設計文件、圖）用 **Opus 5.5**、effort High（effort＝讓 AI 想得多深的設定）；說「開工」前切成 **Sonnet 5.5** 寫程式；LOOP 的對抗審查子代理用 **Opus 5.5**。
 
 ---
 
-## 第 2 段：拍板之後，先出文件再出程式
+## 第 1 段：起手（在 `my-survey-api` 貼）
+
+> 複製下面四行。技術棧、build 零警告、不准刪測試這些鐵律已經寫在 `CLAUDE.md`，AI 會自己讀，prompt 不用重講。
 
 ```
-我的裁決如下（每題附我的理由）：
-
-Q1 <你的答案>：<理由>
-Q2 <你的答案>：<理由>
-Q3 <你的答案>：<理由>
-Q4 <你的答案>：<理由>
-Q5 <你的答案>：<理由>
-Q6 <你的答案>：<理由>
-
-【現在請你做的事】
-1. 產出 docs/SRS-問卷API-delta.md：只寫「與範本 SRS 不同的部分」。
-   範本已有的通則（分層、統一封裝、camelCase 契約、啟動自動遷移＋冪等 seed）不要重述。
-2. 產出 docs/SDD-問卷API-delta.md：只寫與範本 SDD 不同之處。
-   一定要包含：狀態碼矩陣（含 survey 列）、資料表綱要、以及
-   **每一處「偏離範本慣例」的地方和偏離的理由**。
-3. 產出 docs/TASKS.md：逐檔任務清單，每項標明檔名與大概在做什麼。
-
-【嚴格禁止】
-- 還是不准寫程式碼。先讓我看過文件與任務清單。
-- 不准偷加我沒裁決的功能（例如統計端點、匯出端點、軟刪除）。
-- 任務清單裡如果有 PRD 沒要求的東西，請單獨列在「建議但未經裁決」區塊，不要混進主清單。
-
-出完三份文件就停下來等我說「開工」。
+用 .NET CRUD 範本（人員 API）做「課程回饋問卷」的後端 API（POST／GET /api/survey），走規格驅動開發（SDD）：先文件，再程式。
+先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔、PRD-課程回饋問卷.md 和 useSurveyResponses.before.ts（前端現有的資料層：端點、欄位名、型別、中文單選值都以它為準），先不要寫程式。
+這份 PRD 是寫給前端的，後端要決定的事它沒寫：用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 docs/ 的 SRS-問卷API-delta.md、DESIGN-問卷API-delta.md、DIAGRAMS-問卷API.html 和 TASKS.md；等我說「開工」才寫程式，每做完一個回報一行。
 ```
 
-**你應該看到**：三份文件。**重點檢查「建議但未經裁決」區塊**——
-這就是 step1 第三項對照講的「多出來的東西」，harness 擋不住，要靠你在這裡擋。
+**你應該看到：**
+
+1. AI 先回 5～7 題選擇題，涵蓋 id 產生、時間戳、單選值存法、後端要不要重驗、清空／匯出誰做、GET 要不要保護與分頁。**它直接開始寫 Entity 的話，代表它沒照做——打斷它，重貼一次。**
+2. 你答完，AI 交出四個檔。照 `SRS-設計文件-最小樣板.md` 核：SRS-delta 四段、設計文件-delta 四段、圖四張，缺一樣就退回。
+3. 親自核 SRS-delta 第 1 段（裁決跟你說的一樣嗎）和第 3 段（範圍外）。**PRD 沒要求的東西，要是你點頭的，不是 AI 自己加的。**這就是 step1 第三項對照講的「多出來的東西」，harness 擋不住，要靠你在這裡擋。
+4. 跟範本慣例不同的地方（例如 Q1 的 id 前綴、Q3 的存法），設計文件-delta 要寫明「偏離了什麼、為什麼」。
 
 ---
 
-## 第 3 段：開工
+## 第 2 段：開工（同一個對話，先把模型切成 Sonnet 5.5）
 
 ```
-文件我看過了，開工。照 docs/TASKS.md 逐項實作。
-
-【完成的定義】（沒有全部達成就不算完成，不要提前回報）
-1. dotnet build 零 warning 零 error（Mapperly 警告視同錯誤）。
-2. dotnet test 全綠，且測試涵蓋：必填缺漏、選項值不在允許清單、字數上限、正常送出、查全部。
-3. POST /api/survey 回 201 + Location；驗證失敗回 400 且 errors 為 camelCase、訊息繁中。
-4. GET /api/survey 回 200，形狀是 ModelResult<List<T>>。
-5. 回應欄位剛好 10 欄，camelCase，逐字對齊：
-   id, name, org, satisfaction, bestSection, difficulty, adoptFirst, comment,
-   wouldRecommend, submittedAt
-
-【LOOP 規則（照 step4 學過的）】
-- 紅了先判因：是測試本身寫錯、API bug、還是資料庫 bug？講清楚再修。
-- 不准為了讓燈變綠而刪測試、放寬斷言、或改成寬鬆比對。
-- 同一個問題連續修兩次還沒好，停下來報告，不要無限撞牆。
-
-【回報格式】
-只列 changed files、build/test 結果、下一步，20 行內。
+文件我看過了，開工。照 docs/TASKS.md 逐項實作，每做完一個回報一行。
+完成的定義（全部達成才算完成，不要提前回報）：
+1. dotnet build 0 警告 0 錯誤；dotnet test 全綠，測試涵蓋：必填缺漏、單選值不在允許清單、rating 不在 1～5、字數上限（organization 30、suggestion 200）、正常送出、查全部（新的在最前面）。
+2. POST /api/survey 回 201＋Location；驗證失敗回 400，errors 的鍵是 camelCase、訊息繁中。GET /api/survey 回 200，形狀是 ModelResult<List<T>>。
+3. 端點、欄位名、型別、中文單選值都不准改，逐字對齊 useSurveyResponses.before.ts 的 SurveyResponse。回應剛好 10 欄：
+   id, respondentName, organization, rating, bestSection, difficulty, adoptPlan, suggestion, willRecommend, submittedAt
+   - rating 是數字 1～5；willRecommend 是字串「是」或「否」，不是 boolean。
+   - respondentName、suggestion 是選填，沒填時是空字串 ""。
+   - POST 的 body 是扣掉 id、submittedAt 的 8 欄；body 帶了 id、submittedAt 也要忽略。
+4. 單選值用中文，逐字含半形空格。DTO 的 [AllowedValues] 寫中文，跟資料庫 CHECK 共用同一份常數（比照範本 MemberEnums.cs）：
+   - bestSection：為什麼要 harness／範本與規矩／生成新模組／LOOP 驗證
+   - difficulty：太簡單／剛好／太難
+   - adoptPlan：寫 CODE-RULES／整理範本／PRD 流程／LOOP 驗證
+   - willRecommend：是／否
+   資料表用 text 或 varchar(n) 存中文（PostgreSQL 是 UTF-8，varchar(n) 算字數）。Q3 裁決改存英文 key 的話，對照表寫進設計文件-delta；API 進出一律是中文。
 ```
+
+**你應該看到**：AI 照任務清單一項一項做，每做完回報一行。做完先自己走一次 README 第六節的三路驗收。
+
+---
+
+## 第 3 段：LOOP（在工作坊根目錄貼）
+
+> 開一個新的 AI Agent，工作目錄是工作坊根目錄（`AI_CRUD_Workshop_Backend_EASY\`）。
+> 鐵律、埠、對抗審查、要交哪些檔，都寫在 `step4_loop_e2e/LOOP-規矩.md`（step6 的差別在第 7 節），AI 會自己讀，prompt 只要一句「照它做」。
+
+```
+你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做（step6 的差別在第 7 節），自己跑完，中途不要問我。
+受測：step6_survey_api/my-survey-api（API）。先在背景啟動它（埠被占就自己換），修到 dotnet build 0 警告、dotnet test 全綠。
+全綠後開一個子代理做對抗審查：先用 HTTP 實打 POST／GET /api/survey 的 201／400／200，再跑 verify-seam.ps1，對照 PRD 和 useSurveyResponses.before.ts 挑問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html，並更新 SRS-delta、設計文件-delta 和圖。
+```
+
+**你應該看到**：`step6_survey_api/my-survey-api/loop/` 裡有 `LOOP-LOG.md`（每輪的流水紀錄）和 `LOOP-REPORT.html`（給人看的報告，結論在最前面）。`docs/` 的三份文件有標「step6 LOOP 後」。
 
 ---
 
@@ -105,10 +83,13 @@ Q6 <你的答案>：<理由>
 | 歪樓 | 你會看到 | 打斷的話 |
 |---|---|---|
 | 端點改名 | 生出 `/api/survey/responses` 或 `/api/surveys` | 「端點是凍結契約，前端那行 TODO 寫的是 `/api/survey`，請改回來。契約以已經存在的那一端為準。」 |
-| 自己發明欄位 | 多了 `email`、`phone`、`rating` | 「PRD 第 3 節只有 8 個欄位，請刪掉 PRD 沒有的。不准發明需求。」 |
+| 自己發明欄位 | 多了 `email`、`phone`、`score` | 「PRD 第 3 節只有 8 個欄位，請刪掉 PRD 沒有的。不准發明需求。」 |
+| 欄位改名 | 生出 `name`／`org`／`satisfaction`，或把 `willRecommend` 做成 boolean | 「欄位名與型別以 `useSurveyResponses.before.ts` 的 `SurveyResponse` 為準，逐字對齊。契約以已經存在的那一端為準。」 |
+| 單選值換英文 | `[AllowedValues("too-easy", "just-right", "too-hard")]` | 「前端送來的就是中文『太簡單／剛好／太難』。`[AllowedValues]` 要寫中文，逐字含半形空格。」 |
 | 偷加端點 | 多了 `GET /api/survey/{id}`、`/api/survey/stats` | 「PRD 第 6 節明講範圍外。沒經過裁決的一律移除，要建議請列在單獨區塊。」 |
+| 文件少段落、沒有圖 | 只有 SRS-delta，或沒有 `DIAGRAMS-問卷API.html` | 「照 SRS-設計文件-最小樣板.md 補齊：SRS-delta 四段、設計文件-delta 四段、DIAGRAMS 四張圖。補完再停下等我。」 |
 | 回應沒封裝 | 直接回 `List<SurveyResponse>` | 「回應一律 `ModelResult<T>` 封裝，見 `contract-conventions-summary.md`。唯一例外是 DELETE 204。」 |
-| 錯誤訊息英文 | `"Org is required"` | 「對外訊息一律繁體中文，見 `CLAUDE.md` 第 9 條。」 |
+| 錯誤訊息英文 | `"Organization is required"` | 「對外訊息一律繁體中文，見 `CLAUDE.md` 第 9 條。」 |
 | 假綠 | 測試改寬鬆、刪掉斷言 | 「把斷言改回去。測試變綠的唯一合法方式是修好 App，不是放寬測試。」 |
 | 直接改資料庫 | 用 SQL 手動加欄位 | 「改綱要一律走 EF migration，見 `CLAUDE.md` 第 7 條。」 |
 

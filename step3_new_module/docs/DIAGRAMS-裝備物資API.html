@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML 圖面 — 中心裝備物資 API</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --sub: #555;
+    --accent: #0084d1;
+    --line: #d9d9d9;
+    --bg-soft: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    color: var(--ink);
+    background: #fff;
+    font-size: 20px;
+    line-height: 1.7;
+  }
+  header {
+    padding: 48px 6vw 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 { font-size: 44px; margin: 0 0 8px; }
+  header p  { font-size: 22px; color: var(--sub); margin: 0; }
+  nav {
+    padding: 16px 6vw;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+    font-size: 19px;
+  }
+  nav a { color: var(--accent); text-decoration: none; margin-right: 20px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+  section {
+    padding: 40px 4vw 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  section h2 {
+    font-size: 34px;
+    margin: 0 0 6px;
+    color: var(--accent);
+  }
+  section p.desc {
+    font-size: 22px;
+    color: var(--sub);
+    margin: 0 0 20px;
+  }
+  /* 圖照原尺寸畫（字才夠大），比畫面寬就左右捲動，不縮小 */
+  .mermaid {
+    width: 100%;
+    overflow-x: auto;
+    background: #fff;
+    text-align: center;
+  }
+  .mermaid svg { max-width: none !important; height: auto; }
+  footer {
+    padding: 28px 6vw 60px;
+    font-size: 18px;
+    color: var(--sub);
+  }
+  @media print { nav { display: none; } section { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>UML 圖面 — 中心裝備物資 API（課堂版參考解）</h1>
+  <p>對應文件（同資料夾）：SRS-裝備物資API-delta.md（需求差異）、DESIGN-裝備物資API-delta.md（設計文件差異）｜ 路由：api/equipment/items ｜ PM 看圖就好，不用看程式。</p>
+</header>
+
+<nav>
+  <a href="#layers">① 分層架構圖</a>
+  <a href="#er">② 資料表 ER 圖</a>
+  <a href="#seq-create">③ 循序圖：POST 新增＋編碼產生</a>
+  <a href="#status">④ 狀態碼矩陣</a>
+</nav>
+
+<section id="layers">
+  <h2>① 分層架構圖：哪些新增、哪些共用不動</h2>
+  <p class="desc">一個請求從上往下走：Controller 只轉交，商業邏輯全在 Service，再經 EF Core 落進 PostgreSQL。每一列是一層。橘色＝裝備模組新增的檔；綠色＝既有檔「只加不改」；藍色＝範本共用零件，一個字都不動。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':40,'rankSpacing':60}}}%%
+flowchart TB
+  CLIENT["前端 fullchain-app（devProxy /api/equipment）或 Swagger"]
+  subgraph LC["Controller 層：只轉交、對映狀態碼"]
+    direction LR
+    CTRL["EquipmentItemsController<br/>呼叫 Service → 狀態碼"]:::new
+    ARE["ApiResultExtensions<br/>Success → 200／404"]:::share
+    GEH["GlobalExceptionHandler<br/>未預期例外 → 500"]:::share
+    PROG["Program.cs<br/>＋註冊兩行"]:::ext
+  end
+  subgraph LS["Service 層：商業邏輯全在這"]
+    direction LR
+    SVC["EquipmentService<br/>產 id、算 code、查無回失敗"]:::new
+    ENUM["EquipmentEnums<br/>分類與項目碼字典（常數）"]:::new
+    MR["ModelResult<br/>{ success, message, data }"]:::share
+  end
+  subgraph LM["DTO 與映射"]
+    direction LR
+    DTO["EquipmentItemRequest／Result<br/>驗證規則、camelCase"]:::new
+    MAP["EquipmentMapper<br/>Mapperly 編譯期映射"]:::new
+  end
+  subgraph LD["資料層：EF Core"]
+    direction LR
+    DBC["AppDbContext<br/>＋DbSet、SEQUENCE、CHECK、唯一索引"]:::ext
+    ENT["EquipmentItem<br/>Entity"]:::new
+    SEEDER["DbSeeder<br/>＋表空才植入"]:::ext
+    SEED["EquipmentSeedData<br/>24 筆種子"]:::new
+    MIG["Migration<br/>AddEquipmentModule"]:::new
+  end
+  MEM["人員 Members 全套（Controller、Service、DTO、測試）<br/>和裝備模組並存，不動"]:::share
+  PG[("PostgreSQL ai_crud_equipment<br/>資料表 equipment_item")]
+  CLIENT --> CTRL
+  CTRL --> SVC
+  SVC --> MAP
+  MAP --> DBC
+  DBC --> PG
+  classDef new fill:#fff4e0,stroke:#e6a23c
+  classDef ext fill:#eaf6ec,stroke:#3c9a52
+  classDef share fill:#e8f4fb,stroke:#0084d1
+  style PG fill:#f7f8fa,stroke:#999
+  </pre>
+</section>
+
+<section id="er">
+  <h2>② 資料表 ER 圖：一筆品項怎麼存</h2>
+  <p class="desc">只有一張主表 equipment_item（欄名 snake_case）。id 由 SEQUENCE 取號；code 有唯一索引；分類字典是程式常數，不建表、沒有外鍵（虛線）。選填欄存 null。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'er':{'fontSize':26,'entityPadding':18}}}%%
+erDiagram
+  equipment_item_seq ||--o{ equipment_item : "nextval 產 id（E-025 起）"
+  EquipmentEnums ||..o{ equipment_item : "常數字典驗證 category_key（不建表、無外鍵）"
+  equipment_item {
+    varchar id PK "E-###，長度 10"
+    varchar code UK "IT-LAP-001，同前綴流水，唯一索引"
+    varchar category_key "必填，CHECK 屬於 10 類"
+    varchar name "必填，長度 50"
+    integer qty "必填，大於等於 0"
+    varchar unit "必填，長度 10"
+    varchar spec1 "必填，長度 200"
+    varchar keeper "選填，可 null"
+    varchar keeper_phone "選填，填了才驗格式"
+    varchar location_name "選填，可 null"
+    varchar status "必填，CHECK normal maintenance scrapped"
+    date purchase_date "選填，可 null，不晚於今天"
+    varchar spec_note "選填，長度 500"
+    date updated_at "系統寫入，本地時區"
+  }
+  equipment_item_seq {
+    bigint start "起始 25（種子佔 1 到 24）"
+  }
+  EquipmentEnums {
+    string value "例：ICT"
+    string code2 "類別 2 碼，例：IT"
+    string label "例：資通訊設備"
+  }
+  </pre>
+</section>
+
+<section id="seq-create">
+  <h2>③ 循序圖：POST 新增＋編碼在交易內產生</h2>
+  <p class="desc">先過驗證；有錯直接回 400，不進 Service。通過後在同一個交易裡：先取 id、再查同前綴最大流水號 +1 算出 code、寫入、提交。唯一索引 ux_equipment_item_code 是最後防線：真的撞號會丟例外、回 500，不會靜默重號。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','fontSize':22,'themeVariables':{'fontSize':'22px'},'sequence':{'actorFontSize':22,'messageFontSize':22,'noteFontSize':22,'width':260}}}%%
+sequenceDiagram
+  actor U as 前端／Swagger
+  participant V as 框架驗證（DTO 規則）
+  participant C as EquipmentItemsController
+  participant S as EquipmentService
+  participant DB as PostgreSQL
+
+  U->>V: POST /api/equipment/items（發電機，JSON camelCase）
+  V->>V: 必填、qty 大於等於 0、分類與狀態允許值、電話格式、日期不晚於今天
+  alt 驗證失敗
+    V-->>U: 400，errors 鍵 camelCase、繁中訊息（例：qty「數量不可小於 0」）
+  else 驗證通過
+    V->>C: Create(request)
+    C->>S: Create(request)
+    S->>DB: BEGIN 交易
+    S->>DB: SELECT nextval('equipment_item_seq')
+    DB-->>S: 25 → id = E-025
+    S->>DB: 查前綴 PW-GEN- 的現有 code
+    DB-->>S: PW-GEN-001、PW-GEN-002 → 最大流水 2
+    S->>S: code = PW-GEN-003；updatedAt = 今天（本地時區）
+    S->>DB: INSERT equipment_item
+    S->>DB: COMMIT
+    Note over S,DB: 唯一索引是最後防線（撞號 → 500）
+    S-->>C: ModelResult { success: true, data }
+    C-->>U: 201 Created ＋ Location: /api/equipment/items/E-025
+  end
+  </pre>
+</section>
+
+<section id="status">
+  <h2>④ 狀態碼矩陣：五條路由會回什麼</h2>
+  <p class="desc">一列一條路由，右邊是它會回的狀態碼。綠色＝成功，橘色＝預期的失敗，紅色＝未預期例外。除了 DELETE 成功的 204，成功和 404 都包成 ModelResult（{ success, message, data }）；400 是框架的驗證格式，errors 的鍵是 camelCase、訊息是繁中；409 契約保留，本版不發出（虛線框）。</p>
+  <pre class="mermaid">
+%%{init: {'theme':'neutral','themeVariables':{'fontSize':'22px'},'flowchart':{'nodeSpacing':24,'rankSpacing':80}}}%%
+flowchart LR
+  GL["GET /items<br/>查全部"] --> GL1["200 全量（id 升冪）"]:::ok
+  GO["GET /items/{id}<br/>查單筆"] --> GO1["200 單筆"]:::ok
+  GO --> GO2["404 查無"]:::warn
+  PO["POST /items<br/>新增"] --> PO1["201＋Location<br/>id、code 後端產生"]:::ok
+  PO --> PO2["400 驗證失敗"]:::warn
+  PU["PUT /items/{id}<br/>更新"] --> PU1["200 更新後的資料"]:::ok
+  PU --> PU2["400 驗證失敗"]:::warn
+  PU --> PU3["404 查無（不做 upsert）"]:::warn
+  DE["DELETE /items/{id}<br/>硬刪除"] --> DE1["204 無主體（唯一不封裝）"]:::ok
+  DE --> DE2["404 再刪一次就查無"]:::warn
+  ANY["任一路由：未預期例外<br/>（DB 斷線、撞號）"] -.-> E500["500 GlobalExceptionHandler<br/>不外露細節"]:::bad
+  R409["409：契約保留，本版不發出"]:::reserved
+  classDef ok fill:#eaf6ec,stroke:#3c9a52
+  classDef warn fill:#fff4e0,stroke:#e6a23c
+  classDef bad fill:#fdecec,stroke:#c8232c
+  classDef reserved fill:#f7f8fa,stroke:#999,stroke-dasharray: 5 5
+  </pre>
+</section>
+
+<footer>
+  <p>圖面基準：同資料夾 DESIGN-裝備物資API-delta.md、SRS-裝備物資API-delta.md，實作在 step3_new_module/solution-api/。本頁為獨立 HTML，需網路載入 Mermaid（jsDelivr CDN）；圖照原尺寸畫，比畫面寬時可以左右捲動。</p>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true, theme: 'neutral', securityLevel: 'loose',
+    // 不縮小到畫面寬：照原尺寸畫，字級才是真的 22px
+    flowchart: { useMaxWidth: false }, sequence: { useMaxWidth: false }, er: { useMaxWidth: false, fontSize: 26 },
+  });
+</script>
+</body>
+</html>

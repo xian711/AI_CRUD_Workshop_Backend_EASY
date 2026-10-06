@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 namespace CrudTemplate.Api.Mapping;
 
 /// <summary>
-/// 裝備物資映射設定（Mapperly source generator，映射碼於編譯期產生，SDD-delta §6）。
+/// 裝備物資映射設定（Mapperly source generator，映射碼於編譯期產生，DESIGN-delta §6）。
 /// </summary>
 /// <remarks>
 /// <c>RequiredMappingStrategy.Target</c>：目標有欄位未被映射 → 編譯期警告（csproj 設為錯誤）。

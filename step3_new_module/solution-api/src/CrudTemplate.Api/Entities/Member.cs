@@ -1,7 +1,7 @@
 namespace CrudTemplate.Api.Entities;
 
 /// <summary>
-/// 資料表 <c>template_member</c> 對應實體（SDD §4.1）。
+/// 資料表 <c>template_member</c> 對應實體（DESIGN §4.1）。
 /// </summary>
 /// <remarks>
 /// PascalCase 屬性由 DbContext 命名轉換映射為 snake_case 欄位（NFR-B-07）。
@@ -49,7 +49,7 @@ public class Member
     /// <summary>職務代碼（director / deputy / leader / member）。</summary>
     public string PositionCode { get; set; } = string.Empty;
 
-    /// <summary>多值資格（EF primitive collection → PostgreSQL 原生 text[] 陣列欄位，SDD §4.3）。</summary>
+    /// <summary>多值資格（EF primitive collection → PostgreSQL 原生 text[] 陣列欄位，DESIGN §4.3）。</summary>
     public List<string> Qualifications { get; set; } = [];
 
     /// <summary>狀態（在職 / 停用）。</summary>

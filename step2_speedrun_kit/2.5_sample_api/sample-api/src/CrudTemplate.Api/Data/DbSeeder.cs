@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CrudTemplate.Api.Data;
 
 /// <summary>
-/// 冪等 seed：資料表為空才植入 24 筆種子（SDD §8，FR-B-602 / NFR-B-02）。
+/// 冪等 seed：資料表為空才植入 24 筆種子（DESIGN §8，FR-B-602 / NFR-B-02）。
 /// </summary>
 /// <remarks>
 /// 假設單一應用實例啟動；多實例同時冷啟的競態（兩邊都判空而重複植入）不在本教學範圍。

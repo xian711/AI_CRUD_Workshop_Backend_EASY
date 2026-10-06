@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CrudTemplate.Api.Controllers;
 
 /// <summary>
-/// 人員 CRUD 控制器（SDD §2 / §3）。薄委派：委派 Service → 依 Success 對映狀態碼。
+/// 人員 CRUD 控制器（DESIGN §2 / §3）。薄委派：委派 Service → 依 Success 對映狀態碼。
 /// </summary>
 /// <remarks>
 /// 禁止查詢/組路徑/商業判斷（皆在 Service）。JWT 接縫：未來以 <c>User</c>(ClaimsPrincipal) 傳入 Service（FR-B-702，本版不啟用）。
