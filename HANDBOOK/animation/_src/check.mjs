@@ -15,6 +15,7 @@ const errs = []
 p.on('pageerror', e => errs.push(e.message))
 p.on('console', m => { if (m.type() === 'warning' || m.type() === 'error') errs.push(m.text()) })
 p.on('requestfailed', r => errs.push('fail ' + r.url()))
+await p.addInitScript(() => { window.__noFreeze = true })   // 截圖要完整畫面：暫停中也讓動畫跑完
 await p.goto(pathToFileURL(file).href)
 await p.waitForTimeout(1500)
 await p.click('#bVoice')
