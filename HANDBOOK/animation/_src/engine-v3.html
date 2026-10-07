@@ -310,7 +310,10 @@ function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth){t
 const PRE=new Map();
 function preAudio(src){let a=PRE.get(src);if(!a){a=new Audio();a.preload='auto';a.src=src;try{a.load();}catch(e){}PRE.set(src,a);}return a;}
 function preloadAhead(i,k,n){let c=i,s=k;for(let m=0;m<n;m++){s++;if(!scenes[c]||s>=scenes[c].steps.length){c++;s=0;}if(!scenes[c])break;const q=recFor(c,s);if(q)preAudio(q.src);}}
-function playRec(r,tok){stopAudio();const a=preAudio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;try{a.currentTime=0;}catch(e){}
+/* 背景預載：一次一個排隊（載好或 4 秒後才換下一個），不跟正在播的那句搶頻寬 */
+function bgPreload(list){let i=0;const next=()=>{if(i>=list.length)return;const a=preAudio(list[i++]);if(a.readyState>=4){setTimeout(next,50);return;}let done=false;const go=()=>{if(done)return;done=true;setTimeout(next,100);};a.addEventListener('canplaythrough',go,{once:true});a.addEventListener('error',go,{once:true});setTimeout(go,4000);};next();next();next();}
+function loadingNote(a){const n=$('voiceNote');if(!n)return;if(a.readyState>=3){if(n.dataset.loading){n.hidden=true;delete n.dataset.loading;}return;}n.textContent='聲音載入中…';n.hidden=false;n.dataset.loading='1';const off=()=>{if(n.dataset.loading){n.hidden=true;delete n.dataset.loading;}};a.addEventListener('playing',off,{once:true});a.addEventListener('error',off,{once:true});}
+function playRec(r,tok){stopAudio();const a=preAudio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;try{a.currentTime=0;}catch(e){}loadingNote(a);
   preloadAhead(cur,stepI,4);
   const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
   const fail=()=>{if(tok!==stepToken)return;stopAudio();speak(scenes[cur].steps[stepI][0],tok);};
@@ -330,7 +333,7 @@ function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textCo
   try{if(window.parent!==window)window.parent.postMessage({type:'anim:state',anim:ANIM_ID,scene:cur+1,step:stepI+1,title:s.title,text:s.steps[stepI][0],total:scenes.length},'*');}catch(e){}
   const w=$('askWhere');if(w)w.textContent=`正在看：第 ${cur+1} 段　${s.title}`;}
 let gotoTok=0;
-function goto(i,s){clearTimeout(timer);stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
+function goto(i,s){clearTimeout(timer);if(HAS_REC){const q=recFor(i,s);if(q)preAudio(q.src);preloadAhead(i,s,3);}stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
   instant=true;svg.classList.add('instant');layer.innerHTML='';L=layer;refs=scenes[i].build()||{};
   for(let k=0;k<s;k++)scenes[i].steps[k][1](refs);
   svg.getBoundingClientRect();
@@ -343,7 +346,7 @@ function setPlaying(p){clearTimeout(timer);if(p){$('bStart').hidden=true;}
   if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&isRec()&&recFor(cur,stepI)){const done=recResume?recResume.t*1000/speed:0;remain=stepDur-done;}else if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
   else if(!p&&playing){playing=false;if(curAudio&&curAudio._rec)recResume={k:curAudio._rec,t:curAudio.currentTime};stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
 window.__dbg=()=>({cur,stepI,playing,curAudio});
-setTimeout(()=>{if(HAS_REC){const q=recFor(cur,stepI);if(q)preAudio(q.src);preloadAhead(cur,stepI,4);}},300);
+setTimeout(()=>{if(HAS_REC){const q=recFor(cur,stepI);if(q)preAudio(q.src);preloadAhead(cur,stepI,4);setTimeout(()=>bgPreload(scenes.map((_,i)=>recFor(i,0)).filter(Boolean).map(q=>q.src)),2500);}},300);
 $('bPlay').addEventListener('click',()=>{if(ended){playing=true;$('bPlay').textContent='⏸ 暫停';goto(0,0);return;}setPlaying(!playing);});
 $('bStart').addEventListener('click',()=>{setPlaying(true);});
 ['chips','bNext','bPrev','bNextScene','bPrevScene'].forEach(id=>$(id).addEventListener('click',()=>{$('bStart').hidden=true;}));
