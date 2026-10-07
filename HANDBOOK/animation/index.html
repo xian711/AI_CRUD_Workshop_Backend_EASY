@@ -1203,7 +1203,12 @@ function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth){t
   u.onend=()=>next(700/speed);
   u.onerror=e=>{if(e.error==='interrupted'||e.error==='canceled')return;next(Math.max(300,stepDur-(performance.now()-stepStart)));};
   setTimeout(()=>{if(tok===stepToken&&playing)synth.speak(u);},60);}
-function playRec(r,tok){stopAudio();const a=new Audio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;
+/* 預先載入：接下來幾句的 mp3 先下載好，輪到時馬上出聲（線上版不用等下載） */
+const PRE=new Map();
+function preAudio(src){let a=PRE.get(src);if(!a){a=new Audio();a.preload='auto';a.src=src;try{a.load();}catch(e){}PRE.set(src,a);}return a;}
+function preloadAhead(i,k,n){let c=i,s=k;for(let m=0;m<n;m++){s++;if(!scenes[c]||s>=scenes[c].steps.length){c++;s=0;}if(!scenes[c])break;const q=recFor(c,s);if(q)preAudio(q.src);}}
+function playRec(r,tok){stopAudio();const a=preAudio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;try{a.currentTime=0;}catch(e){}
+  preloadAhead(cur,stepI,4);
   const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
   const fail=()=>{if(tok!==stepToken)return;stopAudio();speak(scenes[cur].steps[stepI][0],tok);};
   if(recResume&&recResume.k===r.src){a.currentTime=recResume.t;}recResume=null;
@@ -1235,6 +1240,7 @@ function setPlaying(p){clearTimeout(timer);if(p){$('bStart').hidden=true;}
   if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&isRec()&&recFor(cur,stepI)){const done=recResume?recResume.t*1000/speed:0;remain=stepDur-done;}else if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
   else if(!p&&playing){playing=false;if(curAudio&&curAudio._rec)recResume={k:curAudio._rec,t:curAudio.currentTime};stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
 window.__dbg=()=>({cur,stepI,playing,curAudio});
+setTimeout(()=>{if(HAS_REC){const q=recFor(cur,stepI);if(q)preAudio(q.src);preloadAhead(cur,stepI,4);}},300);
 $('bPlay').addEventListener('click',()=>{if(ended){playing=true;$('bPlay').textContent='⏸ 暫停';goto(0,0);return;}setPlaying(!playing);});
 $('bStart').addEventListener('click',()=>{setPlaying(true);});
 ['chips','bNext','bPrev','bNextScene','bPrevScene'].forEach(id=>$(id).addEventListener('click',()=>{$('bStart').hidden=true;}));
