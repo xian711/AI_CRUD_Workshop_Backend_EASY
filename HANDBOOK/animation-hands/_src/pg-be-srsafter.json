@@ -1,0 +1,1 @@
+{"url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml-after/SRS-裝備物資API-delta.html", "vp": [1240, 644], "dsf": 1.9, "wait": 600, "shots": [{"name": "be-srs-after", "goto": "5. step4 LOOP 後", "up": 10, "boxes": {"h": {"sel": "h1, h2, h3", "hasText": "5. step4 LOOP 後"}}}]}

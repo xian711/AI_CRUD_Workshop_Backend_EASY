@@ -1,0 +1,1 @@
+{"a":"feval","purpose":"webviewPanel","js":"([...document.querySelectorAll('button')].some(b=>b.getBoundingClientRect().width && /^(Stop|Interrupt)/.test(b.getAttribute('aria-label')||'')) || /[0-9]+ agents?/.test(document.body.innerText.slice(-400))) ? 'busy' : 'idle'"}

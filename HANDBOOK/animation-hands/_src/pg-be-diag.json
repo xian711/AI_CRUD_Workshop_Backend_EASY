@@ -1,0 +1,7 @@
+{"url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-裝備物資API.html", "vp": [1240, 644], "dsf": 1.9, "wait": 2500, "shots": [
+ {"name": "be-diag-top", "boxes": {"h1": "h1", "h2": "h2"}},
+ {"name": "be-diag-layers", "goto": "① 分層架構", "up": 10, "boxes": {"h": {"text": "① 分層架構", "exact": false, "last": true}, "svg": "section:nth-of-type(1) svg"}},
+ {"name": "be-diag-er", "goto": "② 資料表", "up": 10, "boxes": {"h": {"text": "② 資料表", "exact": false, "last": true}, "svg": "section:nth-of-type(2) svg"}},
+ {"name": "be-diag-seq", "goto": "③ POST", "up": 10, "boxes": {"h": {"text": "③ POST", "exact": false, "last": true}, "svg": "section:nth-of-type(3) svg"}},
+ {"name": "be-diag-status", "goto": "④", "up": 10, "boxes": {"h": {"text": "④", "exact": false, "last": true}, "svg": "section:nth-of-type(4) svg"}}
+]}

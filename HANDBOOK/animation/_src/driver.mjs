@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { launch, workbench, sleep, K, clipRead, clipWrite, W, meta, termRows, rowBox, sizeWin } from './vsc-lib.mjs'
 const Q = W + '/q'; fs.mkdirSync(Q, { recursive: true })
-const folder = process.env.FOLDER || 'D:\\AI_CRUD_Workshop_Frontend_EASY'
+const folder = process.env.FOLDER === 'none' ? undefined : (process.env.FOLDER || 'D:\\AI_CRUD_Workshop_Frontend_EASY')
 const extra = process.env.SETTINGS ? JSON.parse(process.env.SETTINGS) : {}
 let { app } = await launch({ folder, settings: { 'git.enabled': false, ...extra } })
 let p = await workbench(app)

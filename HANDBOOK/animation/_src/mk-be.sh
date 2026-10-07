@@ -6,7 +6,7 @@ OUT=${1:-out-be}
 python prep.py "$OUT" || exit 1
 python build_be_data.py "$OUT" || exit 1
 ANIM_ASSETS=. python build.py --engine engine-v3.html --extra-helpers helpers-crud.js be-data.js v3-helpers.js --scenes scenes-be.js --meta "$OUT/meta.json" \
-  --out-dir "$OUT" --name anim --title "AI CRUD 後端課動畫" --h1 "AI CRUD 後端工作坊 EASY 版　手把手教學動畫" \
+  --out-dir "$OUT" --name anim --title "AI CRUD 後端課動畫" --h1 "AI CRUD 後端工作坊 EASY 版　教學動畫（講課版）" \
   --subtitle ".NET API＋PostgreSQL：harness・SDD・LOOP・對抗審查，全程實拍　·　小芸＋阿哲預錄配音（AI 語音）" --after after.html || exit 1
 if [ -n "$2" ]; then
   rm -rf check; mkdir -p check

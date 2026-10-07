@@ -11,10 +11,11 @@ function hd(n, eb) { mhead(eb, window.__script[n - 1].title); }
 // 右上角：這一段誰講
 function speakerBadge(who) {
   if (!who) return;
-  const col = who === '小芸' ? C.coral : C.teal, role = who === '小芸' ? '方法和觀念' : '實拍示範';
-  const g = grp(L, false); R(g, 1300, 14, 230, 40, { fill: '#0b1520', stroke: col, sw: 2, rx: 20 });
-  mk('circle', { cx: 1322, cy: 34, r: 11, fill: col }, g);
-  T(g, 1342, 42, who + '｜' + role, { size: 20, weight: 800, fill: col });
+  const col = who === '小芸' ? C.coral : C.teal, role = (window.__roles || {})[who] || (who === '小芸' ? '方法和觀念' : '實拍示範');
+  const w = Math.max(230, 66 + (who.length + 1 + role.length) * 21), x = 1530 - w;
+  const g = grp(L, false); R(g, x, 14, w, 40, { fill: '#0b1520', stroke: col, sw: 2, rx: 20 });
+  mk('circle', { cx: x + 22, cy: 34, r: 11, fill: col }, g);
+  T(g, x + 42, 42, who + '｜' + role, { size: 20, weight: 800, fill: col });
 }
 // 指令字卡：完整指令放在畫面上，聲音不逐字念
 function cmdCard(x, y, w, lines, title, o = {}) {
