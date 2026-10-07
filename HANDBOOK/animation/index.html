@@ -196,7 +196,7 @@
 <section class="after">
   <h2>文字版速查</h2>
   <p>動畫裡的畫面，都是 2026-10-07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome（Swagger）、psql。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
-  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。播放器下面的「聲音」可以改回瀏覽器內建的聲音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
+  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。聲音全部是預錄好的 mp3 檔，播放時不用連 AI、不花 token，也不用瀏覽器內建的語音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
   <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。後端的文件叫 <b>delta</b>：只寫跟人員範本不同的地方。三份：<b>SRS-delta</b>（這一版答應了什麼）、<b>設計文件 DESIGN-delta</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
   <div class="roles">
     <div class="role" style="--c:#f4b942">
@@ -1164,7 +1164,7 @@ function centerIn(box,el){if(!box||!el||el.hidden||box.scrollWidth<=box.clientWi
 $('bFull').addEventListener('click',()=>{const el=$('player');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});});
 function durOf(t){return Math.min(15000,Math.max(4200,t.length*250+1300))/speed;}
 /* ---------- 語音 ---------- */
-const synth=('speechSynthesis' in window)?window.speechSynthesis:null;let voiceOn=!!synth,voices=[],stepToken=0;
+const synth=(!(window.__audio&&Object.keys(window.__audio).length)&&('speechSynthesis' in window))?window.speechSynthesis:null;/* 有預錄配音就只用預錄，不用瀏覽器語音 */let voiceOn=!!synth,voices=[],stepToken=0;
 const CIRC='①②③④⑤⑥⑦⑧⑨⑩';
 function spoken(t){(window.__spoken||[]).forEach(([re,s])=>{t=t.replace(re,s);});return t.replace(/[\u2460-\u2469]/g,c=>(CIRC.indexOf(c)+1)+' 號').replace(/!(\d+)/g,'$1 號').replace(/(\d+):(\d+)/g,'$1 比 $2').replace(/＝/g,'等於').replace(/・/g,' ').replace(/○○/g,'某某').replace(/～/g,'到').replace(/→/g,'到').replace(/＋/g,'加').replace(/／/g,'、').replace(/([A-Za-z0-9.\-]+)\/([A-Za-z0-9.\-]+)/g,'$1 $2').replace(/[「」（）]/g,' ');}
 let CLOUD=false,curAudio=null;const audioCache=new Map();
@@ -1279,7 +1279,7 @@ $('askClose').addEventListener('click',()=>openAsk(false));
 $('askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('askInput').value.trim();if(!q)return;$('askInput').value='';ask(q);});
 const TIPS=(window.__askTips||[]);TIPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>ask(t));$('askTips').appendChild(b);});
 fetch('/api/config',{headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(j=>{if(!j)throw 0;
-  CLOUD=true;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
+  CLOUD=!HAS_REC;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
   if(j.live&&!EMBED){const b=$('bAsk');b.hidden=false;b.addEventListener('click',()=>openAsk(!$('askDrawer').classList.contains('open')));}
 }).catch(()=>{if(ASK_URL&&!EMBED){const b=$('bAsk');const a=document.createElement('a');a.className='askbtn';a.href=ASK_URL;a.target='_blank';a.rel='noopener';a.textContent='💬 問小港（另開網頁）';a.style.textDecoration='none';b.replaceWith(a);}});
 /* ---------- 版面：把整個播放器（標題＋導覽＋舞台＋字幕＋控制列）塞進第一屏 ----------
