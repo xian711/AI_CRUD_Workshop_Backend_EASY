@@ -117,8 +117,11 @@ test('E2 新增品項後 reload：新增的那一筆在重新整理後仍然存�
 
 // ── E3 後端編碼格式（Create → 後端產碼）────────────────────────────
 // 觀念：品項編碼由「後端」在交易內產生（前綴＋流水），前端只做預覽。驗其格式與前綴。
-test('E3 新增後編碼格式：後端產生的 code 為「類別2碼-項目3碼-流水3碼」', async ({ page }) => {
+// 注意：搜尋前綴會同時查到種子（IT-TAB-001），所以不能讀「第一列」——先用唯一規格說明
+//       從後端 API 找到「剛新增的那一筆」，拿後端真正存的 code 驗格式，再回畫面查那一筆。
+test('E3 新增後編碼格式：後端產生的 code 為「類別2碼-項目3碼-流水3碼」', async ({ page, request }) => {
   await page.goto(LIST)
+  await readCount(page)
 
   await page.getByRole('button', { name: '新增品項' }).click()
   await pickOption(page, page.locator('[data-field="categoryKey"]'), '資通訊設備')
@@ -127,17 +130,28 @@ test('E3 新增後編碼格式：後端產生的 code 為「類別2碼-項目3�
   const preview = (await page.locator('[data-field="code"] input').inputValue()).trim()
   expect(preview).toMatch(/^IT-TAB-\d{3}$/) // 資通訊(IT)-平板電腦(TAB)-流水
 
+  const spec = `E3 編碼格式驗證｜10 吋平板｜${Date.now()}`
   await page.locator('[data-field="qty"] input').fill('3')
   await page.locator('[data-field="unit"] input').fill('台')
-  await page.locator('[data-field="spec1"] textarea').fill('E3 編碼格式驗證｜10 吋平板')
+  await page.locator('[data-field="spec1"] textarea').fill(spec)
   await page.getByRole('button', { name: '儲存' }).click()
   await expect(page.getByText('已新增品項')).toBeVisible()
 
-  // 在列表用前綴查回，讀「項目」欄實際顯示的編碼，斷言整體格式（兩碼-三碼-三碼）
-  await searchBy(page, 'IT-TAB-')
-  const shownCode = (await firstRow(page).locator('td').nth(1).locator('div').last().innerText()).trim()
-  expect(shownCode).toMatch(/^[A-Z]{2}-[A-Z]{3}-\d{3}$/)
-  expect(shownCode.startsWith('IT-TAB-')).toBeTruthy()
+  // 後端真正存的 code：用唯一規格說明在 API 回應裡找到這一筆
+  const res = await request.get(API)
+  expect(res.ok()).toBeTruthy()
+  const items = (await res.json()).data as Array<{ code: string; spec1: string }>
+  const created = items.find(it => it.spec1 === spec)
+  expect(created, `API 回應中應含剛新增的「${spec}」`).toBeTruthy()
+  const backendCode = created!.code
+  expect(backendCode).toMatch(/^[A-Z]{2}-[A-Z]{3}-\d{3}$/)
+  expect(backendCode.startsWith('IT-TAB-')).toBeTruthy()
+  expect(backendCode).not.toBe('IT-TAB-001') // 001 是種子，新增的一定是之後的流水號
+
+  // 畫面上用完整 code 查回，確認顯示的就是後端存的那一筆
+  await searchBy(page, backendCode)
+  await expect(page.getByText('共 1 筆', { exact: true })).toBeVisible()
+  await expect(firstRow(page).getByText(backendCode, { exact: true })).toBeVisible()
 })
 
 // ── E4 編輯 → reload 仍在（Update + Persist）──────────────────────
@@ -172,28 +186,43 @@ test('E4 編輯品項後 reload：改後的數量與狀態在重新整理後仍�
 
 // ── E5 刪除 → reload 消失（Delete + Persist）──────────────────────
 // 觀念：刪除是硬刪除，真的從資料庫移除；reload 後那一筆「確實不見」。
-test('E5 刪除品項後 reload：被刪的那一筆在重新整理後確實消失（持久化）', async ({ page }) => {
+// 注意：自己先建一筆再刪（不碰種子，也不會跟 E4 改到同一列）；reload 後先等清單從後端載入完，
+//       再斷言「查無」——不然資料還沒回來時畫面本來就是空的，刪除沒寫進資料庫也會綠。
+test('E5 刪除品項後 reload：被刪的那一筆在重新整理後確實消失（持久化）', async ({ page, request }) => {
+  const uniqueName = `E5 刪除驗證-${Date.now()}`
+  const made = await request.post(API, {
+    data: { categoryKey: 'OTHER', name: uniqueName, qty: 1, unit: '個', spec1: 'E5 自建、等下刪掉', status: 'normal' },
+  })
+  expect(made.status(), 'E5 先用 API 建一筆自己的資料').toBe(201)
+  const code = ((await made.json()).data as { code: string }).code
+
   await page.goto(LIST)
   const before = await readCount(page)
-
-  const code = await firstRowCode(page)
+  await searchBy(page, code)
+  await expect(page.getByText('共 1 筆', { exact: true })).toBeVisible()
   await expect(page.locator('table').getByText(code, { exact: true })).toBeVisible()
+  // 關鍵字會在 debounce 後寫進網址（?q=…，會重繪列表）；等網址同步完再開刪除視窗，免得視窗被重繪關掉
+  await expect(page).toHaveURL(new RegExp(`[?&]q=${encodeURIComponent(code)}`))
 
-  // 桌機表格第一列刪除鈕（scope 到 table，避免命中手機卡片同名鈕）
+  // 桌機表格那一列的刪除鈕（scope 到 table，避免命中手機卡片同名鈕）
   await firstRow(page).locator('button[aria-label="刪除"]').click()
   const dialog = page.getByRole('alertdialog')
   await expect(dialog).toBeVisible()
   await expect(dialog.getByText('刪除品項')).toBeVisible()
   await dialog.getByRole('button', { name: '刪除', exact: true }).click()
-
   await expect(page.getByText(/已刪除/)).toBeVisible()
-  await expect(page.getByText(`共 ${before - 1} 筆`, { exact: true })).toBeVisible()
 
-  // reload 後用編碼搜尋，應查無（真的從 DB 刪掉，不是前端暫時隱藏）
-  await page.reload()
+  // 整頁重新載入（不帶 ?q=，免得一進來就被篩成 0 筆、看不到表格）：
+  // 先等清單從後端載入（表格出現、筆數＝刪除前 −1），再搜尋，應查無
+  await page.goto(LIST)
+  expect(await readCount(page)).toBe(before - 1)
   await searchBy(page, code)
   await expect(page.getByText('查無符合條件的品項')).toBeVisible()
   await expect(page.locator('table').getByText(code, { exact: true })).toHaveCount(0)
+  // 鐵證：後端 API 也查不到這一筆
+  const res = await request.get(API)
+  const items = (await res.json()).data as Array<{ code: string }>
+  expect(items.some(it => it.code === code)).toBeFalsy()
   await page.screenshot({ path: 'screenshots/05_after_delete_gone.png', fullPage: true })
 })
 

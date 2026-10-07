@@ -16,6 +16,8 @@ cd step0_course_intro
 step6 是**課後練習**，課堂不做。
 想看圖文版完整流程：用瀏覽器開 [HANDBOOK/HANDBOOK.html](HANDBOOK/HANDBOOK.html)（雙擊即可，免安裝、免連網，有目錄與深淺色切換）。
 
+> 想先看一遍 AI 怎麼做？用瀏覽器打開 **`HANDBOOK/animation/index.html`**：教學動畫（講課版），看 AI 照 harness、SDD（規格驅動開發：先文件、再程式；程式改了，文件跟著改）、LOOP、對抗審查把裝備物資接上 .NET API＋PostgreSQL，全程實拍（Windows 版，約 17 分鐘，有字幕和雙人預錄配音）。
+
 ## 課程地圖
 
 | 資料夾 | 內容 | 時間 |

@@ -89,7 +89,7 @@
 
 - 回應資料（Result）：上表 13 欄，外加一個 `updatedAt`（比照範本 D12 的異動時間戳），一律 camelCase。
 - 請求資料（Request）：Result 扣掉 `id`、`code`、`updatedAt`（因為這三個都不由使用者輸入）。
-- 封裝：沿用範本 `ModelResult` / `ModelResult<T>`；`DELETE` 成功回 204 無主體（唯一不封裝的例外）。
+- 封裝：成功回應與查無（404）沿用範本 `ModelResult` / `ModelResult<T>`；`DELETE` 成功回 204 無主體；驗證失敗 400 與未預期錯誤 500 照範本的錯誤格式（ValidationProblemDetails、全域例外處理），不包 `ModelResult`。
 - 狀態碼：新增 201＋Location、查無 404、刪除成功 204、驗證失敗 400（錯誤鍵 camelCase）。
 
 ---

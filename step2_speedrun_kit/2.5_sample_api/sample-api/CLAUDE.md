@@ -20,7 +20,7 @@
 1. **Controller 薄委派**：只做「呼叫 Service → `result.ToActionResult(失敗碼)`」；禁止在 Controller 查詢資料庫、組路徑、寫商業判斷（if/迴圈）。
 2. **商業邏輯全在 Service**：`MembersController → IMemberService → MemberService → AppDbContext`，依賴單向向右；Service 用建構子注入，禁止靜態 service locator。
 3. **DTO 驗證用 DataAnnotations ＋ IValidatableObject**：單欄允許值用 `[AllowedValues]`；跨欄位／條件規則（如證號依證件類別、選填欄非空才驗）放 `IValidatableObject.Validate()`。驗證失敗由框架自動回 400，不進 Service。
-4. **回應一律 `ModelResult<T>` 封裝**（`{ success, message, data }`）；**唯一例外＝DELETE 成功回 204 無主體**（HTTP 語意，D5）。
+4. **成功回應與查無（404）一律 `ModelResult<T>` 封裝**（`{ success, message, data }`）；**DELETE 成功回 204 無主體**（HTTP 語意，D5）；400 驗證失敗用框架的 ValidationProblemDetails（錯誤鍵 camelCase），500 由全域例外處理回傳，兩者都不包 `ModelResult`。
 5. **JSON 契約 camelCase、DB 欄位 snake_case**：兩者由 DbContext 命名轉換＋Mapperly 自動銜接，不手寫逐欄改名。錯誤訊息的欄位鍵也是 camelCase。
 6. **Service 不准 blanket try/catch**（D11）：只把「預期的業務失敗」（查無資料）轉成 `ModelResult{ Success=false }`（Controller 映射 404）；未預期例外（DB 斷線等）**不捕捉、直接上拋**給 `GlobalExceptionHandler` 回 500。全包 try/catch 會把基礎設施故障誤映成 404。
 7. **改綱要一律走 EF migration，禁止手改 DB**：加欄位／改型別／加約束都 `dotnet ef migrations add <名稱>`，不改既有 migration、只新增；啟動時 `Database.Migrate()` 自動套用。

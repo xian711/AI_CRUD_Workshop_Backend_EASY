@@ -1,0 +1,81 @@
+<section class="after">
+  <h2>文字版速查</h2>
+  <p>動畫裡的畫面，都是 2026-10-07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome（Swagger）、psql。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。播放器下面的「聲音」可以改回瀏覽器內建的聲音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
+  <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。後端的文件叫 <b>delta</b>：只寫跟人員範本不同的地方。三份：<b>SRS-delta</b>（這一版答應了什麼）、<b>設計文件 DESIGN-delta</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
+  <div class="roles">
+    <div class="role" style="--c:#f4b942">
+      <h3>Step 0 準備環境</h3>
+      <ul>
+        <li>課前裝好：.NET SDK 10、PostgreSQL 18（帳號 postgres／密碼 12345）、Node.js、pnpm、VS Code＋Claude Code 擴充</li>
+        <li>VS Code 選單「終端機」→「新增終端」（快捷鍵 Ctrl+`）</li>
+        <li><code>cd D:\</code>，再 <code>git clone https://github.com/xian711/AI_CRUD_Workshop_Backend_EASY.git</code></li>
+        <li>「檔案」→「開啟資料夾」→ 選 AI_CRUD_Workshop_Backend_EASY → 信任作者</li>
+        <li><code>cd step0_course_intro</code>，再 <code>.\preflight.ps1</code>（11 項）</li>
+      </ul>
+      <p class="out">看到「前置檢查全數通過，可以開課！」就過關；[WARN] 不算錯。psql 不在路徑時，preflight 會印出完整路徑，之後照抄</p>
+    </div>
+    <div class="role" style="--c:#39c0c8">
+      <h3>Step 2 玩範本 API</h3>
+      <ul>
+        <li>教材根目錄的終端機：<code>cd step2_speedrun_kit\2.5_sample_api\sample-api\src\CrudTemplate.Api</code></li>
+        <li><code>dotnet run --urls http://localhost:5080</code>（第一次會自己建資料庫、灌 24 筆種子；這個終端機不要關）</li>
+        <li>瀏覽器開 <code>http://localhost:5080/swagger</code>：人員五條路由各打一次（200／201／404／204）</li>
+        <li>終端機右上角「＋」開第二個：<code>cd step2_speedrun_kit\2.5_sample_api\sample-api</code>，再 <code>dotnet test</code>（49 條全綠）</li>
+        <li>psql 直查：<code>&amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -d ai_crud_template -c "SELECT count(*) FROM template_member;"</code>（密碼 12345）</li>
+        <li>看完回到跑 dotnet run 的終端機按 Ctrl+C，把 5080 讓出來</li>
+      </ul>
+      <p class="out">四份規矩在 sample-api 最上層：CLAUDE.md、CODE-RULES-api-本專案.md、contract-conventions-summary.md、使用說明；Common 資料夾一個字都不動</p>
+    </div>
+    <div class="role" style="--c:#ef8fc6">
+      <h3>Step 3 用 SDD 叫 AI 做新模組</h3>
+      <ul>
+        <li>教材根目錄整段貼上手冊 step3 的複製指令（Copy-Item 三行＋cd），出現 <code>&gt;&gt;</code> 後再按 Enter</li>
+        <li>「檔案」→「開啟資料夾」→ step3_new_module\my-equipment-api</li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b> → 貼起手 prompt（4 行）→ 送出</li>
+        <li>選擇題先自己答，每題看 AI 寫的理由和代價再選；講師會在你答完後發課堂裁決，再對照一次。AI 追加的題目，看不懂就選它標「建議」的</li>
+        <li>AI 先交 docs 裡的 SRS-delta、DESIGN-delta、DIAGRAMS、TASKS 四個檔。圖用瀏覽器開 <code>docs\DIAGRAMS-裝備物資API.html</code></li>
+        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b>（有規矩和範本，寫程式不用最貴的模型）</li>
+        <li>三路驗收：Swagger 五路由（<code>http://localhost:5080/swagger</code>）、<code>dotnet test</code> 全綠、psql 查 <code>ai_crud_equipment</code> 的 <code>equipment_item</code> 24 列。有小落差就一次講一件：看到什麼、期望什麼</li>
+      </ul>
+      <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
+    </div>
+    <div class="role" style="--c:#a996ff">
+      <h3>Step 4 讓 AI 修到全綠、另一個 AI 挑錯</h3>
+      <ul>
+        <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
+        <li>開新的 Claude Code 對話（模型 Sonnet 5.5），貼手冊的 LOOP prompt（4 行；鐵律和產出都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>）</li>
+        <li>AI 自己啟動受測 API（5080）和前端（3199），埠被占就自己換；跑 run-e2e 修到 6 條全綠；再開一個 Opus 5.5 的子代理，先用 HTTP 實打 API，再用 Playwright 開瀏覽器截圖做對抗審查</li>
+        <li>四樣產出：<code>my-equipment-api/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面、有截圖，一定看）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告，一定看）、SRS-delta／DESIGN-delta／DIAGRAMS 有沒有標「step4 LOOP 後」（一定看）；<code>loop/LOOP-LOG.md</code> 是流水紀錄，有紅燈時才翻</li>
+        <li>要你裁決的，AI 用選擇題問；測試本身和前端的問題它只列出來，不會自己改</li>
+      </ul>
+      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準；改綱要只走 migration；審的模型要比寫的高一級</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px">卡住時</h2>
+  <div class="where">
+    <ul>
+      <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
+      <li><b>preflight 說 PostgreSQL 連不上或帳密不對</b>：這是後端課的命脈。先 <code>Get-Service postgresql*</code> 看服務有沒有在跑，停著就 <code>Start-Service postgresql-x64-18</code>；密碼不是 12345 就照手冊 Step 0 改回來。還是紅，整段輸出貼給 AI。</li>
+      <li><b>找不到 psql</b>：不用加 PATH。preflight 會印出完整路徑（通常是 <code>C:\Program Files\PostgreSQL\18\bin\psql.exe</code>），指令前面加 <code>&amp;</code>、路徑用引號包起來。</li>
+      <li><b>dotnet run 說 5080 被占用</b>：多半是上一個 API 還在跑。回那個終端機按 Ctrl+C；不確定是誰在用，就換一個埠 <code>--urls http://localhost:5081</code>，Swagger 網址跟著改。LOOP 的 AI 也會自己換埠。</li>
+      <li><b>dotnet 第一次跑很慢</b>：它在下載套件，課前先跑一次 dotnet run 和 run-e2e，別留到上課。</li>
+      <li><b>dotnet build 噴紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
+      <li><b>AI 問你要不要連上你自己的 Chrome（Claude in Chrome 之類的擴充）</b>：這門課用不到，選「No」，跟它說「不用連我的瀏覽器，繼續」。Step 4 的 Playwright 不一樣：那是 AI 自己開的測試瀏覽器，用來截圖驗收，讓它跑，不要擋。</li>
+      <li><b>Step 3 時間不夠</b>：講師有 checkpoint 腳本，可以直接套參考解，跟上三路驗收和 Step 4。</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">檔案位置</h2>
+  <div class="where">
+    <ul>
+      <li>手冊：<code>HANDBOOK/HANDBOOK.html</code>（每一步的指令和 prompt 都在裡面，直接複製）</li>
+      <li>範本 API：<code>step2_speedrun_kit/2.5_sample_api/sample-api</code>；分層與資料庫圖：<code>step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html</code></li>
+      <li>新模組題目：<code>step3_new_module/PRD-中心裝備物資-後端.md</code>；交件樣板：<code>step3_new_module/SRS-設計文件-最小樣板.md</code></li>
+      <li>你的作品：<code>step3_new_module/my-equipment-api</code>（文件在 <code>docs/</code>，LOOP 產出在 <code>loop/</code>）</li>
+      <li>LOOP 規矩與全鏈路測試：<code>step4_loop_e2e/LOOP-規矩.md</code>、<code>step4_loop_e2e/e2e/tests/fullchain.spec.ts</code>（6 條）</li>
+      <li>課後練習：<code>step6_survey_api/</code>（把前端課那行 TODO 變成真的問卷 API）</li>
+    </ul>
+  </div>
+</section>

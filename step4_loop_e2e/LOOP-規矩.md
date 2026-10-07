@@ -28,7 +28,7 @@
 3. **換了 API 的埠，前端的 API 位址要跟著改**：啟動前端時設 `NUXT_PUBLIC_API_BASE=http://localhost:<API 埠>`（`fullchain-app/nuxt.config.ts` 讀這個變數，決定 `/api/equipment` 轉發到哪）。
 4. **換了埠，`API_URL`（API）和 `BASE_URL`（前端）兩個環境變數要跟著改**：run-e2e 和子代理的 Playwright 腳本都讀這兩個變數，不寫死網址。預設是 `http://localhost:5080`、`http://localhost:3199`。
 5. PostgreSQL 不在 5432：受測 API 用環境變數 `ConnectionStrings__Default` 帶實際的埠。
-6. **run-e2e 預設也用 5080／3199。要換埠就設 `API_URL`、`BASE_URL`，不准改 `run-e2e.ps1`。** run-e2e 的資料庫固定連 5432：5432 被別的程式（不是你啟動的）占住，run-e2e 就跑不起來，停下，在報告寫明是哪個 PID，交人處理。
+6. **run-e2e 預設也用 5080／3199。要換埠就設 `API_URL`、`BASE_URL`，不准改 `run-e2e.ps1`。** run-e2e 的資料庫固定連 5432：PostgreSQL 服務本來就在 5432 監聽，這是正常的，不用也不准關。用 psql 以 postgres／12345 登得進去就可以跑；5432 上跑的不是 PostgreSQL，或登不進去，run-e2e 就跑不起來，停下，在報告寫明是哪個 PID、哪個程式，交人處理。
 7. 用了哪些埠，寫進 `LOOP-LOG.md` 和 `LOOP-REPORT.html`。
 
 ### 1.1 受測服務怎麼啟動（背景執行）
@@ -82,6 +82,7 @@
 
 - `step4_loop_e2e/` 底下的檔一律不動，包括 `run-e2e.ps1`、`e2e/`、`tests.sha256`、`tools/`、`fullchain-app/`。不准重算測試基準。你寫的檔一個都不准放進 `step4_loop_e2e/`（run-e2e 和 `pnpm dev` 自己產生的報告、快取除外）。
 - 範本正本 `docs/baseline/` 不准改；差異一律寫進 `docs/` 的 delta 文件。
+- **不准自己推翻 step3 已拍板的決策**（SRS-delta 第 1 段的 Q1、Q2…）。審查發現的問題要動到已拍板的取捨（例如 Q1 撞號要不要加鎖），先不修，寫進報告列成選擇題，交人裁決。
 - 測試在驗 PRD 沒寫的東西（例如錯誤訊息文字、編碼格式）時，預設先改 API 對齊測試，標「規格外調整」，再在報告裡問人要不要留。
 - 判斷是**前端**（fullchain-app）的問題：不准改，寫進報告交人裁決。
 

@@ -213,11 +213,16 @@ function hi(line){
   // 字串（單引號或雙引號）
   e = e.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|"[^"]*"|'[^']*')/g, function(m){ return '<span class="st">'+m+'</span>'; });
   e = e.replace(/(&quot;.*?&quot;)/g, function(m){ return m.indexOf('class="st"')>=0?m:'<span class="st">'+m+'</span>'; });
-  // 關鍵字（避開已被 span 包住的段落，簡單處理）
-  KEYWORDS.forEach(function(k){
-    e = e.replace(new RegExp("(^|[^\\w>])(" + k + ")(?=[^\\w<]|$)","g"), function(mm,p1,p2){ return p1 + '<span class="kw">'+p2+'</span>'; });
+  // 關鍵字：只處理字串 span 以外的文字；先放佔位符，最後才換成 span，免得 class 這個字又去匹配剛插入的標籤
+  var parts = e.split(/(<span class="st">[\s\S]*?<\/span>)/);
+  parts = parts.map(function(p){
+    if (p.indexOf('<span class="st">') === 0) return p;
+    KEYWORDS.forEach(function(k){
+      p = p.replace(new RegExp("(^|[^\\w])(" + k + ")(?=[^\\w]|$)","g"), function(mm,p1,p2){ return p1 + '\u0001' + p2 + '\u0002'; });
+    });
+    return p;
   });
-  return e;
+  return parts.join('').replace(/\u0001/g,'<span class="kw">').replace(/\u0002/g,'</span>');
 }
 function render(tableId, lines, marks){
   var tb = document.getElementById(tableId);

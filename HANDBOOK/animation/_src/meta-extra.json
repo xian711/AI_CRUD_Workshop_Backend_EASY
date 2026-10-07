@@ -1,0 +1,854 @@
+{
+ "be01-compare-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step1_why_harness/COMPARE.html",
+  "boxes": {
+   "h": [
+    20,
+    10,
+    1200,
+    30
+   ],
+   "table": [
+    20,
+    52,
+    1200,
+    239
+   ]
+  }
+ },
+ "be01-compare-side": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step1_why_harness/COMPARE.html",
+  "boxes": {
+   "h": [
+    20,
+    10,
+    1200,
+    30
+   ]
+  }
+ },
+ "be02-arch-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html",
+  "boxes": {
+   "h1": [
+    74,
+    44,
+    1091,
+    65
+   ]
+  }
+ },
+ "be02-arch-life": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    51
+   ],
+   "svg": [
+    50,
+    119,
+    1141,
+    446
+   ]
+  }
+ },
+ "be02-arch-layers": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    51
+   ]
+  }
+ },
+ "be02-arch-post": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    51
+   ]
+  }
+ },
+ "be02-arch-db": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    51
+   ]
+  }
+ },
+ "be01-compare-side2": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step1_why_harness/COMPARE.html",
+  "boxes": {}
+ },
+ "be02-swagger": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "title": [
+    20,
+    110,
+    1200,
+    42
+   ],
+   "get": [
+    20,
+    276,
+    1200,
+    40
+   ],
+   "post": [
+    20,
+    331,
+    1200,
+    40
+   ],
+   "del": [
+    20,
+    496,
+    1200,
+    40
+   ]
+  }
+ },
+ "be02-swagger-get": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "code": [
+    41,
+    303,
+    84,
+    545
+   ],
+   "body": [
+    125,
+    343,
+    1074,
+    400
+   ],
+   "exec": [
+    51,
+    -60,
+    569,
+    30
+   ]
+  }
+ },
+ "be02-swagger-404": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "code": [
+    41,
+    303,
+    84,
+    248
+   ],
+   "body": [
+    125,
+    361,
+    1074,
+    85
+   ]
+  }
+ },
+ "be02-arch-life-svg": {
+  "w": 1141,
+  "h": 446,
+  "boxes": {}
+ },
+ "be-diag-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API.html",
+  "boxes": {
+   "h1": [
+    50,
+    27,
+    1141,
+    64
+   ],
+   "h2": [
+    50,
+    199,
+    1141,
+    48
+   ]
+  }
+ },
+ "be-diag-layers": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    48
+   ],
+   "svg": [
+    50,
+    167,
+    2266,
+    1186
+   ]
+  }
+ },
+ "be-diag-er": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    48
+   ],
+   "svg": [
+    50,
+    169,
+    1118,
+    853
+   ]
+  }
+ },
+ "be-diag-seq": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    48
+   ],
+   "svg": [
+    50,
+    167,
+    2182,
+    2137
+   ]
+  }
+ },
+ "be-diag-status": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/docs/DIAGRAMS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API.html",
+  "boxes": {
+   "h": [
+    50,
+    10,
+    1141,
+    48
+   ],
+   "svg": [
+    50,
+    169,
+    1552,
+    417
+   ]
+  }
+ },
+ "be-diag-1": {
+  "w": 2266,
+  "h": 1186,
+  "boxes": {}
+ },
+ "be-diag-2": {
+  "w": 1118,
+  "h": 853,
+  "boxes": {}
+ },
+ "be-diag-3": {
+  "w": 2182,
+  "h": 2137,
+  "boxes": {}
+ },
+ "be-diag-4": {
+  "w": 1552,
+  "h": 417,
+  "boxes": {}
+ },
+ "be-prd-fields": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/PRD-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87-%E5%BE%8C%E7%AB%AF.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    32
+   ],
+   "table": [
+    34,
+    62,
+    904,
+    536
+   ],
+   "id": null,
+   "code": [
+    35,
+    138,
+    903,
+    38
+   ]
+  }
+ },
+ "be-prd-decisions": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/PRD-%E4%B8%AD%E5%BF%83%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87-%E5%BE%8C%E7%AB%AF.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    43
+   ],
+   "table": null,
+   "q1": [
+    35,
+    -2085,
+    903,
+    38
+   ],
+   "q6": [
+    35,
+    -1703,
+    903,
+    38
+   ]
+  }
+ },
+ "be-srs-decisions": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    43
+   ],
+   "table": null,
+   "q1": [
+    35,
+    210,
+    1171,
+    120
+   ],
+   "q7": [
+    35,
+    929,
+    1171,
+    120
+   ]
+  }
+ },
+ "be-srs-decisions2": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "q7": [
+    35,
+    589,
+    1171,
+    120
+   ],
+   "q12": [
+    35,
+    1188,
+    1171,
+    120
+   ]
+  }
+ },
+ "be-srs-trace": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    32
+   ],
+   "table": [
+    34,
+    62,
+    1054,
+    574
+   ],
+   "code": null
+  }
+ },
+ "be-srs-scope": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    43
+   ],
+   "h32": [
+    34,
+    258,
+    1172,
+    32
+   ]
+  }
+ },
+ "be-srs-risk": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    188,
+    1172,
+    43
+   ]
+  }
+ },
+ "be-design-files": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/DESIGN-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    43
+   ],
+   "table": null,
+   "shared": [
+    35,
+    1121,
+    1171,
+    120
+   ]
+  }
+ },
+ "be-design-model": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/DESIGN-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    32
+   ],
+   "table": [
+    34,
+    62,
+    999,
+    574
+   ]
+  }
+ },
+ "be-design-q1": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/DESIGN-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    10,
+    1172,
+    32
+   ]
+  }
+ },
+ "be-design-evidence": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/DESIGN-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    28,
+    1172,
+    43
+   ],
+   "table": [
+    34,
+    91,
+    1127,
+    345
+   ],
+   "build": [
+    35,
+    130,
+    1126,
+    38
+   ],
+   "mr": [
+    35,
+    -4688,
+    1171,
+    120
+   ],
+   "mig": [
+    35,
+    -5457,
+    1171,
+    93
+   ]
+  }
+ },
+ "be-tasks": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/TASKS.html",
+  "boxes": {
+   "h1": [
+    34,
+    -126,
+    1172,
+    55
+   ],
+   "total": [
+    34,
+    70,
+    1172,
+    43
+   ],
+   "table": [
+    34,
+    133,
+    600,
+    268
+   ]
+  }
+ },
+ "be-tasks-list": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml/TASKS.html",
+  "boxes": {
+   "t0": [
+    34,
+    10,
+    1172,
+    32
+   ],
+   "t1": [
+    34,
+    138,
+    1172,
+    32
+   ],
+   "t2": [
+    34,
+    267,
+    1172,
+    32
+   ]
+  }
+ },
+ "be-diag-3a": {
+  "w": 2182,
+  "h": 1240,
+  "boxes": {}
+ },
+ "be-diag-3b": {
+  "w": 2182,
+  "h": 958,
+  "boxes": {}
+ },
+ "be-diag-1b": {
+  "w": 2266,
+  "h": 807,
+  "boxes": {}
+ },
+ "be03-swagger": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "title": [
+    20,
+    110,
+    1200,
+    42
+   ],
+   "get": [
+    20,
+    276,
+    1200,
+    40
+   ],
+   "post": [
+    20,
+    331,
+    1200,
+    40
+   ],
+   "del": [
+    20,
+    496,
+    1200,
+    40
+   ]
+  }
+ },
+ "be03-swagger-get": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "code": [
+    41,
+    303,
+    84,
+    545
+   ],
+   "body": [
+    125,
+    343,
+    1074,
+    400
+   ],
+   "exec": [
+    51,
+    -60,
+    569,
+    30
+   ]
+  }
+ },
+ "be03-swagger-404": {
+  "w": 1240,
+  "h": 644,
+  "url": "http://localhost:5080/swagger/index.html",
+  "boxes": {
+   "code": [
+    41,
+    303,
+    84,
+    248
+   ],
+   "body": [
+    125,
+    361,
+    1074,
+    85
+   ]
+  }
+ },
+ "be-rv-01-list": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-rv-03-reload": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-rv-04-edit": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-rv-05-validation": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-rv-06-delete": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-e2e-04-reload": {
+  "w": 1280,
+  "h": 800,
+  "boxes": {}
+ },
+ "be-loop-report-top": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h1": [
+    86,
+    31,
+    1068,
+    44
+   ],
+   "concl": [
+    86,
+    142,
+    1068,
+    57
+   ]
+  }
+ },
+ "be-loop-report-rounds": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    86,
+    10,
+    1068,
+    57
+   ]
+  }
+ },
+ "be-loop-report-review": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    86,
+    10,
+    1068,
+    57
+   ]
+  }
+ },
+ "be-loop-report-review2": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {}
+ },
+ "be-loop-report-decide": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    86,
+    10,
+    1068,
+    57
+   ]
+  }
+ },
+ "be-loop-report-sync": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step3_new_module/my-equipment-api/loop/LOOP-REPORT.html",
+  "boxes": {
+   "h": [
+    86,
+    10,
+    1068,
+    57
+   ]
+  }
+ },
+ "be-pw-report": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AI_CRUD_Workshop_Backend_EASY/step4_loop_e2e/e2e/playwright-report/index.html",
+  "boxes": {}
+ },
+ "be-loop-log": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml-after/LOOP-LOG.html",
+  "boxes": {
+   "h1": [
+    34,
+    38,
+    1172,
+    55
+   ],
+   "r1": [
+    34,
+    206,
+    1172,
+    43
+   ],
+   "rv": [
+    34,
+    542,
+    1172,
+    43
+   ]
+  }
+ },
+ "be-srs-after": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml-after/SRS-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h": [
+    34,
+    131,
+    1172,
+    43
+   ]
+  }
+ },
+ "be-design-after": {
+  "w": 1240,
+  "h": 644,
+  "url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml-after/DESIGN-%E8%A3%9D%E5%82%99%E7%89%A9%E8%B3%87API-delta.html",
+  "boxes": {
+   "h1": [
+    34,
+    38,
+    1172,
+    55
+   ],
+   "ver": [
+    34,
+    113,
+    1172,
+    218
+   ]
+  }
+ }
+}

@@ -1,0 +1,1338 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI CRUD 後端課動畫</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --page:#0b1826; --stage:#10263a; --card:#16324a; --line:#2a4d6b;
+    --ink:#eef3f7; --mut:#9db3c6; --gold:#f4b942; --teal:#39c0c8; --pink:#ef8fc6;
+    --coral:#ff8a5b; --violet:#a996ff; --red:#ff5d6c; --green:#5ad18a;
+    --sans:'Noto Sans TC','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+    --mono:'JetBrains Mono',Consolas,'Courier New',monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--page);color:var(--ink)}
+  body{font-family:var(--sans);font-size:18px;line-height:1.6;margin:0}
+  /* ===== 版面（RWD）：標題＋導覽＋舞台＋字幕＋控制列，盡量塞進同一個螢幕畫面 =====
+     舞台寬度（--stage-w）、字幕字級（--sub-fs）、字幕行數（--sub-n）由下方 JS 的 fit() 量完實際高度後設定。
+     沒有 JS 時，退回用 100vh 粗估的寬度。 */
+  :root{--stage-w:min(100%, calc((100vh - 330px) * 16 / 9));--sub-fs:24px;--sub-n:2;--lab-h:20px}
+  .wrap{max-width:1500px;margin:0 auto;padding-inline:16px;padding-block:8px 48px}
+  header.top{display:flex;align-items:baseline;gap:2px 14px;margin:0 0 6px;min-width:0}
+  header.top h1{flex:none;font-size:clamp(18px,1.45vw,26px);line-height:1.3;font-weight:900;margin:0;letter-spacing:.02em;white-space:nowrap}
+  header.top p{flex:1 1 0;min-width:0;margin:0;color:var(--mut);font-size:clamp(12.5px,.85vw,15px);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 章節膠囊：永遠單行；放不下就橫向捲動（捲軸隱藏、兩端淡出），目前這句所在的膠囊會自動捲到中間 */
+  .chips{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:4px;margin:-4px -4px 4px;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%)}
+  .chips::-webkit-scrollbar,.steps::-webkit-scrollbar{display:none}
+  .chips button{flex:none;font:inherit;font-size:clamp(13.5px,1.05vw,16px);font-weight:700;line-height:1.35;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 14px;cursor:pointer}
+  .chips button[aria-current="true"]{color:#10263a;background:var(--gold);border-color:var(--gold)}
+  /* 兩層章節：上排 Step（單行小膠囊）、下排該 Step 的段落 */
+  .steps{display:flex;gap:6px;margin:0 0 5px;scrollbar-width:none}
+  .steps[hidden]{display:none}
+  .steps button{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:center;gap:.4em;white-space:nowrap;font:inherit;font-size:clamp(13px,1.02vw,16px);line-height:1.35;color:var(--ink);background:var(--card);border:1px solid var(--line);border-bottom:3px solid var(--c);border-radius:10px;padding:3px 10px 2px;cursor:pointer}
+  .steps button b{flex:none;font-size:.92em;font-weight:900;color:var(--c);letter-spacing:.02em}
+  .steps button span{min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+  .steps button[aria-current="true"]{background:#233f59;border-color:var(--c)}
+  .steps button:focus-visible{outline:3px solid var(--teal);outline-offset:-1px}
+  /* 視窗不夠寬（約 1260px 以下）：沒選到的 Step 只留標籤（Step 3），選到的那顆才顯示完整名稱；滑鼠移上去會顯示全名 */
+  @media (max-width:1259px){.steps button:not([aria-current="true"]) span{display:none}}
+  .chips button:focus-visible,.ctrl button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+  .stagebox{position:relative;width:var(--stage-w);max-width:100%;margin:0 auto;background:var(--stage);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  #stage{display:block;width:100%;height:auto}
+  .sub{width:var(--stage-w);max-width:100%;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+  /* 字幕框：高度固定（--sub-n 行），換句子時畫面不會跳；少數特別長的句子由 fitSubText() 暫時縮字（最小 18px）塞進同一個框 */
+  .subline{height:calc(var(--sub-fs) * var(--sub-n) * 1.45 + var(--lab-h) + 16px);overflow:hidden;background:#050d16;border-radius:12px;padding:8px 18px;font-size:var(--sub-cur,var(--sub-fs));font-weight:700;line-height:1.45;text-wrap:pretty;overflow-wrap:anywhere}
+  .subline small{display:block;height:18px;margin-bottom:2px;font-size:max(13px,.5em);line-height:18px;font-weight:700;color:var(--gold);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 全螢幕（投影用）：舞台＋字幕＋控制列填滿螢幕；尺寸同樣由 fit() 算 */
+  .player:fullscreen{background:var(--page);padding:10px 16px;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+  .player:fullscreen .stagebox,.player:fullscreen .sub{flex:none}
+  .player:fullscreen .hint{display:none}
+  .who{display:inline-block;font-size:.62em;font-weight:900;color:#10263a;background:var(--c);border-radius:999px;padding:0 .6em;margin-right:.55em;vertical-align:.16em}
+  .who.x{--c:#ff8a5b} .who.z{--c:#39c0c8}
+  .bar{height:4px;background:var(--card);border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--gold)}
+  /* 控制列：比舞台寬時，以舞台為中心往左右多出去（單行），放不下才折行 */
+  .ctrl{justify-self:center;width:max-content;max-width:min(calc(100vw - 24px),1500px);display:flex;flex-wrap:wrap;gap:6px 6px;align-items:center;justify-content:center}
+  .ctrl button{font:inherit;font-size:15px;font-weight:700;line-height:1.3;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 9px;cursor:pointer;min-width:44px}
+  .ctrl button.main{background:var(--gold);color:#10263a;border-color:var(--gold);min-width:104px}
+  .ctrl select{font:inherit;font-size:14.5px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 4px;max-width:16em}
+  .ctrl label{display:flex;align-items:center;gap:4px;color:var(--mut);font-size:14px;font-weight:700}
+  .ctrl select:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+  .ctrl button.off{color:var(--mut);text-decoration:line-through}
+  .voicenote{color:var(--gold);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  .voicenote[hidden]{display:none}
+  .startbtn{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);font:inherit;font-size:clamp(16px,calc(var(--stage-w) / 45),28px);font-weight:900;color:#10263a;background:var(--gold);border:0;border-radius:999px;padding:.6em 1.4em;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+  .startbtn:focus-visible{outline:4px solid var(--teal);outline-offset:3px}
+  .ctrl .pos{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+  /* 鍵盤提示：可視區高度 800px 以上才顯示（矮螢幕要把高度讓給舞台） */
+  .hint{display:none;color:var(--mut);font-size:14px;line-height:1.35;text-align:center;margin:0}
+  @media (min-height:800px){.hint{display:block}}
+  @media (max-height:700px){:root{--lab-h:0px}.subline small{display:none}}
+  section.after{max-width:1100px;margin:44px auto 0}
+  section.after h2{font-size:26px;font-weight:900;margin:0 0 6px;text-wrap:balance}
+  section.after > p{color:var(--mut);margin:0 0 16px;max-width:65ch}
+  .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .role{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:12px;padding:14px 16px}
+  .role h3{margin:0 0 6px;font-size:20px;color:var(--c)}
+  .role ul{margin:0;padding-left:1.2em;font-size:17px}
+  .role .out{margin:10px 0 0;font-size:16px;font-weight:700;color:var(--ink);background:#0b1826;border-radius:8px;padding:6px 10px}
+  .where{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:17px}
+  section.after code{overflow-wrap:anywhere}
+  .role,.where{min-width:0}
+  .where code{font-family:var(--mono);font-size:15px;color:var(--gold);word-break:break-all}
+
+  #stage text{font-family:var(--sans)}
+  #stage .mono{font-family:var(--mono)}
+  #stage g,#stage text,#stage path,#stage rect,#stage circle{transition:opacity .6s ease, transform 1.2s cubic-bezier(.45,0,.2,1)}
+  #stage .hid{opacity:0}
+  #stage.paused *{animation-play-state:paused!important}
+  #stage .dim{opacity:.22}
+  #stage .draw{stroke-dasharray:1 1;stroke-dashoffset:1;opacity:0;transition:stroke-dashoffset 1.1s ease, opacity .1s}
+  #stage .draw.on{stroke-dashoffset:0;opacity:1}
+  #stage .glow{animation:glow 1.3s ease-in-out 3}
+  @keyframes glow{50%{filter:drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 20px rgba(255,255,255,.55))}}
+  #stage .stamp{transform-box:fill-box;transform-origin:center;transition:opacity .3s, transform .45s cubic-bezier(.2,1.5,.4,1)}
+  #stage .stamp.hid{transform:scale(1.9)}
+  #stage .ping{transform-box:fill-box;transform-origin:center;animation:ping 1.3s ease-out infinite}
+  @keyframes ping{from{transform:scale(1);opacity:1}to{transform:scale(3.4);opacity:0}}
+  #stage .tcursor{animation:tblink 1.1s steps(1) infinite}
+  @keyframes tblink{50%{opacity:0}}
+  #stage .mcur{transition:transform 1.1s cubic-bezier(.45,0,.2,1), opacity .4s}
+  #stage.instant *{transition:none!important;animation:none!important}
+
+  /* ---- 嵌入模式（被 iframe 嵌入，或網址帶 #embed）---- */
+  html.embed header.top, html.embed section.after, html.embed .hint{display:none}
+  html.embed .wrap{padding-block:4px 6px}
+  html.embed .subline{padding:6px 14px}
+  /* ---- 問小港側欄 ---- */
+  .askbtn{font:inherit;font-size:16px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
+  .askbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .askdrawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:#0e2133;border-left:1px solid var(--line);box-shadow:-10px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column;z-index:50;transform:translateX(105%);transition:transform .3s ease}
+  .askdrawer.open{transform:none}
+  .askhead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .askhead h3{margin:0;font-size:20px;font-weight:900;flex:1}
+  .askhead button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer}
+  .askwhere{font-size:14px;color:var(--gold);padding:8px 16px 0}
+  .asklog{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+  .askmsg{border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+  .askmsg.me{align-self:flex-end;background:var(--gold);color:#10263a;font-weight:700;max-width:85%}
+  .askmsg.bot{background:var(--card);border:1px solid var(--line)}
+  .askmsg.wait{color:var(--mut)}
+  .askjump{display:inline-block;margin:6px 6px 0 0;font:inherit;font-size:14px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:8px;padding:4px 10px;cursor:pointer;white-space:normal;text-align:left}
+  .askform{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line)}
+  .askform input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:#081522;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .askform button{font:inherit;font-weight:800;background:var(--gold);color:#10263a;border:0;border-radius:10px;padding:0 14px;cursor:pointer}
+  .askform input:focus-visible{outline:3px solid var(--teal)}
+  .asktips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px}
+  .asktips button{font:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+  @media (prefers-reduced-motion: reduce){
+    #stage *{transition-duration:.01s!important;animation:none!important}
+  }
+  /* 手機寬度：允許垂直捲動，但不出現水平捲軸 */
+  @media (max-width:640px){
+    .wrap{padding-inline:10px}
+    header.top{flex-wrap:wrap}
+    header.top h1{flex:1 1 100%;min-width:0;white-space:normal;font-size:19px}
+    header.top p{flex-basis:100%;white-space:normal;font-size:13px}
+    .steps{overflow-x:auto}
+    .steps button{flex:none;font-size:14px}
+    .chips button{font-size:14px}
+    .ctrl{width:100%;max-width:100%}
+    .ctrl button{padding:7px 10px;font-size:15px}
+    .ctrl select{max-width:100%}
+    .subline{padding:8px 12px}
+  }
+  @media (pointer:coarse){.hint{display:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>AI CRUD 後端工作坊 EASY 版　手把手教學動畫</h1>
+    <p>.NET API＋PostgreSQL：harness・SDD・LOOP・對抗審查，全程實拍　·　小芸＋阿哲預錄配音（AI 語音）</p>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="課程步驟" hidden></nav>
+  <nav class="chips" id="chips" aria-label="章節"></nav>
+
+  <div class="player" id="player">
+  <div class="stagebox">
+    <svg id="stage" viewBox="0 0 1600 900" role="img" aria-label="AI CRUD 後端工作坊 EASY 版　手把手教學動畫動畫畫面">
+      <defs id="defs"></defs>
+      <rect x="0" y="0" width="1600" height="900" fill="#10263a"></rect>
+      <g id="layer"></g>
+    </svg>
+    <button id="bStart" class="startbtn" type="button">▶ 開始播放（有中文語音）</button>
+  </div>
+
+  <div class="sub">
+    <div class="subline" id="subline" aria-live="polite"><small id="scenelabel">第 1 段</small><span id="who" class="who" hidden></span><span id="subtext">載入中…</span></div>
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="ctrl">
+      <button id="bPrevScene" type="button" title="上一段">⏮ 上一段</button>
+      <button id="bPrev" type="button" title="上一句（←）">◀ 上一句</button>
+      <button id="bPlay" type="button" class="main">▶ 播放</button>
+      <button id="bNext" type="button" title="下一句（→）">下一句 ▶</button>
+      <button id="bNextScene" type="button" title="下一段">下一段 ⏭</button>
+      <button id="bVoice" type="button" title="開關語音">🔊 語音：開</button>
+      <label for="voiceSel">聲音<select id="voiceSel"><option value="">預設中文</option></select></label>
+      <label for="speedSel">速度<select id="speedSel"><option value="0.75">0.75×（慢）</option><option value="1" selected>1×（正常）</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×（快）</option></select></label>
+      <button id="bAsk" type="button" class="askbtn" hidden>💬 問小港</button>
+      <button id="bFull" type="button" title="全螢幕（F）">⛶ 全螢幕</button>
+      <span class="pos" id="pos">1／0 段</span>
+    </div>
+    <p class="voicenote" id="voiceNote" hidden></p>
+    <p class="hint">空白鍵：暫停／播放　·　← →：上一句／下一句　·　F：全螢幕　·　上面的 Step 和章節可以直接跳　·　速度同時調整語音和字幕</p>
+  </div>
+  </div>
+
+<section class="after">
+  <h2>文字版速查</h2>
+  <p>動畫裡的畫面，都是 2026-10-07 在 Windows 11 實際操作時拍下來的：VS Code（繁體中文介面）、Claude Code 擴充、PowerShell 終端機、Chrome（Swagger）、psql。大字版終端機裡的每一行，也都是同一次操作印出來的真實文字。</p>
+  <p>配音由 Google Gemini 3.8 Flash TTS 預先錄好：小芸講方法和觀念，阿哲講實拍示範。播放器下面的「聲音」可以改回瀏覽器內建的聲音。動畫裡的指令只放在畫面字卡，完整指令看下面和手冊。</p>
+  <p>名詞：<b>SDD</b>＝規格驅動開發（先文件，再程式；程式改了，文件跟著改）。後端的文件叫 <b>delta</b>：只寫跟人員範本不同的地方。三份：<b>SRS-delta</b>（這一版答應了什麼）、<b>設計文件 DESIGN-delta</b>（怎麼做）、<b>圖 DIAGRAMS</b>（用瀏覽器開，看圖不用看程式）。</p>
+  <div class="roles">
+    <div class="role" style="--c:#f4b942">
+      <h3>Step 0 準備環境</h3>
+      <ul>
+        <li>課前裝好：.NET SDK 10、PostgreSQL 18（帳號 postgres／密碼 12345）、Node.js、pnpm、VS Code＋Claude Code 擴充</li>
+        <li>VS Code 選單「終端機」→「新增終端」（快捷鍵 Ctrl+`）</li>
+        <li><code>cd D:\</code>，再 <code>git clone https://github.com/xian711/AI_CRUD_Workshop_Backend_EASY.git</code></li>
+        <li>「檔案」→「開啟資料夾」→ 選 AI_CRUD_Workshop_Backend_EASY → 信任作者</li>
+        <li><code>cd step0_course_intro</code>，再 <code>.\preflight.ps1</code>（11 項）</li>
+      </ul>
+      <p class="out">看到「前置檢查全數通過，可以開課！」就過關；[WARN] 不算錯。psql 不在路徑時，preflight 會印出完整路徑，之後照抄</p>
+    </div>
+    <div class="role" style="--c:#39c0c8">
+      <h3>Step 2 玩範本 API</h3>
+      <ul>
+        <li>教材根目錄的終端機：<code>cd step2_speedrun_kit\2.5_sample_api\sample-api\src\CrudTemplate.Api</code></li>
+        <li><code>dotnet run --urls http://localhost:5080</code>（第一次會自己建資料庫、灌 24 筆種子；這個終端機不要關）</li>
+        <li>瀏覽器開 <code>http://localhost:5080/swagger</code>：人員五條路由各打一次（200／201／404／204）</li>
+        <li>終端機右上角「＋」開第二個：<code>cd step2_speedrun_kit\2.5_sample_api\sample-api</code>，再 <code>dotnet test</code>（49 條全綠）</li>
+        <li>psql 直查：<code>&amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -d ai_crud_template -c "SELECT count(*) FROM template_member;"</code>（密碼 12345）</li>
+        <li>看完回到跑 dotnet run 的終端機按 Ctrl+C，把 5080 讓出來</li>
+      </ul>
+      <p class="out">四份規矩在 sample-api 最上層：CLAUDE.md、CODE-RULES-api-本專案.md、contract-conventions-summary.md、使用說明；Common 資料夾一個字都不動</p>
+    </div>
+    <div class="role" style="--c:#ef8fc6">
+      <h3>Step 3 用 SDD 叫 AI 做新模組</h3>
+      <ul>
+        <li>教材根目錄整段貼上手冊 step3 的複製指令（Copy-Item 三行＋cd），出現 <code>&gt;&gt;</code> 後再按 Enter</li>
+        <li>「檔案」→「開啟資料夾」→ step3_new_module\my-equipment-api</li>
+        <li>右下角「✻ Claude Code」→ 模型選 <b>Opus 5.5、effort High</b> → 貼起手 prompt（4 行）→ 送出</li>
+        <li>選擇題先自己答，每題看 AI 寫的理由和代價再選；講師會在你答完後發課堂裁決，再對照一次。AI 追加的題目，看不懂就選它標「建議」的</li>
+        <li>AI 先交 docs 裡的 SRS-delta、DESIGN-delta、DIAGRAMS、TASKS 四個檔。圖用瀏覽器開 <code>docs\DIAGRAMS-裝備物資API.html</code></li>
+        <li>說「開工」之前，把模型切成 <b>Sonnet 5.5</b>（有規矩和範本，寫程式不用最貴的模型）</li>
+        <li>三路驗收：Swagger 五路由（<code>http://localhost:5080/swagger</code>）、<code>dotnet test</code> 全綠、psql 查 <code>ai_crud_equipment</code> 的 <code>equipment_item</code> 24 列。有小落差就一次講一件：看到什麼、期望什麼</li>
+      </ul>
+      <p class="out">AI 沒問就寫程式：貼手冊的救援 prompt 叫它停</p>
+    </div>
+    <div class="role" style="--c:#a996ff">
+      <h3>Step 4 讓 AI 修到全綠、另一個 AI 挑錯</h3>
+      <ul>
+        <li>「檔案」→「開啟資料夾」→ 回到教材根目錄</li>
+        <li>開新的 Claude Code 對話（模型 Sonnet 5.5），貼手冊的 LOOP prompt（4 行；鐵律和產出都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>）</li>
+        <li>AI 自己啟動受測 API（5080）和前端（3199），埠被占就自己換；跑 run-e2e 修到 6 條全綠；再開一個 Opus 5.5 的子代理，先用 HTTP 實打 API，再用 Playwright 開瀏覽器截圖做對抗審查</li>
+        <li>四樣產出：<code>my-equipment-api/loop/LOOP-REPORT.html</code>（給人看的報告，結論在最前面、有截圖，一定看）、<code>step4_loop_e2e/e2e/playwright-report/index.html</code>（測試報告，一定看）、SRS-delta／DESIGN-delta／DIAGRAMS 有沒有標「step4 LOOP 後」（一定看）；<code>loop/LOOP-LOG.md</code> 是流水紀錄，有紅燈時才翻</li>
+        <li>要你裁決的，AI 用選擇題問；測試本身和前端的問題它只列出來，不會自己改</li>
+      </ul>
+      <p class="out">鐵律：修兩次不好就停；不准改測試、不准放寬標準；改綱要只走 migration；審的模型要比寫的高一級</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px">卡住時</h2>
+  <div class="where">
+    <ul>
+      <li><b>一執行 .\preflight.ps1 就出現「已停用指令碼執行」或「未經數位簽署」</b>：先執行 <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>，再重跑。公司電腦不准改這個設定時，找 IT 或講師。</li>
+      <li><b>preflight 說 PostgreSQL 連不上或帳密不對</b>：這是後端課的命脈。先 <code>Get-Service postgresql*</code> 看服務有沒有在跑，停著就 <code>Start-Service postgresql-x64-18</code>；密碼不是 12345 就照手冊 Step 0 改回來。還是紅，整段輸出貼給 AI。</li>
+      <li><b>找不到 psql</b>：不用加 PATH。preflight 會印出完整路徑（通常是 <code>C:\Program Files\PostgreSQL\18\bin\psql.exe</code>），指令前面加 <code>&amp;</code>、路徑用引號包起來。</li>
+      <li><b>dotnet run 說 5080 被占用</b>：多半是上一個 API 還在跑。回那個終端機按 Ctrl+C；不確定是誰在用，就換一個埠 <code>--urls http://localhost:5081</code>，Swagger 網址跟著改。LOOP 的 AI 也會自己換埠。</li>
+      <li><b>dotnet 第一次跑很慢</b>：它在下載套件，課前先跑一次 dotnet run 和 run-e2e，別留到上課。</li>
+      <li><b>dotnet build 噴紅字</b>：從你打的指令那一行開始整段複製，貼給 AI；同一個錯誤修兩次還不行，找講師。</li>
+      <li><b>AI 問你要不要連上你自己的 Chrome（Claude in Chrome 之類的擴充）</b>：這門課用不到，選「No」，跟它說「不用連我的瀏覽器，繼續」。Step 4 的 Playwright 不一樣：那是 AI 自己開的測試瀏覽器，用來截圖驗收，讓它跑，不要擋。</li>
+      <li><b>Step 3 時間不夠</b>：講師有 checkpoint 腳本，可以直接套參考解，跟上三路驗收和 Step 4。</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top:28px">檔案位置</h2>
+  <div class="where">
+    <ul>
+      <li>手冊：<code>HANDBOOK/HANDBOOK.html</code>（每一步的指令和 prompt 都在裡面，直接複製）</li>
+      <li>範本 API：<code>step2_speedrun_kit/2.5_sample_api/sample-api</code>；分層與資料庫圖：<code>step2_speedrun_kit/2.4_architecture_db/ARCHITECTURE_DB.html</code></li>
+      <li>新模組題目：<code>step3_new_module/PRD-中心裝備物資-後端.md</code>；交件樣板：<code>step3_new_module/SRS-設計文件-最小樣板.md</code></li>
+      <li>你的作品：<code>step3_new_module/my-equipment-api</code>（文件在 <code>docs/</code>，LOOP 產出在 <code>loop/</code>）</li>
+      <li>LOOP 規矩與全鏈路測試：<code>step4_loop_e2e/LOOP-規矩.md</code>、<code>step4_loop_e2e/e2e/tests/fullchain.spec.ts</code>（6 條）</li>
+      <li>課後練習：<code>step6_survey_api/</code>（把前端課那行 TODO 變成真的問卷 API）</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<aside class="askdrawer" id="askDrawer" aria-label="問小港" aria-hidden="true">
+  <div class="askhead"><h3>💬 問小港</h3><button type="button" id="askClose">關閉</button></div>
+  <div class="askwhere" id="askWhere"></div>
+  <div class="asklog" id="askLog" aria-live="polite"></div>
+  <div class="asktips" id="askTips"></div>
+  <form class="askform" id="askForm"><label for="askInput" class="sr" hidden>問題</label><input id="askInput" autocomplete="off" placeholder="看不懂的地方直接問，例如：五選一怎麼選？"><button type="submit">送出</button></form>
+</aside>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const C={bg:'#10263a',ink:'#eef3f7',mut:'#9db3c6',card:'#16324a',card2:'#1c3d59',line:'#2a4d6b',
+  gold:'#f4b942',teal:'#39c0c8',pink:'#ef8fc6',coral:'#ff8a5b',violet:'#a996ff',red:'#ff5d6c',green:'#5ad18a',grey:'#7f93a6',blue:'#9fb4ff'};
+const svg=document.getElementById('stage'), layer=document.getElementById('layer'), defs=document.getElementById('defs');
+let L=layer, instant=false, timers=[];
+
+/* ---------- 繪圖小工具 ---------- */
+function mk(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a){if(a[k]==null)continue;if(k==='text')e.textContent=a[k];else e.setAttribute(k,a[k]);}(p||L).appendChild(e);return e;}
+function grp(p,hidden=true,cls=''){return mk('g',{class:((hidden?'hid ':'')+cls).trim()||null},p);}
+function T(p,x,y,s,o={}){const size=o.size||34;const t=mk('text',{x,y,'font-size':size,fill:o.fill||C.ink,'text-anchor':o.anchor||'start','font-weight':o.weight||500,class:o.mono?'mono':null},p);String(s).split('\n').forEach((line,i)=>mk('tspan',{x,dy:i?size*1.3:0,text:line},t));return t;}
+function R(p,x,y,w,h,o={}){return mk('rect',{x,y,width:w,height:h,rx:o.rx??14,fill:o.fill||C.card,stroke:o.stroke||'none','stroke-width':o.sw||3,'stroke-dasharray':o.dash||null},p);}
+function P(p,d,color,o={}){return mk('path',{d,fill:'none',stroke:color,'stroke-width':o.w||6,'stroke-linecap':'round',pathLength:1,class:'draw'},p);}
+function box(p,x,y,w,h,label,o={}){const g=grp(p,o.hidden!==false);R(g,x,y,w,h,o);const n=String(label).split('\n').length;const size=o.size||30;T(g,x+w/2,y+h/2-(n-1)*size*0.65+size*0.36,label,{size,anchor:'middle',fill:o.color||C.ink,weight:o.weight||700,mono:o.mono});return g;}
+['gold','teal','pink','coral','violet','red','green','grey','mut','blue'].forEach(k=>{const m=mk('marker',{id:'ah-'+k,viewBox:'0 0 10 10',refX:6,refY:5,markerWidth:4,markerHeight:4,orient:'auto-start-reverse'},defs);mk('path',{d:'M0,0 L10,5 L0,10 z',fill:C[k]},m);});
+function arrow(p,d,ck,o={}){const g=grp(p,o.hidden!==false);const w=o.w||5;
+  if(o.dash)mk('path',{d,fill:'none',stroke:C[ck],'stroke-width':w,'stroke-dasharray':'12 10','stroke-linecap':'round'},g);else P(g,d,C[ck],{w});
+  mk('path',{d,fill:'none',stroke:C[ck],'stroke-opacity':0,'stroke-width':w,'marker-end':`url(#ah-${ck})`,class:'hid late'},g);return g;}
+function dot(p,x,y,color,label,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx:x,cy:y,r:o.r||16,fill:color,stroke:C.bg,'stroke-width':5},g);if(label)T(g,x,o.above?y-30:y+50,label,{size:o.size||22,anchor:'middle',fill:o.lf||C.mut,mono:o.mono!==false,weight:500});return g;}
+function check(p,x,y,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx:x,cy:y,r:22,fill:C.green},g);T(g,x,y+11,'✓',{size:30,anchor:'middle',weight:900,fill:C.bg});return g;}
+function stamp(p,cx,cy,text,color,o={}){const size=o.size||48;const g=grp(p,true,'stamp');const inner=mk('g',{transform:`rotate(${o.rot??-8} ${cx} ${cy})`},g);
+  const lines=String(text).split('\n');const w=o.w||Math.max(...lines.map(l=>l.length))*size+70;const h=o.h||lines.length*size*1.3+34;
+  R(inner,cx-w/2,cy-h/2,w,h,{fill:'rgba(5,13,22,.82)',stroke:color,sw:6,rx:10});T(inner,cx,cy-(lines.length-1)*size*0.65+size*0.36,text,{size,anchor:'middle',weight:900,fill:color});return g;}
+function laneLabel(p,x,y,name,sub,color,right){const t=mk('text',{x,y,'text-anchor':right?'end':'start'},p);mk('tspan',{text:name,fill:color,'font-size':34,'font-weight':900},t);if(sub)mk('tspan',{text:'　'+sub,fill:C.mut,'font-size':24,'font-weight':500},t);return t;}
+function lane(p,x1,x2,y,color,name,sub,o={}){const g=grp(p,o.hidden!==false);P(g,o.d||`M${x1},${y} H${x2}`,color,{w:10});if(name)laneLabel(g,o.right?x2:x1,y-28,name,sub,color,o.right);return g;}
+function sideLane(p,d,y,color,name,sub){const g=grp(p);P(g,d,color,{w:10});T(g,70,y+4,name,{size:38,weight:900,fill:color,mono:true});T(g,70,y+38,sub,{size:22,fill:C.mut});return g;}
+function head(eyebrow,title){T(L,70,78,eyebrow,{size:26,fill:C.coral,weight:700});T(L,70,134,title,{size:50,weight:900});}
+function person(p,cx,cy,color,o={}){const g=grp(p,o.hidden!==false);mk('circle',{cx,cy:cy-40,r:26,fill:color},g);mk('path',{d:`M${cx-46},${cy+42} q0,-54 46,-54 q46,0 46,54 z`,fill:color},g);return g;}
+function db(p,cx,cy,w,h,color){const g=grp(p,false);const rx=w/2,ry=w/7;mk('path',{d:`M${cx-rx},${cy-h/2} v${h} a${rx},${ry} 0 0 0 ${w},0 v${-h}`,fill:C.card2,stroke:color,'stroke-width':4},g);mk('ellipse',{cx,cy:cy-h/2,rx,ry,fill:C.card2,stroke:color,'stroke-width':4},g);mk('path',{d:`M${cx-rx},${cy} a${rx},${ry} 0 0 0 ${w},0`,fill:'none',stroke:color,'stroke-width':3},g);return g;}
+
+/* ---------- 動作 ---------- */
+/* later 的計時器可以暫停：暫停時記下剩多久，繼續播放時接著跑 */
+function later(ms,fn){if(instant){fn();return;}const t={fn,due:performance.now()+ms/speed};t.id=setTimeout(()=>{timers=timers.filter(x=>x!==t);fn();},ms/speed);timers.push(t);}
+let frozen=[];
+function pauseTimers(){const now=performance.now();timers.forEach(t=>{clearTimeout(t.id);t.left=Math.max(0,t.due-now);});svg.classList.add('paused');
+  try{frozen=(svg.getAnimations?svg.getAnimations({subtree:true}):document.getAnimations()).filter(a=>a.playState==='running');frozen.forEach(a=>a.pause());}catch(e){frozen=[];}}
+function resumeTimers(){const now=performance.now();timers.forEach(t=>{if(t.left==null)return;t.due=now+t.left;t.id=setTimeout(()=>{timers=timers.filter(x=>x!==t);t.fn();},t.left);t.left=null;});svg.classList.remove('paused');frozen.forEach(a=>{try{if(a.playState==='paused')a.play();}catch(e){}});frozen=[];}
+function show(x){if(!x)return;if(Array.isArray(x)){x.forEach(show);return;}x.classList.remove('hid');if(x.classList.contains('draw'))x.classList.add('on');x.querySelectorAll('.draw').forEach(d=>d.classList.add('on'));x.querySelectorAll('.late').forEach(d=>later(900,()=>d.classList.remove('hid')));}
+function hide(x){if(Array.isArray(x)){x.forEach(hide);return;}x&&x.classList.add('hid');}
+function dim(x,on=true){if(Array.isArray(x)){x.forEach(e=>dim(e,on));return;}x&&x.classList.toggle('dim',on);}
+function glow(x){if(Array.isArray(x)){x.forEach(glow);return;}if(!x||instant)return;x.classList.remove('glow');void x.getBBox();x.classList.add('glow');}
+function move(x,t){x.style.transform=t;}
+function stagger(list,gap,fn=show){list.forEach((e,i)=>later(i*gap,()=>fn(e)));}
+
+/* 截圖教學動畫共用小工具（由 build.py 放在場景檔之前）*/
+const scenes=[];
+function scene(title,build,steps){scenes.push({title,build,steps});}
+let uid=0;
+const META={"bc01-empty":{"w":1068,"h":601,"boxes":{"tab":[320,31,134,32],"status":[934,573,98,24],"input":[353,476,679,40],"send":[1001,521,26,26]}},"bc01-explorer":{"w":1068,"h":601,"boxes":{"tree":[49,91,265,417],"claude":[53,223,257,22],"agents":[53,201,257,22],"rules":[53,245,257,22],"prd":[53,333,257,22],"tpl":[53,377,257,22]}},"bc01-model-menu":{"w":1068,"h":601,"boxes":{"opus":[357,284,655,39],"sonnet":[357,366,655,39]}},"bc01-model-opus":{"w":1068,"h":601,"boxes":{"model":[420,525,86,18]}},"bc02-prompt":{"w":1068,"h":601,"boxes":{"input":[353,378,679,137],"send":[1001,521,26,26],"model":[420,525,86,18]}},"bc03-question":{"w":1068,"h":601,"boxes":{}},"bc03-reading":{"w":1068,"h":601,"boxes":{}},"bc03-t0060":{"w":1068,"h":601,"boxes":{}},"bc04-answered":{"w":1068,"h":601,"boxes":{"submit":[361,484,663,29]}},"bc04-q1":{"w":1068,"h":601,"boxes":{"tab":[363,226,42,16],"rec":[361,314,648,61],"submit":[361,484,663,29]}},"bc04-q2":{"w":1068,"h":601,"boxes":{"tab":[420,226,30,16],"rec":[361,294,648,61],"submit":[361,484,663,29]}},"bc04-q3":{"w":1068,"h":601,"boxes":{"tab":[463,226,44,16],"rec":[361,294,648,61],"submit":[361,484,663,29]}},"bc04-q4":{"w":1068,"h":601,"boxes":{"tab":[521,279,44,16],"rec":[361,347,663,44],"submit":[361,484,663,29]}},"bc04-submitted":{"w":1068,"h":601,"boxes":{}},"bc05-answered":{"w":1068,"h":601,"boxes":{"submit":[361,484,663,29]}},"bc05-q5":{"w":1068,"h":601,"boxes":{"tab":[363,262,44,16],"rec":[361,330,663,61],"submit":[361,484,663,29]}},"bc05-q6":{"w":1068,"h":601,"boxes":{"tab":[420,226,56,16],"rec":[361,294,648,61],"submit":[361,484,663,29]}},"bc05-q7":{"w":1068,"h":601,"boxes":{"tab":[490,262,68,16],"rec":[361,330,663,61],"submit":[361,484,663,29]}},"bc05-q8":{"w":1068,"h":601,"boxes":{"tab":[571,226,62,16],"rec":[361,294,648,61],"submit":[361,484,663,29]}},"bc05-question":{"w":1068,"h":601,"boxes":{}},"bc05-submitted":{"w":1068,"h":601,"boxes":{}},"bc05b-answered":{"w":1068,"h":601,"boxes":{"submit":[361,484,663,29]}},"bc05b-q10":{"w":1068,"h":601,"boxes":{"tab":[444,262,48,16],"rec":[361,330,663,61],"submit":[361,484,663,29]}},"bc05b-q11":{"w":1068,"h":601,"boxes":{"tab":[508,226,71,16],"rec":[361,314,648,44],"submit":[361,484,663,29]}},"bc05b-q12":{"w":1068,"h":601,"boxes":{"tab":[597,262,48,16],"rec":[361,330,663,61],"submit":[361,484,663,29]}},"bc05b-q9":{"w":1068,"h":601,"boxes":{"tab":[363,279,68,16],"rec":[361,347,663,44],"submit":[361,484,663,29]}},"bc05b-submitted":{"w":1068,"h":601,"boxes":{}},"bc05c-decided":{"w":1068,"h":601,"boxes":{"head":[371,203,658,39]}},"bc06-docs":{"w":1068,"h":601,"boxes":{"head":[371,203,643,37],"srs":[371,-1164,658,20],"design":[371,-938,658,20],"diag":[371,-713,658,20],"ok":[371,-24,658,20],"model":[477,521,86,18]}},"bc06-idle-raw":{"w":1068,"h":601,"boxes":{}},"bc06-next-answer":{"w":1068,"h":601,"boxes":{"tab":[363,226,36,16]}},"bc06-next-submitted":{"w":1068,"h":601,"boxes":{}},"bc06-next":{"w":1068,"h":601,"boxes":{"tab":[363,233,36,16],"q":[361,272,663,20],"rec":[361,301,663,44],"go":[361,393,663,44]}},"bc06-question":{"w":1068,"h":601,"boxes":{}},"bc06-review-ask":{"w":1068,"h":601,"boxes":{"msg":[353,413,679,98],"send":[1001,517,26,26]}},"bc06-t0060":{"w":1068,"h":601,"boxes":{}},"bc06-t0120":{"w":1068,"h":601,"boxes":{}},"bc06-t0180":{"w":1068,"h":601,"boxes":{}},"bc06-t0240":{"w":1068,"h":601,"boxes":{}},"bc06-t0300":{"w":1068,"h":601,"boxes":{}},"bc07-go-typed":{"w":1068,"h":601,"boxes":{"input":[70,471,471,40],"model":[195,521,95,18],"send":[510,517,26,26]}},"bc07-model-menu":{"w":1068,"h":601,"boxes":{"opus":[75,279,447,39],"sonnet":[75,362,447,39]}},"bc08-build-start":{"w":1068,"h":601,"boxes":{}},"bc09-ask-summary":{"w":1068,"h":601,"boxes":{}},"bc09-next":{"w":1068,"h":601,"boxes":{"tab":[80,222,36,16],"rec":[78,290,440,61]}},"bc09-progress":{"w":1068,"h":601,"boxes":{"t9":[104,203,925,20],"t10":[142,3930,878,630],"t11":[104,1697,925,20]}},"bc09-question":{"w":1068,"h":601,"boxes":{}},"bc09-t0060":{"w":1068,"h":601,"boxes":{}},"bc09-t0120":{"w":1068,"h":601,"boxes":{}},"bc09-t0180":{"w":1068,"h":601,"boxes":{}},"bc09-t0240":{"w":1068,"h":601,"boxes":{}},"bc09-t0300":{"w":1068,"h":601,"boxes":{}},"bc09-t0360":{"w":1068,"h":601,"boxes":{}},"bc09-t0420":{"w":1068,"h":601,"boxes":{}},"bc10-summary":{"w":1068,"h":601,"boxes":{"tests":[130,430,899,20],"docs":[130,450,899,40],"model":[344,521,95,18]}},"bc11-fix1-ask":{"w":1068,"h":601,"boxes":{"msg":[219,413,679,98],"send":[867,517,26,26]}},"bc11-fix1-done":{"w":1068,"h":601,"boxes":{}},"bc12-fix2-ask":{"w":1068,"h":601,"boxes":{"msg":[219,452,679,59],"send":[867,517,26,26]}},"bc12-fix2-done":{"w":1068,"h":601,"boxes":{}},"bc20-empty":{"w":1068,"h":601,"boxes":{}},"bc20-loop-msg":{"w":1068,"h":601,"boxes":{"msg":[347,119,669,115]}},"bc20-loop-pasted":{"w":1068,"h":601,"boxes":{"input":[353,-117,679,157],"send":[1001,45,26,26],"model":[420,49,95,18]}},"bc21-ports":{"w":1068,"h":601,"boxes":{"port":[371,211,658,20],"stop":[371,1103,658,20]}},"bc21-start":{"w":1068,"h":601,"boxes":{}},"bc21-start2":{"w":1068,"h":601,"boxes":{}},"bc22-t0060":{"w":1068,"h":601,"boxes":{}},"bc22-t0120":{"w":1068,"h":601,"boxes":{}},"bc22-t0180":{"w":1068,"h":601,"boxes":{}},"bc22-t0240":{"w":1068,"h":601,"boxes":{}},"bc22-t0300":{"w":1068,"h":601,"boxes":{}},"bc22-t0360":{"w":1068,"h":601,"boxes":{}},"bc22-t0420":{"w":1068,"h":601,"boxes":{}},"bc22-t0480":{"w":1068,"h":601,"boxes":{}},"bc22-t0540":{"w":1068,"h":601,"boxes":{}},"bc22-t0600":{"w":1068,"h":601,"boxes":{}},"bc22-t0660":{"w":1068,"h":601,"boxes":{}},"bc22-t0720":{"w":1068,"h":601,"boxes":{}},"bc22-t0780":{"w":1068,"h":601,"boxes":{}},"bc22-t0840":{"w":1068,"h":601,"boxes":{}},"bc22-t0900":{"w":1068,"h":601,"boxes":{}},"bc22-t0960":{"w":1068,"h":601,"boxes":{}},"bc22-t1020":{"w":1068,"h":601,"boxes":{}},"bc22-t1080":{"w":1068,"h":601,"boxes":{}},"bc22-t1140":{"w":1068,"h":601,"boxes":{}},"bc22-t1200":{"w":1068,"h":601,"boxes":{}},"bc23-agent":{"w":1068,"h":601,"boxes":{"agent":[371,211,658,20]}},"bc23-green":{"w":1068,"h":601,"boxes":{"green":[371,211,658,20],"build":[371,16364,658,40]}},"bc23-review":{"w":1068,"h":601,"boxes":{"review":[371,211,658,20],"fix":[371,1080,658,20]}},"bc25-conclusion":{"w":1068,"h":601,"boxes":{"head":[371,211,658,40],"fixed":[397,283,632,40],"you":[397,323,632,137]}},"bc25-fixed":{"w":1068,"h":601,"boxes":{"lock":[371,211,658,20],"r2":[371,452,658,20],"tests":[371,-34,658,20]}},"bc25-url":{"w":1068,"h":601,"boxes":{"url":[371,342,52,17],"fe":[436,374,250,17],"docs":[397,185,632,39]}},"be-design-after":{"w":1240,"h":644,"boxes":{"h1":[34,38,1172,55],"ver":[34,113,1172,218]}},"be-design-decisions":{"w":1068,"h":601,"boxes":{}},"be-design-evidence":{"w":1240,"h":644,"boxes":{"h":[34,28,1172,43],"table":[34,91,1127,345],"build":[35,130,1126,38],"mr":[35,-4688,1171,120],"mig":[35,-5457,1171,93]}},"be-design-files":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,43],"shared":[35,1121,1171,120]}},"be-design-model":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,32],"table":[34,62,999,574]}},"be-design-open":{"w":1068,"h":601,"boxes":{"h1":[610,-1699,387,90],"tab":[53,31,269,32]}},"be-design-q1":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,32]}},"be-diag-1":{"w":2266,"h":1186,"boxes":{}},"be-diag-1b":{"w":2266,"h":807,"boxes":{}},"be-diag-2":{"w":1118,"h":853,"boxes":{}},"be-diag-3":{"w":2182,"h":2137,"boxes":{}},"be-diag-3a":{"w":2182,"h":1240,"boxes":{}},"be-diag-3b":{"w":2182,"h":958,"boxes":{}},"be-diag-4":{"w":1552,"h":417,"boxes":{}},"be-diag-er":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,48],"svg":[50,169,1118,853]}},"be-diag-layers":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,48],"svg":[50,167,2266,1186]}},"be-diag-seq":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,48],"svg":[50,167,2182,2137]}},"be-diag-status":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,48],"svg":[50,169,1552,417]}},"be-diag-top":{"w":1240,"h":644,"boxes":{"h1":[50,27,1141,64],"h2":[50,199,1141,48]}},"be-e2e-04-reload":{"w":1280,"h":800,"boxes":{}},"be-loop-log":{"w":1240,"h":644,"boxes":{"h1":[34,38,1172,55],"r1":[34,206,1172,43],"rv":[34,542,1172,43]}},"be-loop-report-decide":{"w":1240,"h":644,"boxes":{"h":[86,10,1068,57]}},"be-loop-report-review":{"w":1240,"h":644,"boxes":{"h":[86,10,1068,57]}},"be-loop-report-review2":{"w":1240,"h":644,"boxes":{}},"be-loop-report-rounds":{"w":1240,"h":644,"boxes":{"h":[86,10,1068,57]}},"be-loop-report-sync":{"w":1240,"h":644,"boxes":{"h":[86,10,1068,57]}},"be-loop-report-top":{"w":1240,"h":644,"boxes":{"h1":[86,31,1068,44],"concl":[86,142,1068,57]}},"be-prd-decisions":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,43],"q1":[35,-2085,903,38],"q6":[35,-1703,903,38]}},"be-prd-fields":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,32],"table":[34,62,904,536],"code":[35,138,903,38]}},"be-prd-open":{"w":1068,"h":601,"boxes":{"h1":[610,-1699,387,90],"tab":[53,31,269,32]}},"be-pw-report":{"w":1240,"h":644,"boxes":{}},"be-rv-01-list":{"w":1280,"h":800,"boxes":{}},"be-rv-03-reload":{"w":1280,"h":800,"boxes":{}},"be-rv-04-edit":{"w":1280,"h":800,"boxes":{}},"be-rv-05-validation":{"w":1280,"h":800,"boxes":{}},"be-rv-06-delete":{"w":1280,"h":800,"boxes":{}},"be-srs-after":{"w":1240,"h":644,"boxes":{"h":[34,131,1172,43]}},"be-srs-decisions":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,43],"q1":[35,210,1171,120],"q7":[35,929,1171,120]}},"be-srs-decisions2":{"w":1240,"h":644,"boxes":{"q7":[35,589,1171,120],"q12":[35,1188,1171,120]}},"be-srs-open":{"w":1068,"h":601,"boxes":{"h1":[610,-5916,387,90],"tab":[53,31,269,32]}},"be-srs-risk":{"w":1240,"h":644,"boxes":{"h":[34,188,1172,43]}},"be-srs-scope":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,43],"h32":[34,258,1172,32]}},"be-srs-trace":{"w":1240,"h":644,"boxes":{"h":[34,10,1172,32],"table":[34,62,1054,574]}},"be-tasks-list":{"w":1240,"h":644,"boxes":{"t0":[34,10,1172,32],"t1":[34,138,1172,32],"t2":[34,267,1172,32]}},"be-tasks":{"w":1240,"h":644,"boxes":{"h1":[34,-126,1172,55],"total":[34,70,1172,43],"table":[34,133,600,268]}},"be00-preflight":{"w":1068,"h":601,"boxes":{"panel":[315,30,745,539],"net":[335,129,475,19],"pg":[335,148,501,19],"psql":[335,168,589,19],"psqlpath":[335,187,510,19],"login":[335,207,580,19],"port":[335,246,589,19],"summary":[335,479,370,19]}},"be00-trust":{"w":1068,"h":601,"boxes":{"dialog":[310,199,449,204],"yes":[551,369,101,25]}},"be01-compare-side":{"w":1240,"h":644,"boxes":{"h":[20,10,1200,30]}},"be01-compare-side2":{"w":1240,"h":644,"boxes":{}},"be01-compare-top":{"w":1240,"h":644,"boxes":{"h":[20,10,1200,30],"table":[20,52,1200,239]}},"be02-arch-db":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,51]}},"be02-arch-layers":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,51]}},"be02-arch-life-svg":{"w":1141,"h":446,"boxes":{}},"be02-arch-life":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,51],"svg":[50,119,1141,446]}},"be02-arch-post":{"w":1240,"h":644,"boxes":{"h":[50,10,1141,51]}},"be02-arch-top":{"w":1240,"h":644,"boxes":{"h1":[74,44,1091,65]}},"be02-dotnet-run":{"w":1068,"h":601,"boxes":{"panel":[315,30,745,539],"insert":[335,129,589,19],"seq":[335,323,501,19],"listen":[335,362,396,19],"started":[335,401,466,19]}},"be02-dotnet-test":{"w":1068,"h":601,"boxes":{"panel":[315,30,745,539],"finished":[335,401,536,19],"ok":[335,421,448,19],"summary":[335,460,580,19]}},"be02-harness-files":{"w":1068,"h":601,"boxes":{"tree":[44,91,265,417],"claude":[48,415,257,22],"agents":[48,393,257,22],"rules":[48,437,257,22],"contract":[48,459,257,22],"guide":[48,371,257,22],"docs":[48,283,257,22]}},"be02-psql":{"w":1068,"h":601,"boxes":{"panel":[315,30,745,539],"cmd":[335,362,360,19],"count":[335,362,360,19],"n":[335,421,53,19]}},"be02-swagger-404":{"w":1240,"h":644,"boxes":{"code":[41,303,84,248],"body":[125,361,1074,85]}},"be02-swagger-get":{"w":1240,"h":644,"boxes":{"code":[41,303,84,545],"body":[125,343,1074,400],"exec":[51,-60,569,30]}},"be02-swagger":{"w":1240,"h":644,"boxes":{"title":[20,110,1200,42],"get":[20,276,1200,40],"post":[20,331,1200,40],"del":[20,496,1200,40]}},"be03-copy":{"w":1068,"h":601,"boxes":{"panel":[315,30,745,539],"copy":[335,246,589,19],"cd":[335,479,343,19]}},"be03-dotnet-run":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"listen":[73,358,396,19],"started":[73,397,466,19]}},"be03-dotnet-test":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"finished":[73,417,536,19],"ok":[73,436,448,19],"summary":[73,475,580,19]}},"be03-psql":{"w":1068,"h":601,"boxes":{"panel":[52,104,1012,465],"cmd":[73,358,976,19],"count":[73,358,976,19],"n":[73,436,53,19]}},"be03-swagger-404":{"w":1240,"h":644,"boxes":{"code":[41,303,84,248],"body":[125,361,1074,85]}},"be03-swagger-get":{"w":1240,"h":644,"boxes":{"code":[41,303,84,545],"body":[125,343,1074,400],"exec":[51,-60,569,30]}},"be03-swagger":{"w":1240,"h":644,"boxes":{"title":[20,110,1200,42],"get":[20,276,1200,40],"post":[20,331,1200,40],"del":[20,496,1200,40]}},"hb-step3-paradigm":{"w":1411,"h":761,"boxes":{}},"hb-step5-value":{"w":1375,"h":771,"boxes":{}},"hb-overview":{"w":1800,"h":1005,"boxes":{}}};
+let HC='#f4b942';  // 標註框預設色：深色截圖用金色；淺色系統畫面在場景檔第一行寫 HC='#ff8a1f';
+const FR={x:120,y:116,w:1360,h:765};          // 一般：整張截圖
+const FD={x:430,y:128,w:1130,h:636};          // 示範：左邊步驟、右邊截圖
+const FW={x:70,y:170,w:1460,h:616};           // 超寬 2560×1080
+const FA={x:150,y:116,w:1300,h:731};          // 下方留一行註記
+function tw(s,size){let w=0;for(const ch of String(s))w+=ch.charCodeAt(0)>0x2e7f?size:size*0.6;return w;}
+function mhead(eb,title){T(L,70,52,eb,{size:24,fill:C.coral,weight:700});T(L,70,100,title,{size:42,weight:900});}
+/* 一張系統畫面；回傳群組 g（g.inner 可放大，標註都放在 inner 裡跟著放大） */
+function scr(name,F=FR){const m=META[name]||{w:1920,h:1080,boxes:{}};const g=grp(L);
+  const id='cl'+(++uid);const cp=mk('clipPath',{id},defs);mk('rect',{x:F.x,y:F.y,width:F.w,height:F.h,rx:8},cp);
+  R(g,F.x-5,F.y-5,F.w+10,F.h+10,{fill:'#050d16',stroke:C.line,sw:4,rx:12});
+  const c=mk('g',{'clip-path':`url(#${id})`},g);const inner=mk('g',{},c);
+  mk('image',{href:'images/'+name+'.jpg',x:F.x,y:F.y,width:F.w,height:F.h,preserveAspectRatio:'none'},inner);
+  g.inner=inner;g.F=F;g.m=m;g.k=F.w/m.w;g.nm=name;return g;}
+/* 截圖座標（原始畫面像素）→ 舞台座標 */
+function rb(g,k,pad=0){const b=Array.isArray(k)?k:g.m.boxes[k];if(!b){console.warn('no box',g.nm,k);return{x:g.F.x,y:g.F.y,w:10,h:10};}
+  const s=g.k;return{x:g.F.x+b[0]*s-pad,y:g.F.y+b[1]*s-pad,w:b[2]*s+2*pad,h:b[3]*s+2*pad};}
+/* 標註框＋標籤 */
+function hl(r,g,k,label,o={}){const q=rb(g,k,o.pad??5);const col=o.col||HC;const h=grp(g.inner);
+  R(h,q.x,q.y,q.w,q.h,{fill:o.fill||'none',stroke:col,sw:o.sw||5,rx:10});
+  if(label){const size=o.size||26;const lw=tw(label,size)+30;const F=g.F;
+    let lx=o.right?(q.x+q.w-lw):q.x;if(o.lx!=null)lx=o.lx;lx=Math.min(Math.max(lx,F.x+6),F.x+F.w-lw-6);
+    let ly=o.below?(q.y+q.h+8):(q.y-size-24);if(o.inside)ly=q.y+8;
+    if(ly<F.y+4)ly=q.y+q.h+8;if(ly+size+18>F.y+F.h)ly=Math.max(F.y+4,q.y-size-24);
+    R(h,lx,ly,lw,size+18,{fill:col,rx:8});T(h,lx+lw/2,ly+size*0.95+3,label,{size,anchor:'middle',weight:900,fill:C.bg});}
+  (r.H=r.H||[]).push(h);return h;}
+/* 點擊示意：金色圓點＋擴散圈 */
+function ping(r,g,k){const q=rb(g,k,0);const cx=q.x+q.w/2,cy=q.y+q.h/2;const h=grp(g.inner);
+  mk('circle',{cx,cy,r:13,fill:C.gold,stroke:C.bg,'stroke-width':3},h);mk('circle',{cx,cy,r:13,fill:'none',stroke:C.gold,'stroke-width':5,class:'ping'},h);
+  (r.H=r.H||[]).push(h);return h;}
+/* 聚光：其他地方變暗 */
+function spot(r,g,k,pad=8){const q=rb(g,k,pad);const F=g.F;const h=grp(g.inner);
+  mk('path',{d:`M${F.x-3000},${F.y-3000}h${F.w+6000}v${F.h+6000}h${-(F.w+6000)}z M${q.x},${q.y}v${q.h}h${q.w}v${-q.h}z`,fill:'rgba(3,8,14,.6)','fill-rule':'evenodd'},h);
+  (r.H=r.H||[]).push(h);return h;}
+/* 只顯示指定的標註（其他收起來） */
+function only(r,...list){list=list.flat();(r.H||[]).forEach(h=>{if(!list.includes(h))hide(h);});list.forEach((h,i)=>later(i*350,()=>{show(h);glow(h);}));}
+/* 放大到某一塊 */
+function zoom(g,k,o={}){const q=rb(g,k,o.pad??40);const F=g.F;let z=Math.min(F.w/q.w,F.h/q.h,o.max||2);if(z<1)z=1;
+  const hw=F.w/2/z,hh=F.h/2/z;let cx=q.x+q.w/2,cy=q.y+q.h/2;cx=Math.min(Math.max(cx,F.x+hw),F.x+F.w-hw);cy=Math.min(Math.max(cy,F.y+hh),F.y+F.h-hh);
+  move(g.inner,`translate(${F.x+F.w/2-z*cx}px,${F.y+F.h/2-z*cy}px) scale(${z})`);}
+function unzoom(g){move(g.inner,'');}
+/* 換到另一張畫面（淡入，舊的稍後收起） */
+function to(r,g){show(g);(r.S||[]).forEach(o=>{if(o!==g)later(650,()=>hide(o));});}
+function shots(r,names,F){r.S=names.map(n=>scr(n,F));return r.S;}
+/* 示範用：左邊的步驟清單 */
+function stepList(labels,y0=150,gap=150){const g=grp(L,false);const items=labels.map((t,i)=>{const it=grp(g,false);const y=y0+i*gap;
+    const bx=R(it,40,y,350,104,{fill:C.card,stroke:C.line,sw:3});mk('circle',{cx:88,cy:y+52,r:28,fill:C.line},it);T(it,88,y+63,String(i+1),{size:30,anchor:'middle',weight:900,fill:C.ink});
+    T(it,130,y+64,t,{size:29,weight:800});if(i<labels.length-1)T(it,215,y+gap-10,'▼',{size:24,anchor:'middle',fill:C.mut});it._bx=bx;it._c=it.querySelector('circle');return it;});
+  g.set=n=>items.forEach((it,j)=>{it._bx.setAttribute('stroke',j===n?C.gold:C.line);it._bx.setAttribute('fill',j===n?'#2a2410':C.card);it._c.setAttribute('fill',j<=n?C.gold:C.line);dim(it,j>n);});
+  g.set(-1);return g;}
+function caseBar(text){return box(L,430,788,1130,76,text,{size:28,fill:'#2a2410',stroke:C.gold,sw:2,color:C.gold,hidden:false});}
+function note(text,y=900-18){return T(L,800,y,text,{size:20,anchor:'middle',fill:C.mut});}
+
+
+/* 依圖片比例放進指定區域 */
+function fitF(name,A={x:70,y:116,w:1460,h:765}){const m=META[name];const k=Math.min(A.w/m.w,A.h/m.h);const w=m.w*k,h=m.h*k;return{x:A.x+(A.w-w)/2,y:A.y+(A.h-h)/2,w,h};}
+function fshots(r,list){r.S=list.map(([n,A])=>scr(n,fitF(n,A)));return r.S;}
+function card(x,y,w,h,title,lines,col,o={}){const g=grp(L,o.hidden!==false);R(g,x,y,w,h,{fill:C.card,stroke:col,sw:3});T(g,x+22,y+44,title,{size:o.ts||30,weight:900,fill:col});
+  lines.forEach((t,i)=>T(g,x+26,y+88+i*(o.lh||40),t,{size:o.size||25}));return g;}
+
+/* ===== AI CRUD 工作坊動畫專用小工具（接在技能的 helpers.js 後面）=====
+   chapter()：章節（step0～step5）；term()：大字版終端機（逐字打指令、逐行出結果）；
+   bwin()：瀏覽器外框＋網址列；cursor()/clickAt()：滑鼠游標移過去點一下；keys()：按鍵圖示；codeCard()：大字指令卡。 */
+const CHAPS = [];
+function chapter(tag, title, color) { CHAPS.push({ tag, title, color: color || C.gold }); }
+function scene(title, build, steps) { scenes.push({ title, build, steps, chap: CHAPS.length - 1 }); }
+window.__chaps = CHAPS;
+
+const MONO = "'JetBrains Mono','Cascadia Mono',Consolas,'Noto Sans TC','Microsoft JhengHei',monospace";
+const TC = { bg: '#181818', bar: '#1f1f1f', line: '#3c3c3c', ink: '#d4d4d4', mut: '#8b949e', cmd: '#f2cc60', ok: '#23d18b', warn: '#f5f543', err: '#f14c4c', link: '#3b8eea', cyan: '#29b8db', flag: '#9da5b4' };
+
+/* 外框（截圖用）：不畫深色邊框的 scr，給瀏覽器外框裡面用 */
+function scrIn(name, F, parent) {
+  const m = META[name] || { w: 1600, h: 900, boxes: {} }; const g = grp(parent || L);
+  const id = 'cl' + (++uid); const cp = mk('clipPath', { id }, defs); mk('rect', { x: F.x, y: F.y, width: F.w, height: F.h }, cp);
+  const c = mk('g', { 'clip-path': `url(#${id})` }, g); const inner = mk('g', {}, c);
+  mk('image', { href: 'images/' + name + '.jpg', x: F.x, y: F.y, width: F.w, height: F.h, preserveAspectRatio: 'none' }, inner);
+  g.inner = inner; g.F = F; g.m = m; g.k = F.w / m.w; g.nm = name; return g;
+}
+
+/* 瀏覽器外框：上面一條網址列（大字），下面放截圖。回傳 {g, S:[截圖…], ut}；預設藏起來，用 show(bw.g) 顯示 */
+const BW = { x: 120, y: 112, w: 1360, h: 770, bar: 64 };
+function bwin(names, url, A = BW, o = {}) {
+  const g = grp(L, o.hidden !== false);
+  R(g, A.x - 4, A.y - 4, A.w + 8, A.h + 8, { fill: '#e8eaed', stroke: '#9aa0a6', sw: 3, rx: 14 });
+  [['#ff5f57', 0], ['#febc2e', 1], ['#28c840', 2]].forEach(([c, i]) => mk('circle', { cx: A.x + 26 + i * 26, cy: A.y + A.bar / 2, r: 8, fill: c }, g));
+  R(g, A.x + 112, A.y + 11, A.w - 136, A.bar - 22, { fill: '#ffffff', stroke: '#dadce0', sw: 2, rx: 21 });
+  T(g, A.x + 136, A.y + A.bar / 2 + 10, '🔒', { size: 22 });
+  const ut = T(g, A.x + 172, A.y + A.bar / 2 + 11, url || '', { size: 30, weight: 700, fill: '#202124' }); ut.classList.add('mono'); ut.style.fontFamily = MONO;
+  const F = { x: A.x, y: A.y + A.bar, w: A.w, h: A.h - A.bar };
+  const S = names.map(n => scrIn(n, F, g));
+  return { g, S, ut, F };
+}
+/* 在一組截圖裡換到另一張（淡入，其他稍後收起） */
+function swap(list, g) { show(g); list.forEach(o => { if (o !== g) later(650, () => hide(o)); }); }
+/* 換網址（typing=true 會一個字一個字打出來） */
+function burl(bw, text, typing) {
+  const ut = bw.ut;
+  if (!typing) { ut.textContent = text; return; }
+  ut.textContent = ''; [...text].forEach((ch, i) => later(i * 45, () => { ut.textContent = text.slice(0, i + 1); }));
+}
+
+/* 大字版終端機。o: {x,y,w,h,size,title,path}；回傳 api：
+   t.cmd(指令,{path,typing})：印提示字元並逐字打指令；t.out([行…],{gap})：逐行出結果；
+   t.mark(第幾行,標籤,顏色)：框住某一行；t.clear()：清空。行文字開頭是 [PASS]/[WARN]/[FAIL] 會自動上色。 */
+function term(o = {}) {
+  const x = o.x ?? 80, y = o.y ?? 120, w = o.w ?? 1440, h = o.h ?? 640, size = o.size ?? 30, lh = o.lh ?? Math.round(size * 1.55);
+  const g = grp(L, o.hidden !== false);
+  R(g, x, y, w, h, { fill: TC.bg, stroke: TC.line, sw: 3, rx: 16 });
+  R(g, x, y, w, 58, { fill: TC.bar, rx: 16 }); R(g, x, y + 40, w, 18, { fill: TC.bar, rx: 0 });
+  mk('line', { x1: x, y1: y + 58, x2: x + w, y2: y + 58, stroke: TC.line, 'stroke-width': 2 }, g);
+  T(g, x + 30, y + 39, o.title || '終端機', { size: 24, weight: 800, fill: '#ffffff' });
+  mk('rect', { x: x + 26, y: y + 50, width: 80, height: 4, fill: C.gold }, g);
+  T(g, x + w - 30, y + 39, o.shell || 'powershell', { size: 22, anchor: 'end', fill: TC.mut });
+  if (o.note) T(g, x + w / 2, y + 39, o.note, { size: 22, anchor: 'middle', fill: C.gold, weight: 700 });
+  const id = 'tc' + (++uid); const cp = mk('clipPath', { id }, defs); mk('rect', { x: x + 8, y: y + 70, width: w - 16, height: h - 78 }, cp);
+  const body = mk('g', { 'clip-path': `url(#${id})` }, g); const marks = mk('g', {}, body); const inner = mk('g', {}, body);
+  const cap = Math.floor((h - 84) / lh); let n = 0; const x0 = x + 30, y0 = y + 62 + 14 + size;
+  let path = o.path || 'D:\\AI_CRUD_Workshop_Frontend_EASY';
+  const cur = mk('rect', { x: x0, y: y0 - size, width: size * 0.55, height: size * 1.15, fill: '#ffffff', class: 'tcursor' }, inner);
+  const api = { g, lines: [], x, y, w, h, size, lh };
+  function scroll() { const over = Math.max(0, n - cap); const t = `translateY(${-over * lh}px)`; inner.style.transform = t; marks.style.transform = t; }
+  function color(s) { if (/^\[PASS\]/.test(s)) return TC.ok; if (/^\[WARN\]/.test(s)) return TC.warn; if (/^\[FAIL\]/.test(s)) return TC.err; if (/^\s*修復提示/.test(s)) return TC.err; return null; }
+  // 像真的終端機一樣：一行太長就折到下一行（中文字算 1 個字寬，英數算 0.6 個字寬）
+  const maxW = w - 60, cw = ch => /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/.test(ch) ? size : size * 0.6;
+  function split(parts, first = 0) {
+    const rows = [[]]; let used = first;
+    parts.forEach(([s, c, wt]) => { let buf = '';
+      [...s].forEach(ch => { const d = cw(ch); if (used + d > maxW && used > 0) { if (buf) rows[rows.length - 1].push([buf, c, wt]); rows.push([]); buf = ''; used = 0; } buf += ch; used += d; });
+      if (buf) rows[rows.length - 1].push([buf, c, wt]); });
+    return rows;
+  }
+  function addLine(parts) {
+    const t = mk('text', { x: x0, y: y0 + n * lh, 'font-size': size }, inner); t.style.fontFamily = MONO;
+    parts.forEach(([s, c, wt]) => mk('tspan', { text: s, fill: c || TC.ink, 'font-weight': wt || 500 }, t));
+    n++; api.lines.push(t); scroll(); return t;
+  }
+  // 一個邏輯行可能折成好幾列：第一列記住全部列（t._rows），框線時框住全部
+  function addRows(parts) { const rows = split(parts).map(addLine); rows[0]._rows = rows; return rows[0]; }
+  function park(t) { const bb = t.getBBox(); cur.setAttribute('x', bb.x + bb.width + 4); cur.setAttribute('y', +t.getAttribute('y') - size * 0.92); }
+  api.prompt = (p2) => { if (p2) path = p2; const t = addLine([[`PS ${path}> `, TC.ink]]); park(t); return t; };
+  api.cmd = (command, o2 = {}) => {
+    if (o2.path) path = o2.path;
+    const P = `PS ${path}> `; const t = addLine([[P, TC.ink]]);
+    const sp = command.indexOf(' '); const head = sp < 0 ? command : command.slice(0, sp); const rest = sp < 0 ? '' : command.slice(sp);
+    const all = head + rest; const chars = [...all];
+    // 算出每個字落在第幾列：第一列接在提示字元後面，放不下就換到新的一列
+    let used = [...P].reduce((s, ch) => s + cw(ch), 0); const rowOf = []; let row = 0;
+    chars.forEach(ch => { const d = cw(ch); if (used + d > maxW) { row++; used = 0; } rowOf.push(row); used += d; });
+    const els = [t]; for (let i = 1; i <= row; i++) els.push(addLine([]));
+    const spans = els.map(e => [mk('tspan', { text: '', fill: TC.cmd, 'font-weight': 700 }, e), mk('tspan', { text: '', fill: '#ffffff', 'font-weight': 600 }, e)]);
+    t._rows = els;
+    const paint = k => { const buf = els.map(() => ['', '']); chars.slice(0, k).forEach((ch, i) => { buf[rowOf[i]][i < head.length ? 0 : 1] += ch; });
+      spans.forEach(([a, b], i) => { a.textContent = buf[i][0]; b.textContent = buf[i][1]; }); park(els[k ? rowOf[k - 1] : 0]); };
+    const step = o2.cps ? 1000 / o2.cps : 55; const t0 = o2.delay ?? 300;
+    if (o2.typing === false) { paint(chars.length); return t; }
+    paint(0);
+    chars.forEach((ch, i) => later(t0 + i * step, () => paint(i + 1)));
+    return t;
+  };
+  api.out = (lines, o2 = {}) => {
+    const gap = o2.gap ?? 140, t0 = o2.delay ?? 0; const made = [];
+    lines.forEach((s, i) => {
+      const parts = Array.isArray(s) ? s : [[s, color(s) || o2.color, color(s) ? 700 : 500]];
+      const t = addRows(parts); made.push(t); t._rows.forEach(e => e.classList.add('hid'));
+      later(t0 + i * gap, () => { t._rows.forEach(e => e.classList.remove('hid')); park(t._rows[t._rows.length - 1]); });
+    });
+    return made;
+  };
+  api.mark = (t, label, col = C.gold, o2 = {}) => {
+    const hg = grp(marks, true); const bb = (t._rows || [t]).map(e => e.getBBox()).reduce((a, b) => {
+      const x1 = Math.min(a.x, b.x), y1 = Math.min(a.y, b.y); return { x: x1, y: y1, width: Math.max(a.x + a.width, b.x + b.width) - x1, height: Math.max(a.y + a.height, b.y + b.height) - y1 }; });
+    R(hg, bb.x - 12, bb.y - 6, Math.max(bb.width + 24, o2.minw || 0), bb.height + 12, { fill: 'rgba(244,185,66,.10)', stroke: col, sw: 4, rx: 10 });
+    if (label) { const lw = tw(label, 24) + 28; const bw2 = Math.max(bb.width + 24, o2.minw || 0);
+      // 標籤放在這一行的右邊（不壓到上下行）；右邊放不下就貼著終端機右緣
+      // 折成好幾列時，放在最後一列（通常比較短）的字後面
+      const rows = t._rows || [t]; const lb = rows.length > 1 ? rows[rows.length - 1].getBBox() : null;
+      let lx = lb ? lb.x + lb.width + 24 : bb.x - 12 + bw2 + 14; if (lx + lw > x + w - 14) lx = x + w - lw - 14;
+      const ly = lb ? lb.y + lb.height / 2 - 19 : bb.y + bb.height / 2 - 19;
+      R(hg, lx, ly, lw, 38, { fill: col, rx: 8 }); T(hg, lx + lw / 2, ly + 28, label, { size: 24, weight: 900, anchor: 'middle', fill: C.bg }); }
+    return hg;
+  };
+  api.clear = () => { [...inner.querySelectorAll('text')].forEach(e => e.remove()); [...marks.children].forEach(e => e.remove()); n = 0; api.lines = []; scroll(); };
+  api.hideCursor = () => cur.classList.add('hid');
+  return api;
+}
+
+/* 滑鼠游標：cursor(r) 建一個（放在最上層），clickAt(r, g, 鍵或[x,y,w,h]) 移過去並點一下 */
+function cursor(r) {
+  const g = grp(L, true, 'mcur'); g.style.transform = 'translate(1500px,820px)';
+  mk('path', { d: 'M0,0 L0,40 L11,30 L18,47 L25,44 L18,28 L32,28 Z', fill: '#ffffff', stroke: '#111111', 'stroke-width': 3, 'stroke-linejoin': 'round' }, g);
+  r.cur = g; return g;
+}
+/* 放大／還原：和 helpers.js 的版本一樣，另外記下放大的位移與倍率（g._zt），讓游標跟著換算 */
+function zoom(g, k, o = {}) {
+  const q = rb(g, k, o.pad ?? 40); const F = g.F; let z = Math.min(F.w / q.w, F.h / q.h, o.max || 2); if (z < 1) z = 1;
+  const hw = F.w / 2 / z, hh = F.h / 2 / z; let cx = q.x + q.w / 2, cy = q.y + q.h / 2;
+  cx = Math.min(Math.max(cx, F.x + hw), F.x + F.w - hw); cy = Math.min(Math.max(cy, F.y + hh), F.y + F.h - hh);
+  g._zt = { tx: F.x + F.w / 2 - z * cx, ty: F.y + F.h / 2 - z * cy, z };
+  move(g.inner, `translate(${g._zt.tx}px,${g._zt.ty}px) scale(${z})`);
+}
+function unzoom(g) { g._zt = null; move(g.inner, ''); }
+function clickAt(r, g, k, o = {}) {
+  const q = g ? rb(g, k, 0) : { x: k[0], y: k[1], w: k[2] || 0, h: k[3] || 0 };
+  let cx = q.x + q.w * (o.fx ?? 0.5), cy = q.y + q.h * (o.fy ?? 0.5);
+  // 截圖放大中：把截圖上的座標換成舞台座標
+  if (g && g._zt) { cx = g._zt.tx + g._zt.z * cx; cy = g._zt.ty + g._zt.z * cy; }
+  L.appendChild(r.cur); show(r.cur); later(30, () => { r.cur.style.transform = `translate(${cx}px,${cy}px)`; });
+  if (o.click !== false) later(1250, () => { const c = mk('circle', { cx, cy, r: 16, fill: 'none', stroke: C.gold, 'stroke-width': 6, class: 'ping' }, L); later(1800, () => c.remove()); });
+}
+
+/* 按鍵圖示：keys(x, y, ['Ctrl','`'])，回傳群組（預設藏起來） */
+function keys(x, y, list, o = {}) {
+  const g = grp(L, o.hidden !== false); const size = o.size || 34; let cx = x;
+  list.forEach((k, i) => {
+    if (i) { T(g, cx + 14, y + size * 1.05, '+', { size, weight: 900, fill: C.mut }); cx += 44; }
+    const w = Math.max(size * 1.6, tw(k, size) + 36);
+    R(g, cx, y, w, size * 1.6, { fill: '#f4f6f8', stroke: '#aab4be', sw: 3, rx: 10 }); R(g, cx, y + size * 1.6 - 8, w, 8, { fill: '#aab4be', rx: 4 });
+    T(g, cx + w / 2, y + size * 1.12, k, { size, weight: 900, anchor: 'middle', fill: '#1d2733' }); cx += w;
+  });
+  g.w = cx - x; return g;
+}
+
+/* 大字指令卡：要學員照打的指令 */
+function codeCard(x, y, w, lines, o = {}) {
+  const size = o.size || 30, lh = Math.round(size * 1.5), h = o.h || (lines.length * lh + 70);
+  const g = grp(L, o.hidden !== false);
+  R(g, x, y, w, h, { fill: '#0b1520', stroke: o.col || C.teal, sw: 3, rx: 14 });
+  T(g, x + 22, y + 36, o.title || '照著打', { size: 22, weight: 800, fill: o.col || C.teal });
+  lines.forEach((s, i) => { const t = T(g, x + 26, y + 50 + size + i * lh, s, { size, weight: 700, fill: /^#/.test(s) ? C.mut : '#ffffff' }); t.style.fontFamily = MONO; });
+  return g;
+}
+
+/* 一句話重點條（畫面下方） */
+function tip(text, o = {}) { return box(L, o.x ?? 120, o.y ?? 800, o.w ?? 1360, o.h ?? 76, text, { size: o.size || 30, fill: '#2a2410', stroke: o.col || C.gold, sw: 3, color: o.col || C.gold, weight: 800, hidden: o.hidden !== false }); }
+
+// 由 build_v3_data.py 產生：講稿與配音清單
+window.__script = [{"chap": "開場", "title": "這堂課：把假資料變真的", "who": "小芸", "lines": ["這堂課接著前端課做。前端課的裝備物資模組，資料放在瀏覽器記憶體，按 F5 重新整理，剛新增的那筆就不見了。", "這堂課要把它變成真的：資料寫進 PostgreSQL 資料庫，F5 之後還在，關掉瀏覽器、重開機也還在。這叫持久化。", "比喻：前端 mock 像白板，每按一次 F5，就被擦回最初那 24 筆；這堂課是記進帳本，寫了就留著。", "方法跟前端課一樣：harness 給規矩、範本給骨架、SDD 先文件再程式、LOOP 自己驗、另一個 AI 挑錯。只是這次做的是後端。"]}, {"chap": "開場", "title": "請求的一生", "who": "小芸", "lines": ["先記一條動線，叫「請求的一生」。使用者在瀏覽器按一下，請求先到前端的轉接站 devProxy。", "再到後端：Controller 只負責收件，回一個狀態碼。狀態碼是三位數的回條：201 是新增成功，404 是找不到。Service 做真正的事，像算編碼。", "接著 EF Core 把物件翻成 SQL，寫進 PostgreSQL 的資料表。最後原路回來，變成畫面。", "前端課只做到瀏覽器那一格。這堂課把後面整段接起來。資料在資料庫查得到，才叫真的。"]}, {"chap": "開場", "title": "課程地圖", "who": "小芸", "lines": ["Step 0 前置檢查，Step 1 看後端有規矩、沒規矩差在哪，Step 2 玩範本 API。", "Step 3 用 SDD 做裝備物資的後端，Step 4 用 LOOP 跑全鏈路測試再對抗審查，Step 5 總結。課後還有 Step 6：把前端課那行 TODO 變成真的 API。", "指令都在畫面上和手冊裡，照著貼。我們把時間花在 AI 怎麼做事。"]}, {"chap": "Step 0", "title": "前置檢查：11 項", "who": "阿哲", "lines": ["開始前，照手冊的清單裝好 .NET SDK 10、PostgreSQL 18、Node.js、pnpm，和 VS Code 裡的 Claude Code。", "把後端課的教材下載下來，用 VS Code 打開，在終端機跑前置檢查 preflight。這次有 11 項。", "最要緊的幾項是命脈：.NET 版本、PostgreSQL 連得上、帳密登得進去、5080 埠空著。最後寫「可以開課」就過關，WARN 不算錯。", "psql 是 PostgreSQL 附的查詢工具，不經過畫面，直接看資料表。它不在系統路徑也沒關係，preflight 會把完整路徑印出來，之後照抄就好。"]}, {"chap": "Step 0", "title": "紅燈最常是資料庫沒開", "who": "阿哲", "lines": ["後端課最常見的紅燈是 PostgreSQL 沒啟動或帳密不對。先看服務有沒有在跑；停著的話，用「以系統管理員身分執行」開 PowerShell，再啟動它。", "還是紅，就把整段輸出貼給 AI，請它帶你修。手冊有現成的 prompt。", "課前一天，先跑一次 dotnet run 和 Step 4 的自動測試 run-e2e。它們第一次會下載東西，最花時間，別留到上課。"]}, {"chap": "Step 1", "title": "同一句後端需求，兩個產出", "who": "小芸", "lines": ["Step 1 一樣做實驗：同一句「幫我加一個新增裝備的 API」，一次不給規矩，一次附上規矩。", "先講公道話：現在的模型不給規矩也寫得很漂亮。分層、注入、參數化、驗證、201 加 Location，它自己就會。", "差在三件事：回應包成什麼形狀、id 和編碼長什麼樣、欄位名和訊息語言。沒規矩，這些全是 AI 當場自己發明的。", "比喻：請一個很厲害的木工做櫃子。不給圖，他做得又快又好，但抽屜高度、把手樣式都是他定的，跟你家其他櫃子搭不起來。規矩就是那張圖。"]}, {"chap": "Step 1", "title": "後端 harness 管什麼", "who": "小芸", "lines": ["所以後端的 harness 管的是：成功和查無的回應一律用 ModelResult 包起來、錯誤訊息用繁體中文、欄位名跟前端一模一樣、取號要在交易裡做。", "它管「怎麼寫」，不管「做多少」。id 和編碼怎麼產生、範圍做多大，留到 Step 3 的選擇題讓你拍板。"]}, {"chap": "Step 2", "title": "範本 API 跑起來：Swagger、測試、psql", "who": "阿哲", "lines": ["Step 2 先把範本跑起來。開終端機，進 sample-api 的 CrudTemplate.Api，打 dotnet run，指定 5080 埠。第一次會自己建資料庫、灌 24 筆種子。", "API 是後端開給前端的窗口。瀏覽器開 localhost:5080/swagger，Swagger 是 API 的操作面板，人員管理五條路由各打一次：查全部、查一筆、新增、修改、刪除。", "狀態碼要有語意：新增回 201，查不到回 404，刪除回 204，再刪一次 404。", "再開一個終端機，進 sample-api 資料夾跑 dotnet test，49 條全綠。再用 psql 直接查資料表，看到 24 筆。看完回第一個終端機按 Ctrl+C，把 5080 讓出來。"]}, {"chap": "Step 2", "title": "後端 harness：四份給 AI 讀的規矩", "who": "小芸", "lines": ["範本根目錄一樣有四份規矩。CLAUDE.md 是總綱：技術棧鎖定、程式規則、契約要點。CODE-RULES-api 是後端細則：分層、命名、驗證、測試。", "contract-conventions-summary 是契約摘要：狀態碼矩陣、流水號怎麼取，還有 ModelResult，它是統一的信封，固定三格：success、message、data。使用說明教 AI 怎麼開新的 API 模組。", "你不用逐條讀懂，但 CLAUDE.md 只有四十幾行，掃一遍，確認鐵律跟你們公司一致。規矩寫錯，AI 會照著錯。"]}, {"chap": "Step 2", "title": "分層：Controller 薄、Service 厚、Common 不改", "who": "小芸", "lines": ["範本的分層很固定。Controllers 只做「呼叫 Service、對映狀態碼」；Services 放商業邏輯：取號、產 id、查無回失敗。", "Data 放 DbContext、種子和 migration。migration 是改資料表的施工單，照順序執行，不准手改資料庫。Entities 對應資料表，Models 是對外的請求和回應。", "Common 是跨模組共用的：ModelResult 封裝、狀態碼分流、全域例外處理。開新模組時 Common 一個字都不動。", "跟前端課一樣的心法：跟實體長相有關的，複製改名；通用機制，直接共用。"]}, {"chap": "Step 3", "title": "SDD：先文件，再程式；這次寫的是 delta", "who": "小芸", "lines": ["Step 3 要做裝備物資的後端 API。一樣走 SDD，規格驅動開發：PRD、選擇題、SRS、設計文件和圖、任務清單，最後才程式。", "不同的是，這次的文件叫 delta，只寫「跟人員範本不同的地方」。範本的 SRS 和設計文件是正本，一個字都不改。", "比喻：社區裡已經有一棟樣品屋，現在照它再蓋一棟。你只寫跟樣品屋不一樣的地方；水電總管大家共用，不准動。"]}, {"chap": "Step 3", "title": "PRD：服從前端的契約，留六個決定給你", "who": "小芸", "lines": ["需求寫在 PRD。重點只有一句：前端已經定好的欄位名，後端照著做，一個都不能改，改了就接不上。", "契約 13 欄：必填 6 欄、選填 5 欄、後端自己產生 2 欄，id 和 code。回應一律 camelCase。", "PRD 第 5 節刻意留了六個決定，畫面下方都列出來了。這六題由你拍板。"]}, {"chap": "Step 3", "title": "實拍：複製範本，貼起手 prompt", "who": "阿哲", "lines": ["實際操作。在教材根目錄開新終端機，貼上手冊的複製指令：把範本複製成 my-equipment-api，再把 PRD 和最小樣板放進去。參考解不進工作區。", "用 VS Code 打開 my-equipment-api，開 Claude Code，模型選 Opus 5.5，effort 選 High；effort 就是讓 AI 想多深。貼上起手 prompt，只有四句。", "它叫 AI 先讀 CLAUDE.md，和給別家 AI 看的 AGENTS.md，兩份指向同一套規矩；再讀 PRD，先不要寫程式。畫面上這一串讀檔，就是 AI 在讀規矩。"]}, {"chap": "Step 3", "title": "實拍：AI 出選擇題，你拍板", "who": "阿哲", "lines": ["讀完，AI 沒有寫程式，先出選擇題。每題都有建議和一句理由。", "六題我先自己想一輪，再對照講師發的課堂裁決選。答案要等你自己答完，講師才會發，所以這裡不念。", "PRD 沒寫清楚的，它又多問了 6 題，像人員模組要不要保留。這是 prompt 和 harness 一起運作：prompt 叫它先問；CLAUDE.md 規定只在非問不可時問，而且用選擇題。"]}, {"chap": "Step 3", "title": "實拍：先交文件，你核過才開工", "who": "阿哲", "lines": ["拍板後，AI 先交文件：SRS-delta、設計文件-delta、四張圖，還有任務清單，都寫在 docs 資料夾。這次 14 個任務、預計 94 條測試，程式一行都還沒寫。", "它還點名要你確認它自己補的 7 個細節。先別急著說開工：打開 SRS-delta，先看它補的那幾條，再核三段、看一眼圖。"]}, {"chap": "Step 3", "title": "打開 SRS-delta：這一版答應了什麼", "who": "小芸", "lines": ["說開工之前，先打開 SRS-delta。第一段是已拍板決策：六題加追加題，每題的裁決、理由、誰拍板。", "第二段是需求追溯：13 欄每一欄做在哪一層、怎麼驗。第三段是範圍外，這一版不做什麼。第四段是待定與風險，看有沒有你不能接受的。", "標星號的三段是 PM 一定要核的。你不用看 C#，看這三段就知道它答應了什麼。"]}, {"chap": "Step 3", "title": "打開設計文件-delta 和圖：看圖，不用看程式", "who": "小芸", "lines": ["再看設計文件-delta，它有四段：檔案責任、資料模型、關鍵決策怎麼做、harness 證據。第一段寫哪一層新增哪些檔，Common 完全沒動。", "最後一段是遵守 harness 的證據：build 零警告、測試幾條、成功和查無都包 ModelResult、訊息都是繁中、綱要只走 migration。", "重點在圖。用瀏覽器打開 DIAGRAMS，四張：分層架構、資料表 ER 圖、新增品項的循序圖、狀態碼矩陣。", "看圖就知道請求怎麼走、資料表長什麼樣、編碼在交易裡怎麼取、哪種情況回哪個狀態碼，不用讀程式。圖看不懂就退回去重畫：實拍那次狀態碼矩陣太窄，阿哲就請它改成橫的。"]}, {"chap": "Step 3", "title": "實拍：換模型、開工、做完", "who": "阿哲", "lines": ["文件核過了，說「開工」之前，把模型換成 Sonnet 5.5。有規矩和範本，寫程式用便宜的就夠；清單上更高階的模型，這堂課用不到。", "說「開工」，它照範本的分層一層一層做：資料表實體、migration、DTO、對映、Service、Controller、種子、測試。每做完一項回報一行。這次大約 7 分鐘。", "最後我請它用五行總結：94 條測試全綠，文件也對齊了。到這裡，你一行 C# 都沒碰過。"]}, {"chap": "Step 3", "title": "實拍：三路驗收", "who": "阿哲", "lines": ["AI 說做完了，換你親眼驗，三路。先在 my-equipment-api 開終端機，照手冊打 dotnet run，把你自己的 API 開在 5080。", "第一路 Swagger：裝備物資五條路由各打一次，狀態碼要對。第二路 dotnet test，全綠就好；這次 94 條，條數以你的任務清單為準。", "第三路 psql，這次資料庫換成 ai_crud_equipment，查 equipment_item，24 列。範本的人員也是 24 筆，庫名打錯一樣會看到 24，要看清楚。"]}, {"chap": "Step 3", "title": "實拍：做完還是有小修改", "who": "阿哲", "lines": ["驗收一定會有小落差。這次我發現兩個：採購日期送空字串，回的是英文錯誤；空表單送出，分類和狀態各報兩條錯。", "一次講一件：看到什麼、期望什麼、只改這個。AI 改一次，我再驗一次。這兩次也補了測試，從 94 條變 114 條。", "問題不大，但你得坐在電腦前面陪它。這段來回，Step 4 交給兩個角色：6 條測試抓大方向，審查的 AI 專抓這種細節。"]}, {"chap": "Step 4", "title": "別再一問一答：找另一個 AI 取代你", "who": "小芸", "lines": ["一問一答像主管手把手帶新人，時間全耗在教。換個做法：規矩寫在 harness，示範放在範本，驗收標準寫成自動測試。", "這堂課的驗收標準是 6 條全鏈路 E2E 測試，教材已經寫好。全鏈路的意思是：程式自己開瀏覽器，從畫面一路打到後端和資料庫。", "再找另一個 AI 取代你「來回要 AI 修」的角色。它只負責找碴、不准誇獎，所以叫對抗審查。"]}, {"chap": "Step 4", "title": "LOOP：6 條測試、reload 試金石、兩條鐵律", "who": "小芸", "lines": ["LOOP 就是讓 AI 自己跑「改程式、跑測試、再改」，直到 6 條全綠。", "這 6 條故意「做一個動作、重新整理、再檢查」。重新整理就是擦白板的那一下：mock 會回到 24 筆種子，真的寫進資料庫才會留下。", "兩條鐵律一樣：不准偷改標準答案，也就是不准改測試、不准放寬；同一個問題修兩次沒好，就停下來回報。", "鐵律、埠、審查方式、要交哪四樣，都寫在 LOOP 規矩檔裡。它也是 harness 的一份。prompt 只要說「照規矩做」。"]}, {"chap": "Step 4", "title": "實拍：一個 prompt，AI 自己起服務、自己跑測試", "who": "阿哲", "lines": ["實際看一次。回到最外層的教材資料夾，開新的 Claude Code 對話，模型 Sonnet 5.5，貼上 LOOP prompt，四句。送出前確認右下角跟畫面一樣是 Auto，它才不會每一步都停下來問你。", "送出就不用管了。AI 先把你的 API 和前端開起來，埠被占就換。跑測試前它先停掉你的 API，run-e2e 暫時開一個連測試資料庫的 API，跑完再把你的開回來；前端一直沿用。", "第一輪就 6 條全綠，因為 Step 3 已經補了很多測試。但全綠只代表這 6 條沒抓到問題，接下來的對抗審查才是重點。"]}, {"chap": "Step 4", "title": "實拍：全綠之後，另一個 AI 先打 API、再開瀏覽器", "who": "阿哲", "lines": ["全綠之後，它照規矩叫出一個子代理。子代理就是 AI 自己再開的分身，只做一件事，這裡專門挑錯，用比寫程式高一級的 Opus 5.5。", "審查分兩段：先用 HTTP 真的打 API，看 201、400、404 和回應形狀對不對；再用 Playwright 開瀏覽器，一頁一頁截圖對照契約。", "從貼上到交報告，大約 22 分鐘，中間沒有人插手。"]}, {"chap": "Step 4", "title": "對抗審查挑到什麼", "who": "小芸", "lines": ["審查挑到 10 條，最大的一條：同一個前綴同時新增，20 筆有 9 筆撞號回 500。這動到你在 Q1 拍板的取捨，它應該先問你；這次它直接加了鎖，你要回頭決定接不接受。", "剩下的寫成 4 題選擇題，放在報告第 7 節：一個沒修的 500，還有 4 條假綠，就是燈是綠的、其實沒驗到。寫程式的 AI 審自己，像學生自己改考卷，所以要換一個程度更高的來改。"]}, {"chap": "Step 4", "title": "交出來的四樣東西：報告裡有 F5 還在的鐵證", "who": "阿哲", "lines": ["LOOP 做完交四樣。流水紀錄 LOOP-LOG 有紅燈時才翻；結果報告 LOOP-REPORT 一定要看，結論在最前面，有 HTTP 實打的結果和截圖。", "第三樣是 Playwright 的測試報告，6 條點得開。", "報告裡最重要的一張圖：新增一筆，按 F5 重新整理，那一筆還在。前端 mock 會掉回 24 筆，這裡留住了。這就是持久化的鐵證。", "看完報告，照報告的網址自己點一遍：新增一筆、F5、還在。第 7 節的選擇題在同一個對話回給它，再照報告最後的指令把兩個服務關掉。"]}, {"chap": "Step 4", "title": "程式改了，文件跟著改", "who": "小芸", "lines": ["第四樣最容易漏掉：程式改了，文件有沒有跟著改？這次 AI 修完 API，回頭把 SRS-delta、設計文件-delta 和圖也更新了，標上「step4 LOOP 後」。", "SDD 的意思就在這裡：菜改了，菜單跟著改。下一個人接手，看文件就知道現在的 API 長什麼樣子。"]}, {"chap": "Step 4", "title": "三道 Gate：回公司直接當 PR 檢查表", "who": "小芸", "lines": ["五個 Step 很多東西，回公司只要記三道 Gate。規格 Gate：六題裁決、SRS 和設計文件各四段、四張圖、任務清單。", "程式 Gate：build 零警告、測試全綠、Swagger 狀態碼、psql 查得到資料。", "交付 Gate：LOOP 報告、流水紀錄、測試報告 6 比 6、被測的是你自己的作品、文件標「step4 LOOP 後」。這三道同時就是 PR 檢查表。"]}, {"chap": "Step 5", "title": "回公司怎麼用，還有沒教到的", "who": "小芸", "lines": ["回公司三步。第一，把 harness 四份規矩帶進專案，改成公司規則。第二，挑最成熟的 API 整理成範本。第三，新需求都走 SDD 加 LOOP。", "誠實講，今天的成果不是可以上線的版本。編碼併發要決定加鎖還是重試，還有帳密認證、資料量、harness 不管範圍，這四條回公司要補。測試全綠不等於可上線。", "方法不綁語言。四件換成你們技術棧的規則，流程一樣能用。課後練習 Step 6：把前端課那行 TODO 變成真的問卷 API，走同一套流程。"]}, {"chap": "Step 5", "title": "記住四句話", "who": "小芸", "lines": ["第一，後端服從前端的契約，欄位名一個都不改。", "第二，SDD 先文件再程式，delta 只寫不同的地方。", "第三，LOOP 跑全鏈路，F5 還在才叫真的。", "第四，最後由你拍板、由你驗收。"]}];
+window.__audio = {"1-1": {"src": "audio/eab22db509fb.mp3", "sec": 10.56, "who": "小芸"}, "1-2": {"src": "audio/336e0fd24ef0.mp3", "sec": 11.04, "who": "小芸"}, "1-3": {"src": "audio/3d0d10813ca5.mp3", "sec": 10.68, "who": "小芸"}, "1-4": {"src": "audio/50d1ccde7881.mp3", "sec": 13.04, "who": "小芸"}, "2-1": {"src": "audio/4c01dbf9464c.mp3", "sec": 8.96, "who": "小芸"}, "2-2": {"src": "audio/85b9a68c12a0.mp3", "sec": 13.88, "who": "小芸"}, "2-3": {"src": "audio/dedfa2ef2dec.mp3", "sec": 8.28, "who": "小芸"}, "2-4": {"src": "audio/879213101e9a.mp3", "sec": 8.92, "who": "小芸"}, "3-1": {"src": "audio/72978b441774.mp3", "sec": 8.2, "who": "小芸"}, "3-2": {"src": "audio/11c8ec65ec52.mp3", "sec": 13.92, "who": "小芸"}, "3-3": {"src": "audio/a3f4baead23e.mp3", "sec": 6.48, "who": "小芸"}, "4-1": {"src": "audio/c0c1a2f04789.mp3", "sec": 10.72, "who": "阿哲"}, "4-2": {"src": "audio/517859fb850f.mp3", "sec": 9.32, "who": "阿哲"}, "4-3": {"src": "audio/69f277ad5b74.mp3", "sec": 13.2, "who": "阿哲"}, "4-4": {"src": "audio/29d2f3f40839.mp3", "sec": 12.68, "who": "阿哲"}, "5-1": {"src": "audio/293451d803a5.mp3", "sec": 11.92, "who": "阿哲"}, "5-2": {"src": "audio/d0ad6799c042.mp3", "sec": 6.44, "who": "阿哲"}, "5-3": {"src": "audio/2c3c2288ab43.mp3", "sec": 11.08, "who": "阿哲"}, "6-1": {"src": "audio/226da0373cc0.mp3", "sec": 9.12, "who": "小芸"}, "6-2": {"src": "audio/cf19400eb639.mp3", "sec": 10.16, "who": "小芸"}, "6-3": {"src": "audio/2e507b64060e.mp3", "sec": 12.2, "who": "小芸"}, "6-4": {"src": "audio/cebf03583270.mp3", "sec": 13.24, "who": "小芸"}, "7-1": {"src": "audio/9f839441c26a.mp3", "sec": 13.6, "who": "小芸"}, "7-2": {"src": "audio/712451b379d8.mp3", "sec": 8.84, "who": "小芸"}, "8-1": {"src": "audio/e7bee3d79a86.mp3", "sec": 17.16, "who": "阿哲"}, "8-2": {"src": "audio/94d84f7ba947.mp3", "sec": 18.56, "who": "阿哲"}, "8-3": {"src": "audio/a6f9e97a5e2c.mp3", "sec": 9.16, "who": "阿哲"}, "8-4": {"src": "audio/50e7f095641c.mp3", "sec": 17.44, "who": "阿哲"}, "9-1": {"src": "audio/7db95380a86e.mp3", "sec": 15.4, "who": "小芸"}, "9-2": {"src": "audio/9f01d8fbeceb.mp3", "sec": 16.68, "who": "小芸"}, "9-3": {"src": "audio/d0d5fab38f71.mp3", "sec": 10.92, "who": "小芸"}, "10-1": {"src": "audio/709deddc9e84.mp3", "sec": 11.68, "who": "小芸"}, "10-2": {"src": "audio/017d3740ff04.mp3", "sec": 13.08, "who": "小芸"}, "10-3": {"src": "audio/872e1a6fd56d.mp3", "sec": 10.84, "who": "小芸"}, "10-4": {"src": "audio/c2816e2ca758.mp3", "sec": 8.72, "who": "小芸"}, "11-1": {"src": "audio/6feff474b87c.mp3", "sec": 14.84, "who": "小芸"}, "11-2": {"src": "audio/048de16ea5e3.mp3", "sec": 10.52, "who": "小芸"}, "11-3": {"src": "audio/b4f6a25f5be7.mp3", "sec": 11.08, "who": "小芸"}, "12-1": {"src": "audio/10ca5ef2e999.mp3", "sec": 10.32, "who": "小芸"}, "12-2": {"src": "audio/1a05f462f0dc.mp3", "sec": 9.28, "who": "小芸"}, "12-3": {"src": "audio/75a360484e1e.mp3", "sec": 6.28, "who": "小芸"}, "13-1": {"src": "audio/b7ad22203010.mp3", "sec": 15.52, "who": "阿哲"}, "13-2": {"src": "audio/e29f9d402027.mp3", "sec": 13.92, "who": "阿哲"}, "13-3": {"src": "audio/39d4e703acfe.mp3", "sec": 16.36, "who": "阿哲"}, "14-1": {"src": "audio/714860ad3f6d.mp3", "sec": 6.52, "who": "阿哲"}, "14-2": {"src": "audio/cf9f42191b21.mp3", "sec": 10.4, "who": "阿哲"}, "14-3": {"src": "audio/17abc2ce513b.mp3", "sec": 15.68, "who": "阿哲"}, "15-1": {"src": "audio/80efcd423657.mp3", "sec": 15.28, "who": "阿哲"}, "15-2": {"src": "audio/f1c5d4f5a405.mp3", "sec": 11.6, "who": "阿哲"}, "16-1": {"src": "audio/cc58aebd6c7d.mp3", "sec": 11.68, "who": "小芸"}, "16-2": {"src": "audio/908afadb2e28.mp3", "sec": 12.44, "who": "小芸"}, "16-3": {"src": "audio/1bdbfaa1fafa.mp3", "sec": 7.04, "who": "小芸"}, "17-1": {"src": "audio/f27369693315.mp3", "sec": 12.8, "who": "小芸"}, "17-2": {"src": "audio/35bd6d4d7f99.mp3", "sec": 12.08, "who": "小芸"}, "17-3": {"src": "audio/a9268a901a48.mp3", "sec": 10.56, "who": "小芸"}, "17-4": {"src": "audio/b4a8fbc0cf4b.mp3", "sec": 16.16, "who": "小芸"}, "18-1": {"src": "audio/e857f863b426.mp3", "sec": 13.8, "who": "阿哲"}, "18-2": {"src": "audio/b97f06f08a1e.mp3", "sec": 16.44, "who": "阿哲"}, "18-3": {"src": "audio/c98c7546b23c.mp3", "sec": 9.56, "who": "阿哲"}, "19-1": {"src": "audio/6e693040314f.mp3", "sec": 13.28, "who": "阿哲"}, "19-2": {"src": "audio/77cd69aa5c72.mp3", "sec": 12.76, "who": "阿哲"}, "19-3": {"src": "audio/1ceb95def390.mp3", "sec": 17.04, "who": "阿哲"}, "20-1": {"src": "audio/04b857db5c97.mp3", "sec": 13.16, "who": "阿哲"}, "20-2": {"src": "audio/31b5cf801e48.mp3", "sec": 12.76, "who": "阿哲"}, "20-3": {"src": "audio/a530d9336290.mp3", "sec": 12.48, "who": "阿哲"}, "21-1": {"src": "audio/71a4778faf41.mp3", "sec": 11.92, "who": "小芸"}, "21-2": {"src": "audio/a78966ed1734.mp3", "sec": 13.2, "who": "小芸"}, "21-3": {"src": "audio/7607497831d1.mp3", "sec": 9.6, "who": "小芸"}, "22-1": {"src": "audio/32ddc0d79ba7.mp3", "sec": 6.36, "who": "小芸"}, "22-2": {"src": "audio/108fe21c8f4c.mp3", "sec": 12.12, "who": "小芸"}, "22-3": {"src": "audio/3537e494290d.mp3", "sec": 9.2, "who": "小芸"}, "22-4": {"src": "audio/fb8a3689042c.mp3", "sec": 10.8, "who": "小芸"}, "23-1": {"src": "audio/8106e158921a.mp3", "sec": 18.48, "who": "阿哲"}, "23-2": {"src": "audio/edbc333c7946.mp3", "sec": 18.4, "who": "阿哲"}, "23-3": {"src": "audio/693e69575b22.mp3", "sec": 11.4, "who": "阿哲"}, "24-1": {"src": "audio/7b522b98991f.mp3", "sec": 13.68, "who": "阿哲"}, "24-2": {"src": "audio/74b0bad45aaf.mp3", "sec": 13.24, "who": "阿哲"}, "24-3": {"src": "audio/e8b05f457889.mp3", "sec": 5.36, "who": "阿哲"}, "25-1": {"src": "audio/843a199055f8.mp3", "sec": 15.08, "who": "小芸"}, "25-2": {"src": "audio/9468a8a1a1b1.mp3", "sec": 15.84, "who": "小芸"}, "26-1": {"src": "audio/c2a9fccfaca0.mp3", "sec": 14.6, "who": "阿哲"}, "26-2": {"src": "audio/6d7681fc85e3.mp3", "sec": 4.0, "who": "阿哲"}, "26-3": {"src": "audio/5f9aea19f4d0.mp3", "sec": 13.12, "who": "阿哲"}, "26-4": {"src": "audio/599a5357dba7.mp3", "sec": 15.44, "who": "阿哲"}, "27-1": {"src": "audio/1af3c1b76cf3.mp3", "sec": 13.2, "who": "小芸"}, "27-2": {"src": "audio/2c31547594de.mp3", "sec": 8.44, "who": "小芸"}, "28-1": {"src": "audio/a9576538e0e1.mp3", "sec": 11.64, "who": "小芸"}, "28-2": {"src": "audio/df65943f070e.mp3", "sec": 9.04, "who": "小芸"}, "28-3": {"src": "audio/f55a0c86d588.mp3", "sec": 12.6, "who": "小芸"}, "29-1": {"src": "audio/9259222a3488.mp3", "sec": 13.12, "who": "小芸"}, "29-2": {"src": "audio/3fc372d279e5.mp3", "sec": 17.48, "who": "小芸"}, "29-3": {"src": "audio/f3a2c8e6f465.mp3", "sec": 13.28, "who": "小芸"}, "30-1": {"src": "audio/2baa5ddb72cf.mp3", "sec": 5.12, "who": "小芸"}, "30-2": {"src": "audio/ee3e0b357f2f.mp3", "sec": 5.56, "who": "小芸"}, "30-3": {"src": "audio/808b01d929ab.mp3", "sec": 4.08, "who": "小芸"}, "30-4": {"src": "audio/a48713b65de9.mp3", "sec": 3.92, "who": "小芸"}};
+
+// ── 第三版：講稿（window.__script）驅動場景；字幕＝講稿＝配音，一字不差 ──
+// sc3(第幾段, 畫面, [每一句的動作…])：句數要跟講稿一樣，不一樣就在主控台警告
+function sc3(n, build, acts) {
+  const S = window.__script[n - 1];
+  if (!S) { console.warn('no script for scene', n); return; }
+  if (acts.length !== S.lines.length) console.warn('scene', n, S.title, 'acts', acts.length, '!= lines', S.lines.length);
+  const b = () => { const r = build() || {}; speakerBadge(S.who); return r; };
+  scenes.push({ title: S.title, who: S.who, build: b, steps: S.lines.map((t, k) => [t, acts[k] || (() => {})]), chap: CHAPS.length - 1 });
+}
+function hd(n, eb) { mhead(eb, window.__script[n - 1].title); }
+// 右上角：這一段誰講
+function speakerBadge(who) {
+  if (!who) return;
+  const col = who === '小芸' ? C.coral : C.teal, role = who === '小芸' ? '方法和觀念' : '實拍示範';
+  const g = grp(L, false); R(g, 1300, 14, 230, 40, { fill: '#0b1520', stroke: col, sw: 2, rx: 20 });
+  mk('circle', { cx: 1322, cy: 34, r: 11, fill: col }, g);
+  T(g, 1342, 42, who + '｜' + role, { size: 20, weight: 800, fill: col });
+}
+// 指令字卡：完整指令放在畫面上，聲音不逐字念
+function cmdCard(x, y, w, lines, title, o = {}) {
+  return codeCard(x, y, w, lines, { title: title || '照著打（手冊裡可以直接複製）', size: o.size || 26, col: o.col || C.gold });
+}
+// 一排流程方塊：[[字, 顏色]…]，回傳每一格（預設藏起來）
+function flowRow(y, items, o = {}) {
+  const w = o.w || 220, gap = o.gap || 25, h = o.h || 120, x0 = o.x ?? (800 - (items.length * w + (items.length - 1) * gap) / 2);
+  return items.map(([t, col], i) => {
+    const g = grp(L); const x = x0 + i * (w + gap);
+    R(g, x, y, w, h, { fill: C.card, stroke: col, sw: 4 });
+    T(g, x + w / 2, y + h / 2 - (t.split('\n').length - 1) * 18 + 12, t, { size: 30, anchor: 'middle', weight: 900, fill: col });
+    if (i) T(g, x - gap / 2, y + h / 2 + 12, '→', { size: 30, anchor: 'middle', fill: C.mut });
+    return g;
+  });
+}
+
+// ============================================================
+// AI CRUD 後端工作坊 EASY 版：手把手教學動畫（講課版）
+// 講稿：tts-audition/script_be.py → window.__script；配音 → window.__audio
+// 兩人分段：小芸（Sulafat）講方法和觀念，阿哲（Sadaltager）講實拍示範。指令只放在畫面字卡。
+// 畫面：2026-10-07 在 Windows 11 實拍（VS Code 繁中介面＋Claude Code、PowerShell、Chrome／Swagger、psql）。
+// Step 3 文件用 Opus 5.5 High、寫程式用 Sonnet 5.5；Step 4 審查子代理用 Opus 5.5。
+// ============================================================
+const OR = '#ff6a00'                        // 淺色網頁上的標註色
+const FV = FR                                // VS Code 截圖：整張
+function vsh(r, names, F = FV) { return shots(r, names, F) }
+const RED = s => [[s, TC.err, 700]], GRN = s => [[s, TC.ok, 700]]
+const BLUE = '#4da3ff'
+
+// ════════════════════════════ 開場 ════════════════════════════
+chapter('開場', '把假資料變真的', C.teal)
+
+sc3(1, () => {
+  const r = {}; hd(1, '開場')
+  r.two = [['前端課：mock', '資料放在瀏覽器記憶體\n按 F5，剛新增的那筆就不見了', C.coral], ['這堂課：真後端', '資料寫進 PostgreSQL\nF5 之後還在，重開機也還在', C.teal]]
+    .map(([h, s, col], i) => card(70 + i * 745, 150, 715, 300, h, s.split('\n'), col, { size: 32, ts: 44, lh: 60 }))
+  r.pers = box(L, 70, 480, 1460, 90, '這叫「持久化」：資料真的被留下來', { size: 36, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 900 })
+  r.cmp = box(L, 70, 600, 1460, 190, '比喻\n前端 mock＝白板，每按一次 F5 就擦回最初 24 筆\n這堂課＝記進帳本，寫了就留著', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  const items = [['harness', '給規矩', C.gold], ['範本', '給骨架', C.teal], ['SDD', '先文件再程式', C.violet], ['LOOP＋對抗審查', '自己驗、另一個 AI 挑錯', C.coral]]
+  r.cards = items.map(([a, b, col], i) => { const g = grp(L); const x = 70 + i * 372; R(g, x, 150, 344, 300, { fill: C.card, stroke: col, sw: 5 })
+    T(g, x + 172, 280, a, { size: 42, anchor: 'middle', weight: 900, fill: col }); T(g, x + 172, 360, b, { size: 28, anchor: 'middle', fill: C.ink }); return g })
+  r.same = box(L, 70, 520, 1460, 200, '方法跟前端課一模一樣\n只是這次做的是後端', { size: 44, fill: C.card, stroke: C.gold, color: C.ink, weight: 900 })
+  return r
+}, [
+  r => { show(r.two[0]); glow(r.two[0]) },
+  r => { show(r.two[1]); glow(r.two[1]); later(2500, () => show(r.pers)) },
+  r => { show(r.cmp); glow(r.cmp) },
+  r => { hide([...r.two, r.pers, r.cmp]); stagger(r.cards, 350); later(2200, () => { show(r.same); glow(r.same) }) },
+])
+
+sc3(2, () => {
+  const r = {}; hd(2, '開場')
+  r.nodes = flowRow(170, [['瀏覽器', C.teal], ['devProxy\n前端轉接站', C.teal], ['Controller\n收件、回狀態碼', C.violet], ['Service\n做真正的事', C.violet], ['EF Core\n物件翻成 SQL', C.pink], ['PostgreSQL\n資料表', C.coral]], { w: 225, gap: 22 })
+  r.life = scr('be02-arch-life-svg', fitF('be02-arch-life-svg', { x: 70, y: 320, w: 1460, h: 480 }))
+  r.src = tip('教材 step2 的 ARCHITECTURE_DB.html：① 請求的一生', { y: 806, size: 26, col: C.teal })
+  r.fe = box(L, 70, 330, 760, 90, '前端課只做到「瀏覽器」這一格', { size: 30, fill: '#3a1f1f', stroke: C.coral, color: C.ink, weight: 800 })
+  r.be = box(L, 770, 330, 760, 90, '這堂課把後面整段接起來', { size: 30, fill: '#173a3c', stroke: C.teal, color: C.ink, weight: 800 })
+  r.real = tip('資料在資料庫查得到，才叫真的', { y: 806, size: 36, col: C.gold })
+  return r
+}, [
+  r => { stagger(r.nodes.slice(0, 2), 400); later(1200, () => show([r.life, r.src])) },
+  r => { stagger(r.nodes.slice(2, 4), 400); glow([r.nodes[2], r.nodes[3]]) },
+  r => { stagger(r.nodes.slice(4), 400); glow([r.nodes[4], r.nodes[5]]) },
+  r => { hide([r.life, r.src]); show(r.fe); glow(r.nodes[0]); later(2000, () => { show(r.be); glow(r.nodes.slice(1)) }); later(4500, () => { show(r.real); glow(r.real) }) },
+])
+
+sc3(3, () => {
+  const r = {}; hd(3, '開場')
+  const items = [['Step 0', '前置檢查 11 項', C.mut, 0], ['Step 1', '有規矩、沒規矩差在哪', C.coral, 0], ['Step 2', '玩範本 API', C.teal, 1], ['Step 3', 'SDD 做裝備物資後端', C.pink, 1], ['Step 4', 'LOOP 全鏈路＋對抗審查', C.violet, 1], ['Step 5', '總結、回公司', C.green, 0]]
+  r.c = items.map(([a, b, col, key], i) => { const g = grp(L); const x = 70 + (i % 3) * 495, y = 130 + Math.floor(i / 3) * 270
+    R(g, x, y, 465, 235, { fill: key ? '#203f5a' : C.card, stroke: col, sw: key ? 6 : 3 })
+    T(g, x + 30, y + 70, a, { size: 40, weight: 900, fill: col }); T(g, x + 30, y + 150, b, { size: 32, weight: 800 })
+    if (key) T(g, x + 435, y + 70, '重點', { size: 26, anchor: 'end', weight: 900, fill: C.gold }); return g })
+  r.s6 = box(L, 70, 680, 1460, 80, '課後 Step 6：把前端課那行 TODO 變成真的問卷 API', { size: 30, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  r.tip = tip('指令都在畫面上和手冊裡，照著貼；時間花在 AI 怎麼做事', { y: 830, size: 30, col: C.gold })
+  return r
+}, [
+  r => stagger(r.c.slice(0, 3), 400),
+  r => { stagger(r.c.slice(3), 400); later(2600, () => { show(r.s6); glow(r.s6) }) },
+  r => { show(r.tip); glow(r.tip) },
+])
+
+// ════════════════════════════ Step 0 ════════════════════════════
+chapter('Step 0', '前置檢查', C.gold)
+
+sc3(4, () => {
+  const r = {}; hd(4, 'step0')
+  r.pre = card(120, 160, 1360, 440, '課前先裝好（手冊 Step 0 有清單）', ['.NET SDK 10　·　PostgreSQL 18（postgres／12345）', 'Node.js　·　pnpm', 'VS Code 裡的 AI 助手：Claude Code 擴充'], C.gold, { size: 34, ts: 40, lh: 74 })
+  const [a] = vsh(r, ['be00-preflight'])
+  r.k = cmdCard(120, 650, 1360, ['cd step0_course_intro', '.\\preflight.ps1'], '教材資料夾的終端機（11 項檢查）')
+  r.a1 = hl(r, a, 'net', '', { col: C.green })
+  r.a2 = hl(r, a, 'pg', '', { col: C.green })
+  r.a3 = hl(r, a, 'login', '', { col: C.green })
+  r.a4 = hl(r, a, 'port', '', { col: C.green })
+  r.life = tip('命脈四項：.NET 版本・PostgreSQL 連得上・帳密登得進去・5080 埠空著', { y: 806, size: 28, col: C.green })
+  r.a5 = hl(r, a, 'summary', '「可以開課」：過關（WARN 不算錯）', { col: C.green, above: true, size: 28 })
+  r.p1 = hl(r, a, 'psql', 'WARN：psql 不在系統路徑', { col: C.gold, above: true, size: 26 })
+  r.p2 = hl(r, a, 'psqlpath', '它自己找到了，完整路徑印在這，之後照抄', { col: C.gold, below: true, size: 26 })
+  return r
+}, [
+  r => { show(r.pre); glow(r.pre) },
+  r => { hide(r.pre); show([r.S[0], r.k]) },
+  r => { hide(r.k); only(r, r.a1, r.a2, r.a3, r.a4); show(r.life); later(5200, () => { hide(r.life); only(r, r.a5) }) },
+  r => { zoom(r.S[0], 'psqlpath', { pad: 120, max: 1.6 }); only(r, r.p1, r.p2) },
+])
+
+sc3(5, () => {
+  const r = {}; hd(5, 'step0')
+  r.red = box(L, 70, 130, 1460, 90, '後端課最常見的紅燈：PostgreSQL 沒啟動、帳密不對', { size: 34, fill: '#3a1f1f', stroke: C.red, color: C.ink, weight: 900 })
+  r.k1 = cmdCard(70, 250, 1460, ['Get-Service postgresql*', 'Start-Service postgresql-x64-18'], '先看服務有沒有在跑，停著就啟動它（PowerShell）', { size: 30 })
+  r.prompt = codeCard(70, 460, 1460, ['這是工作坊前置檢查 preflight.ps1 的完整輸出，我用 Windows 11。', '請說明每個 [FAIL] 的原因，給我可複製的修復指令；不要改工作坊的檔案。', '（把整份輸出貼在後面）'], { title: '還是紅：整段輸出貼給 AI（手冊 Step 0 的求救 prompt）', size: 28, col: C.coral })
+  r.first = box(L, 70, 460, 1460, 170, '課前一天先跑一次 dotnet run 和 E2E\n第一次會下載東西，最花時間，別留到上課', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  return r
+}, [
+  r => { show(r.red); glow(r.red); later(1800, () => { show(r.k1); glow(r.k1) }) },
+  r => { show(r.prompt); glow(r.prompt) },
+  r => { hide(r.prompt); show(r.first); glow(r.first) },
+])
+
+// ════════════════════════════ Step 1 ════════════════════════════
+chapter('Step 1', '為什麼要給 AI 規矩', C.coral)
+
+sc3(6, () => {
+  const r = {}; hd(6, 'step1')
+  r.bw = bwin(['be01-compare-side', 'be01-compare-top'], 'COMPARE.html'); r.B = r.bw.S
+  r.l = hl(r, r.B[0], [22, 56, 589, 46], '沒給規矩', { col: C.coral, above: true, size: 28 })
+  r.rr = hl(r, r.B[0], [629, 56, 589, 46], '有給規矩（harness）', { col: C.teal, above: true, size: 28 })
+  r.ok = hl(r, r.B[0], [629, 205, 589, 110], '綠底：照你們規矩寫的地方（欄位名、繁中訊息）', { col: C.green, below: true, size: 24 })
+  r.bad = hl(r, r.B[0], [22, 400, 589, 90], '紅：訊息英文、欄位叫 Category、Quantity——AI 自己決定的', { col: C.red, below: true, size: 24 })
+  r.t1 = hl(r, r.B[1], 'table', '三項差異：回應形狀、id 和編碼、欄位名與訊息', { col: OR, above: true, size: 26 })
+  r.cmp = box(L, 70, 130, 1460, 230, '比喻：請一個很厲害的木工做櫃子\n不給圖，他做得又快又好，但抽屜高度、把手樣式都是他定的\n跟你家其他櫃子搭不起來。規矩就是那張圖', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.l, r.rr)) },
+  r => { only(r, r.ok) },
+  r => { only(r, r.bad); later(3500, () => { swap(r.B, r.B[1]); only(r, r.t1) }) },
+  r => { only(r); hide(r.bw.g); show(r.cmp); glow(r.cmp) },
+])
+
+sc3(7, () => {
+  const r = {}; hd(7, 'step1')
+  const rows = ['成功和查無一律用 ModelResult 包起來', '錯誤訊息一律繁體中文', '欄位名跟前端一模一樣', '取號要在交易裡做', 'Controller 薄、Service 厚、Common 不動']
+  r.tbl = grp(L); R(r.tbl, 70, 120, 1460, 470, { fill: C.card, stroke: C.line, sw: 3 })
+  T(r.tbl, 800, 168, '後端 harness 管的事', { size: 32, anchor: 'middle', weight: 900, fill: C.gold })
+  r.rowG = rows.map((n, i) => { const g = grp(r.tbl, false); const y = 195 + i * 75; R(g, 90, y, 1420, 64, { fill: '#173a3c', rx: 10 })
+    T(g, 120, y + 43, (i + 1) + '. ' + n, { size: 32, weight: 800 }); return g })
+  r.two = [['管「怎麼寫」', 'harness', C.teal], ['不管「做多少」', 'id、編碼、範圍：Step 3 選擇題你拍板', C.gold]].map(([h, s, col], i) => card(120 + i * 690, 620, 670, 170, h, [s], col, { size: 30, ts: 40 }))
+  return r
+}, [
+  r => { show(r.tbl); stagger(r.rowG, 300, glow) },
+  r => { stagger(r.two, 500) },
+])
+
+// ════════════════════════════ Step 2 ════════════════════════════
+chapter('Step 2', '範本 API 與 harness', C.teal)
+
+sc3(8, () => {
+  const r = {}; hd(8, 'step2')
+  const [a, b, c] = vsh(r, ['be02-dotnet-run', 'be02-dotnet-test', 'be02-psql'])
+  r.k = cmdCard(120, 660, 1360, ['cd step2_speedrun_kit\\2.5_sample_api\\sample-api\\src\\CrudTemplate.Api', 'dotnet run --urls http://localhost:5080'], '教材資料夾的終端機（Step 2 做完按 Ctrl+C 關掉）', { size: 24 })
+  r.a1 = hl(r, a, 'insert', '第一次：自己建資料庫、灌 24 筆種子', { col: C.green, below: true, size: 26 })
+  r.a2 = hl(r, a, 'listen', 'API 在 5080 埠聽', { col: C.green, right: true, size: 26 })
+  r.bw = bwin(['be02-swagger', 'be02-swagger-get', 'be02-swagger-404'], 'localhost:5080/swagger'); r.B = r.bw.S
+  r.s1 = hl(r, r.B[0], 'get', '查全部', { col: OR, right: true, size: 26 })
+  r.s2 = hl(r, r.B[0], 'post', '新增', { col: OR, right: true, size: 26 })
+  r.s3 = hl(r, r.B[0], 'del', '刪除', { col: OR, right: true, size: 26 })
+  r.g1 = hl(r, r.B[1], 'code', '200', { col: C.green, right: true, size: 30 })
+  r.g2 = hl(r, r.B[1], 'body', '24 筆，包在 success／message／data 裡', { col: C.green, above: true, size: 26 })
+  r.n1 = hl(r, r.B[2], 'code', '查不到：404', { col: C.red, right: true, size: 30 })
+  r.codes = flowRow(700, [['新增\n201', C.green], ['查不到\n404', C.coral], ['刪除\n204', C.teal], ['再刪一次\n404', C.coral]], { w: 300, gap: 40 })
+  r.b1 = hl(r, b, 'summary', '49 條測試全綠', { col: C.green, above: true, size: 28 })
+  r.c1 = hl(r, c, 'n', 'psql 直查資料表：24 筆', { col: C.green, right: true, size: 28 })
+  r.k2 = cmdCard(70, 610, 1460, ['cd step2_speedrun_kit\\2.5_sample_api\\sample-api', 'dotnet test', '$env:PGPASSWORD=\'12345\'; & "C:\\Program Files\\PostgreSQL\\18\\bin\\psql.exe" -U postgres -h localhost -d ai_crud_template -c "SELECT count(*) FROM template_member;"'], '第二個終端機（右上角「＋」）', { size: 20 })
+  r.three = tip('看完回第一個終端機按 Ctrl+C，把 5080 讓給 Step 3', { y: 830, size: 32, col: C.gold })
+  return r
+}, [
+  r => { show([r.S[0], r.k]); later(2500, () => only(r, r.a1, r.a2)) },
+  r => { hide([r.S[0], r.k]); only(r); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.s1, r.s2, r.s3)); later(5000, () => { swap(r.B, r.B[1]); only(r, r.g1, r.g2) }) },
+  r => { swap(r.B, r.B[2]); only(r, r.n1); later(1500, () => { hide(r.bw.g); only(r); stagger(r.codes, 350) }) },
+  r => { hide(r.codes); show([r.S[1], r.k2]); later(2600, () => { hide(r.k2); only(r, r.b1) }); later(4200, () => { to(r, r.S[2]); only(r, r.c1) }); later(7500, () => { show(r.three); glow(r.three) }) },
+])
+
+sc3(9, () => {
+  const r = {}; hd(9, 'step2')
+  const [a] = vsh(r, ['be02-harness-files'])
+  r.a1 = hl(r, a, 'claude', 'CLAUDE.md：總綱（技術棧、程式規則、契約要點）', { lx: 560, col: C.gold, size: 24 })
+  r.a2 = hl(r, a, 'rules', 'CODE-RULES-api：後端細則（分層、命名、驗證、測試）', { lx: 560, col: C.gold, size: 24, below: true })
+  r.b1 = hl(r, a, 'contract', 'contract-conventions-summary：契約摘要（狀態碼、ModelResult、流水號）', { lx: 560, col: C.teal, size: 22, below: true })
+  r.b2 = hl(r, a, 'guide', '使用說明：怎麼複製範本開新的 API 模組', { lx: 560, col: C.teal, size: 24 })
+  r.who = [['寫給 AI 讀', '你不用逐條讀懂', C.teal], ['人負責確認', 'CLAUDE.md 只有四十幾行，掃一遍', C.gold]].map(([h, s, col], i) => card(120 + i * 690, 640, 670, 150, h, [s], col, { size: 28, ts: 36 }))
+  r.warn = tip('規矩寫錯，AI 會照著錯', { y: 830, size: 34, col: C.coral })
+  return r
+}, [
+  r => { show(r.S[0]); later(500, () => only(r, r.a1, r.a2)) },
+  r => { only(r, r.b1, r.b2) },
+  r => { only(r); stagger(r.who, 400); later(3000, () => { show(r.warn); glow(r.warn) }) },
+])
+
+sc3(10, () => {
+  const r = {}; hd(10, 'step2')
+  r.bw = bwin(['be02-arch-layers'], 'ARCHITECTURE_DB.html'); r.B = r.bw.S
+  r.row = hl(r, r.B[0], [59, 174, 1122, 108], '依賴單向向右：Controller → Service → EF Core → PostgreSQL', { col: OR, above: true, size: 26 })
+  r.ctl = hl(r, r.B[0], [59, 347, 545, 140], 'Controller 只做：呼叫 Service、對映狀態碼', { col: OR, below: true, size: 24 })
+  r.svc = hl(r, r.B[0], [636, 347, 545, 140], 'Service 放商業邏輯：取號、產 id、查無回失敗', { col: OR, below: true, size: 24 })
+  const rows = [['Controllers', '呼叫 Service、對映狀態碼', 1], ['Services', '商業邏輯', 1], ['Data', 'DbContext、種子、migration（施工單）', 2], ['Entities', '對應資料表', 1], ['Models', '對外的請求和回應，驗證寫在 Request', 1], ['Common', 'ModelResult、狀態碼分流、全域例外', 0]]
+  r.tbl = grp(L); R(r.tbl, 70, 120, 1460, 560, { fill: C.card, stroke: C.line, sw: 3 })
+  T(r.tbl, 800, 168, '範本的資料夾：一句話', { size: 32, anchor: 'middle', weight: 900, fill: C.gold })
+  r.rowG = rows.map(([n, d, copy], i) => { const g = grp(r.tbl, false); const y = 195 + i * 76; R(g, 90, y, 1420, 64, { fill: copy === 1 ? '#173a3c' : '#3a2a14', rx: 10 })
+    T(g, 120, y + 43, n, { size: 30, weight: 900, fill: copy === 1 ? C.teal : C.gold }); T(g, 400, y + 43, d, { size: 28 }); T(g, 1490, y + 43, copy === 1 ? '複製改名' : copy === 2 ? '只加不改' : '一個字都不動', { size: 28, anchor: 'end', weight: 900, fill: copy === 1 ? C.teal : C.gold }); return g })
+  r.rule = box(L, 70, 700, 1460, 100, '跟實體長相有關的，複製改名；通用機制，直接共用', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.row)); later(3500, () => only(r, r.ctl, r.svc)) },
+  r => { only(r); hide(r.bw.g); show(r.tbl); stagger(r.rowG.slice(2, 5), 350, glow) },
+  r => { glow(r.rowG[5]) },
+  r => { show(r.rule); glow(r.rule) },
+])
+
+
+// ════════════════════════════ Step 3 ════════════════════════════
+chapter('Step 3', 'SDD：先文件，再程式', C.pink)
+
+sc3(11, () => {
+  const r = {}; hd(11, 'step3')
+  r.head = box(L, 70, 130, 1460, 100, 'SDD＝規格驅動開發：先文件，再程式', { size: 44, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.nodes = flowRow(260, [['PRD\n寫需求', C.teal], ['選擇題\n你拍板', C.gold], ['SRS\n答應什麼', C.violet], ['設計文件\n＋圖', C.violet], ['任務\n清單', C.pink], ['程式\nAI 寫', C.coral]], { w: 220, gap: 25 })
+  r.delta = box(L, 70, 420, 1460, 170, '這次的文件叫 delta：只寫「跟人員範本不同的地方」\n範本的 SRS 和設計文件是正本，一個字都不改', { size: 34, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 800 })
+  r.cmp = box(L, 70, 620, 1460, 190, '比喻：社區裡已經有一棟樣品屋，現在照它再蓋一棟\n只寫跟樣品屋不一樣的地方；水電總管大家共用，不准動', { size: 34, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 800 })
+  return r
+}, [
+  r => { show(r.head); glow(r.head); later(1500, () => stagger(r.nodes, 300)) },
+  r => { show(r.delta); glow(r.delta) },
+  r => { show(r.cmp); glow(r.cmp) },
+])
+
+sc3(12, () => {
+  const r = {}; hd(12, 'step3')
+  const [a, b] = vsh(r, ['be-prd-fields', 'be-prd-decisions'])
+  r.a1 = hl(r, a, 'h', '契約：前端定好的欄位名，後端照做，一個都不能改', { below: true, size: 26 })
+  r.a2 = hl(r, a, 'table', '13 欄：必填 6、選填 5、後端自己產 2（id、code）', { col: C.gold, below: true, size: 26 })
+  r.b1 = hl(r, b, 'h', '第 5 節：六個決定留給你', { col: C.gold, below: true, size: 28 })
+  r.six = tip('編碼誰產生・id 怎麼產・字典建不建表・硬刪或軟刪・分頁在哪做・採購日期能不能空', { y: 806, size: 26, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(500, () => only(r, r.a1)) },
+  r => { only(r, r.a2) },
+  r => { to(r, r.S[1]); only(r, r.b1); later(3500, () => { show(r.six); glow(r.six) }) },
+])
+
+sc3(13, () => {
+  const r = {}; hd(13, 'step3')
+  const [a, b, c, d] = vsh(r, ['be03-copy', 'bc01-model-opus', 'bc02-prompt', 'bc03-reading'])
+  r.a1 = hl(r, a, 'copy', '把範本複製成 my-equipment-api', { col: C.green, above: true, size: 26 })
+  r.a2 = hl(r, a, 'cd', '進到專案資料夾；參考解不進工作區', { col: C.green, below: true, size: 26 })
+  r.cp = tip('複製指令在手冊 step3，整段貼上，出現 >> 再按 Enter', { y: 806, size: 28, col: C.teal })
+  r.b1 = hl(r, b, 'model', 'Opus 5.5 High：文件階段想得深', { col: C.gold, above: true, size: 26 })
+  r.c1 = hl(r, c, 'input', '起手 prompt：只有 4 句，第一句就說走 SDD', { above: true, size: 28 })
+  r.d1 = hl(r, d, [350, 190, 680, 100], '好幾行 Read：AI 在讀規矩和 PRD，先不寫程式', { below: true, size: 28 })
+  return r
+}, [
+  r => { show([r.S[0], r.cp]); later(500, () => only(r, r.a1, r.a2)) },
+  r => { hide(r.cp); to(r, r.S[1]); only(r, r.b1); later(4000, () => { to(r, r.S[2]); only(r, r.c1) }) },
+  r => { to(r, r.S[3]); only(r, r.d1) },
+])
+
+sc3(14, () => {
+  const r = {}; hd(14, 'step3')
+  const [a, b, c, d] = vsh(r, ['bc04-q1', 'bc04-q3', 'bc05-q6', 'bc05-q7'])
+  r.a1 = hl(r, a, 'rec', '每題都有「建議」＋一句理由', { col: C.green, below: true, size: 28 })
+  r.a2 = hl(r, a, 'tab', '一次四題，分頁切換', { col: C.gold, above: true, size: 26 })
+  r.pick = tip('先自己答，再對照講師發的課堂裁決（答案不在動畫裡）', { y: 806, size: 28, col: C.teal })
+  r.b1 = hl(r, b, 'rec', '每個選項都寫了代價，看完理由再選', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, c, 'rec', '「建議」是 AI 的意見，拍板的是你', { col: C.green, below: true, size: 26 })
+  r.d1 = hl(r, d, 'tab', 'PRD 沒寫的，AI 多問了 6 題（Q7～Q12）', { col: C.gold, above: true, size: 26 })
+  r.d2 = hl(r, d, 'rec', '人員模組要保留嗎？保留，兩模組並存', { col: C.gold, below: true, size: 26 })
+  r.rule = codeCard(70, 640, 1460, ['只在非問不可時才問人，用選擇題（2–4 選項、標建議）；不發明 PRD 沒寫的規則。'], { title: 'CLAUDE.md 寫的規矩（harness）', size: 30, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1, r.a2)) },
+  r => { zoom(r.S[0], 'rec', { pad: 120, max: 1.6 }); show(r.pick); later(3500, () => { unzoom(r.S[0]); to(r, r.S[1]); only(r, r.b1) }); later(6500, () => { to(r, r.S[2]); only(r, r.c1) }) },
+  r => { hide(r.pick); to(r, r.S[3]); only(r, r.d1, r.d2); later(4500, () => { only(r); show(r.rule); glow(r.rule) }) },
+])
+
+sc3(15, () => {
+  const r = {}; hd(15, 'step3')
+  const [a, b, c] = vsh(r, ['bc06-docs', 'be-tasks', 'bc06-next'])
+  r.a1 = hl(r, a, 'head', '四份文件完成，尚未動手寫程式', { col: C.green, below: true, size: 28 })
+  r.b1 = hl(r, b, 'table', '14 個任務，程式一行都還沒寫', { col: C.green, above: true, size: 28 })
+  r.c1 = hl(r, c, 'rec', 'AI 自己建議：你先看文件', { col: C.gold, below: true, size: 28 })
+  r.chk = box(L, 120, 300, 1360, 260, '先別急著說開工\n打開 SRS-delta 核三段、看一眼圖，確認了才開工', { size: 44, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)); later(4500, () => { to(r, r.S[1]); only(r, r.b1) }) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3000, () => { only(r); hide(r.S); show(r.chk); glow(r.chk) }) },
+])
+
+
+sc3(16, () => {
+  const r = {}; hd(16, 'step3 ・ SRS-delta')
+  r.bw = bwin(['be-srs-decisions', 'be-srs-decisions2', 'be-srs-trace', 'be-srs-scope'], 'docs/SRS-裝備物資API-delta.md'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], [29, 96, 994, 450], 'Q1～Q12：裁決、理由、誰拍板', { col: OR, above: true, size: 28 })
+  r.a2 = hl(r, r.B[0], [1188, 96, 40, 450], '課堂講師', { col: C.gold, below: true, right: true, size: 26 })
+  r.a3 = hl(r, r.B[1], 'q7', '追加題也一題一列', { col: OR, above: true, size: 26 })
+  r.b1 = hl(r, r.B[2], 'h', '需求追溯：13 欄每一欄做在哪一層、怎麼驗', { col: OR, below: true, size: 26 })
+  r.d1 = hl(r, r.B[3], 'h32', '這一輪決定不做的', { col: OR, below: true, size: 28 })
+  r.pm = [['1. 已拍板決策', '答應了哪些取捨'], ['2. 需求追溯', '每個需求做在哪'], ['3. 範圍外', '這一版不做什麼']].map(([h, s], i) => card(70 + i * 495, 300, 465, 220, '★ ' + h, [s], C.gold, { size: 30, ts: 34 }))
+  r.pmt = box(L, 70, 600, 1460, 120, '標星號的三段 PM 必核：不用看 C#，看這三段就知道它答應了什麼', { size: 32, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1, r.a2)); later(5500, () => { swap(r.B, r.B[1]); only(r, r.a3) }) },
+  r => { swap(r.B, r.B[2]); only(r, r.b1); later(4500, () => { swap(r.B, r.B[3]); only(r, r.d1) }) },
+  r => { only(r); hide(r.bw.g); stagger(r.pm, 350); later(1200, () => show(r.pmt)) },
+])
+
+sc3(17, () => {
+  const r = {}; hd(17, 'step3 ・ 設計文件＋圖')
+  r.bw = bwin(['be-design-files', 'be-design-evidence'], 'docs/DESIGN-裝備物資API-delta.md'); r.B = r.bw.S
+  r.a1 = hl(r, r.B[0], 'h', '檔案責任：哪一層新增哪些檔', { col: OR, below: true, size: 28 })
+  r.a2 = hl(r, r.B[0], [748, 100, 145, 520], '新增／只加不改', { col: OR, above: true, size: 26 })
+  r.c1 = hl(r, r.B[1], 'h', '遵守 harness 的證據', { col: OR, below: true, size: 30 })
+  r.c2 = hl(r, r.B[1], 'table', '', { col: OR })
+  r.d1 = scr('be-diag-1b', fitF('be-diag-1b', { x: 40, y: 120, w: 1520, h: 680 }))
+  r.d1t = tip('① 分層架構：綠＝新增、黃＝只加不改、灰虛線＝共用不動', { y: 816, size: 28, col: C.teal })
+  r.d2 = scr('be-diag-2', fitF('be-diag-2', { x: 40, y: 120, w: 1520, h: 680 }))
+  r.d2t = tip('② 資料表 ER 圖：equipment_item 一張表、唯一索引、SEQUENCE', { y: 816, size: 28, col: C.teal })
+  r.d3 = scr('be-diag-3a', fitF('be-diag-3a', { x: 40, y: 120, w: 1520, h: 680 }))
+  r.d3t = tip('③ 新增品項：驗證失敗回 400；通過後在同一個交易裡取 id、算編碼', { y: 816, size: 28, col: C.teal })
+  r.d4 = scr('be-diag-4', fitF('be-diag-4', { x: 40, y: 220, w: 1520, h: 480 }))
+  r.d4t = tip('④ 狀態碼矩陣：五條路由各回哪些狀態碼', { y: 816, size: 28, col: C.teal })
+  r.ev = tip('看圖就知道請求怎麼走、資料表長什麼樣、哪種情況回哪個狀態碼——不用讀程式', { y: 816, size: 28, col: C.gold })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.a1, r.a2)) },
+  r => { swap(r.B, r.B[1]); only(r, r.c1, r.c2) },
+  r => { only(r); hide(r.bw.g); show([r.d1, r.d1t]); later(4200, () => { hide([r.d1, r.d1t]); show([r.d2, r.d2t]) }) },
+  r => { hide([r.d2, r.d2t]); show([r.d3, r.d3t]); later(4800, () => { hide([r.d3, r.d3t]); show([r.d4, r.d4t]) }); later(9000, () => { hide(r.d4t); show(r.ev); glow(r.ev) }) },
+])
+
+
+sc3(18, () => {
+  const r = {}; hd(18, 'step3')
+  const [a, b, c, d] = vsh(r, ['bc07-model-menu', 'bc07-go-typed', 'bc09-progress', 'bc10-summary'])
+  r.a1 = hl(r, a, 'sonnet', '寫程式改用 Sonnet 5.5', { col: C.gold, below: true, size: 28 })
+  r.b1 = hl(r, b, 'model', 'Sonnet 5.5 High', { col: C.gold, above: true, size: 26 })
+  r.b2 = hl(r, b, 'input', '說「開工」', { col: C.green, above: true, right: true, size: 26 })
+  r.c1 = hl(r, c, 't9', '一項一項做，自己跑起來驗', { above: true, size: 26 })
+  r.c2 = hl(r, c, 't11', '94 條一次全綠', { col: C.green, below: true, size: 26 })
+  r.d1 = hl(r, d, 'tests', '五行總結：94 條全綠、build 0 警告', { col: C.green, above: true, size: 26 })
+  r.d2 = hl(r, d, 'docs', '文件也對齊了', { col: C.green, below: true, size: 26 })
+  r.time = box(L, 1080, 64, 400, 46, '這次實拍：約 7 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.cheap = tip('有規矩和範本，寫程式用便宜的就夠', { y: 806, size: 30, col: C.gold })
+  r.order = tip('Entity → migration → DTO → 對映 → Service → Controller → 種子 → 測試', { y: 806, size: 28, col: C.teal })
+  return r
+}, [
+  r => { show([r.S[0], r.cheap]); later(400, () => only(r, r.a1)); later(4000, () => { to(r, r.S[1]); only(r, r.b1, r.b2) }) },
+  r => { hide(r.cheap); to(r, r.S[2]); only(r, r.c1, r.c2); show([r.time, r.order]) },
+  r => { hide(r.order); to(r, r.S[3]); only(r, r.d1, r.d2) },
+])
+
+sc3(19, () => {
+  const r = {}; hd(19, 'step3 ・ 三路驗收')
+  r.three = [['① Swagger', '五條路由，狀態碼要對', C.teal], ['② dotnet test', '全綠', C.green], ['③ psql', '直查資料表 24 列', C.gold]].map(([h, s, col], i) => card(70 + i * 495, 300, 465, 220, h, [s], col, { size: 30, ts: 42 }))
+  r.bw = bwin(['be03-swagger', 'be03-swagger-get', 'be03-swagger-404'], 'localhost:5080/swagger'); r.B = r.bw.S
+  r.s1 = hl(r, r.B[0], 'get', '裝備物資五條路由', { col: OR, above: true, size: 26 })
+  r.g1 = hl(r, r.B[1], 'code', '200', { col: C.green, right: true, size: 30 })
+  r.g2 = hl(r, r.B[1], 'body', 'E-001、IT-LAP-001：跟前端的種子一樣', { col: C.green, above: true, size: 26 })
+  r.n1 = hl(r, r.B[2], 'code', 'E-999：404', { col: C.red, right: true, size: 30 })
+  const [t, p] = vsh(r, ['be03-dotnet-test', 'be03-psql'])
+  r.t1 = hl(r, t, 'summary', '94 條全綠', { col: C.green, above: true, size: 28 })
+  r.p1 = hl(r, p, 'n', 'equipment_item：24 列', { col: C.green, right: true, size: 28 })
+  r.real = tip('資料真的在資料庫裡：這是跟前端課最大的差別', { y: 830, size: 32, col: C.gold })
+  r.run = cmdCard(120, 560, 1360, ['cd src\\CrudTemplate.Api', 'dotnet run --urls http://localhost:5080'], '在 my-equipment-api 開終端機：把你自己的 API 開起來', { size: 26 })
+  r.db = tip('庫名是 ai_crud_equipment（範本的人員也是 24 筆，打錯庫名一樣看到 24）', { y: 830, size: 26, col: C.coral })
+  return r
+}, [
+  r => { stagger(r.three, 400); later(1800, () => { show(r.run); glow(r.run) }) },
+  r => { hide([...r.three, r.run]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.s1)); later(3000, () => { swap(r.B, r.B[1]); only(r, r.g1, r.g2) }); later(6500, () => { swap(r.B, r.B[2]); only(r, r.n1) }); later(9000, () => { hide(r.bw.g); only(r); show(r.S[0]); later(300, () => only(r, r.t1)) }) },
+  r => { to(r, r.S[1]); only(r, r.p1); later(2500, () => { show(r.db); glow(r.db) }) },
+])
+
+sc3(20, () => {
+  const r = {}; hd(20, 'step3')
+  const [a, b, c, d] = vsh(r, ['bc11-fix1-ask', 'bc11-fix1-done', 'bc12-fix2-ask', 'bc12-fix2-done'])
+  r.a1 = hl(r, a, 'msg', '小落差 1：採購日期送空字串，回英文錯誤', { col: C.gold, above: true, size: 26 })
+  r.b1 = hl(r, b, [100, 160, 925, 160], 'AI 改一次：空字串當沒填，錯誤改繁中', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, c, 'msg', '小落差 2：空表單，分類和狀態各報兩條錯', { col: C.gold, above: true, size: 26 })
+  r.d1 = hl(r, d, [100, 160, 925, 120], 'AI 再改一次，測試補上、文件也跟著改', { col: C.green, below: true, size: 26 })
+  r.how = tip('一次講一件：看到什麼、期望什麼、只改這個', { y: 806, size: 32, col: C.teal })
+  r.pain = box(L, 120, 300, 1360, 260, '問題不大，但你得坐在電腦前面陪它\n這段來回，就是 Step 4 要交出去的事', { size: 42, fill: '#3a1f1f', stroke: C.coral, color: C.ink, weight: 900 })
+  return r
+}, [
+  r => { show(r.S[0]); later(300, () => only(r, r.a1)); later(4500, () => { to(r, r.S[1]); only(r, r.b1) }); later(8000, () => { to(r, r.S[2]); only(r, r.c1) }) },
+  r => { to(r, r.S[3]); only(r, r.d1); show(r.how) },
+  r => { only(r); hide([...r.S, r.how]); show(r.pain); glow(r.pain) },
+])
+
+// ════════════════════════════ Step 4 ════════════════════════════
+chapter('Step 4', 'LOOP＋對抗審查', C.violet)
+
+
+sc3(21, () => {
+  const r = {}; hd(21, 'step4')
+  r.left = card(70, 140, 700, 300, '一問一答', ['看到什麼、期望什麼，一次講一件', '主管手把手帶新人', '時間全耗在教'], C.coral, { size: 30, ts: 40, lh: 60 })
+  r.right = card(830, 140, 700, 300, '換個做法', ['規矩寫在 harness', '示範放在範本', '驗收標準寫成自動測試'], C.teal, { size: 30, ts: 40, lh: 60 })
+  r.e2e = box(L, 70, 470, 1460, 150, '驗收標準＝6 條全鏈路 E2E 測試（教材已寫好）\n全鏈路：程式自己開瀏覽器，從畫面一路打到後端和資料庫', { size: 32, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 800 })
+  r.adv = box(L, 70, 650, 1460, 160, '再找另一個 AI，取代你「來回要 AI 修」的角色\n它只負責找碴、不准誇獎 → 對抗審查', { size: 36, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.left); glow(r.left); later(2500, () => { show(r.right); glow(r.right) }) },
+  r => { show(r.e2e); glow(r.e2e) },
+  r => { show(r.adv); glow(r.adv) },
+])
+
+sc3(22, () => {
+  const r = {}; hd(22, 'step4')
+  r.loop = flowRow(140, [['改程式', C.teal], ['跑 6 條測試', C.violet], ['有紅：再改', C.coral], ['全綠：停', C.green]], { w: 330, gap: 30 })
+  const tests = [['E1', '清單載入：共 24 筆，資料來自 PostgreSQL'], ['E2', '新增後 reload，那一筆還在'], ['E3', '新增後編碼格式：類別2碼-項目3碼-流水3碼'], ['E4', '編輯後 reload，新值還在'], ['E5', '刪除後 reload，那一筆真的消失'], ['E6', '直打 API：前端新增的出現在後端 GET']]
+  r.tbl = grp(L); R(r.tbl, 70, 290, 1460, 490, { fill: C.card, stroke: C.line, sw: 3 })
+  r.rows = tests.map(([k, t], i) => { const g = grp(r.tbl, false); const y = 310 + i * 76; R(g, 90, y, 1420, 64, { fill: /reload/.test(t) ? '#173a3c' : '#1c2f4a', rx: 10 })
+    T(g, 120, y + 43, k, { size: 30, weight: 900, fill: C.teal }); T(g, 200, y + 43, t, { size: 28 }); return g })
+  r.stone = tip('reload 是試金石：mock 會掉回種子，真的落庫才會留下', { y: 806, size: 30, col: C.gold })
+  r.iron = [['鐵律 1', '不准改測試、不准放寬標準', C.red], ['鐵律 2', '同一個問題修兩次沒好，停下回報', C.red]].map(([h, s, col], i) => card(70 + i * 745, 290, 715, 170, h, [s], col, { size: 30, ts: 38 }))
+  r.file = card(70, 490, 1460, 300, 'step4_loop_e2e/LOOP-規矩.md（給 AI 讀，也是 harness 的一份）', ['鐵律、埠不寫死、審查怎麼做', '要交四樣：LOOP-LOG.md、LOOP-REPORT.html、測試報告、文件標「step4 LOOP 後」', 'prompt 只要說「照規矩做」'], C.violet, { size: 30, ts: 32, lh: 62 })
+  return r
+}, [
+  r => { stagger(r.loop, 350) },
+  r => { show(r.tbl); stagger(r.rows, 250, glow); later(2500, () => { show(r.stone); glow(r.stone) }) },
+  r => { hide([r.tbl, r.stone]); stagger(r.iron, 500) },
+  r => { show(r.file); glow(r.file) },
+])
+
+
+
+sc3(23, () => {
+  const r = {}; hd(23, 'step4')
+  const [a, b, c] = vsh(r, ['bc20-loop-msg', 'bc21-ports', 'bc23-green'])
+  r.a1 = hl(r, a, 'msg', 'LOOP prompt：四句，第一句「照 LOOP-規矩.md 做」', { above: false, below: true, size: 26 })
+  r.a2 = hl(r, a, [554, 516, 100, 18], 'Sonnet 5.5', { col: C.gold, above: true, size: 24 })
+  r.open = tip('回到最外層的教材資料夾，開新對話；右下角確認是 Auto，才不會每步都停下來問', { y: 806, size: 28, col: C.teal })
+  r.b1 = hl(r, b, 'port', '先查埠：5080、3199 空著；PostgreSQL 在 5432 跑著', { col: C.green, below: true, size: 26 })
+  r.b2 = tip('跑測試前先停你的 API → run-e2e 暫開連測試庫的 API → 跑完再開回來；前端沿用', { y: 806, size: 28, col: C.teal })
+  r.c1 = hl(r, c, 'green', '第 1 輪就 6 條全綠', { col: C.green, below: true, size: 28 })
+  r.why = tip('全綠只代表這 6 條沒抓到問題；接下來的對抗審查才是重點', { y: 806, size: 28, col: C.gold })
+  return r
+}, [
+  r => { show([r.S[0], r.open]); later(400, () => only(r, r.a1, r.a2)) },
+  r => { hide(r.open); to(r, r.S[1]); only(r, r.b1); show(r.b2) },
+  r => { hide(r.b2); to(r, r.S[2]); only(r, r.c1); show(r.why) },
+])
+
+sc3(24, () => {
+  const r = {}; hd(24, 'step4')
+  const [a] = vsh(r, ['bc23-agent'])
+  r.a1 = hl(r, a, 'agent', '子代理：AI 再開的分身，專門挑錯（Opus 5.5，高一級）', { col: C.gold, below: true, size: 26 })
+  r.a2 = hl(r, a, [370, 258, 660, 105], '「只挑錯，不誇獎」', { col: C.coral, below: true, size: 26 })
+  r.bw = bwin(['be-loop-report-review', 'be-rv-01-list', 'be-rv-03-reload'], 'loop/LOOP-REPORT.html'); r.B = r.bw.S
+  r.h1 = hl(r, r.B[0], [70, 190, 700, 32], '第一段：HTTP 真的打 API，共 83 項', { col: OR, below: true, size: 26 })
+  r.pw = scr('be-rv-01-list', fitF('be-rv-01-list', { x: 240, y: 120, w: 1120, h: 680 }))
+  r.pwt = tip('第二段：Playwright 開瀏覽器，一頁一頁截圖對照契約', { y: 816, size: 28, col: C.teal })
+  r.time = box(L, 1080, 64, 400, 46, '從貼上到交報告：約 22 分鐘', { size: 24, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  r.hands = tip('中間沒有人插手', { y: 816, size: 34, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(400, () => only(r, r.a1)); later(3500, () => only(r, r.a2)) },
+  r => { only(r); hide(r.S[0]); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.h1)); later(4500, () => { only(r); hide(r.bw.g); show([r.pw, r.pwt]) }) },
+  r => { hide(r.pwt); show([r.time, r.hands]); glow(r.time) },
+])
+
+sc3(25, () => {
+  const r = {}; hd(25, 'step4')
+  const [a, b, c] = vsh(r, ['bc23-review', 'bc25-fixed', 'bc25-conclusion'])
+  r.a1 = hl(r, a, 'review', '審查回來：5 條 App 問題、5 條測試問題', { col: C.coral, below: true, size: 26 })
+  r.b1 = hl(r, b, 'lock', '同前綴同時新增：20 筆有 9 筆 500 → 它自己加了鎖（動到 Q1，該先問你）', { col: C.coral, below: true, size: 24 })
+  r.b2 = hl(r, b, 'r2', '第 2 輪也全綠', { col: C.green, below: true, size: 26 })
+  r.c1 = hl(r, c, 'you', '報告第 7 節：4 題選擇題交你裁決（沒修的 500、假綠…）', { col: C.gold, above: true, size: 26 })
+  r.exam = tip('寫程式的 AI 審自己＝學生自己改考卷 → 換一個程度更高的來改', { y: 806, size: 28, col: C.gold })
+  return r
+}, [
+  r => { show(r.S[0]); later(300, () => only(r, r.a1)); later(4000, () => { to(r, r.S[1]); only(r, r.b1) }); later(9000, () => only(r, r.b2)) },
+  r => { to(r, r.S[2]); only(r, r.c1); later(3500, () => { show(r.exam); glow(r.exam) }) },
+])
+
+sc3(26, () => {
+  const r = {}; hd(26, 'step4 ・ 四樣產出')
+  r.bw = bwin(['be-loop-log', 'be-loop-report-top', 'be-pw-report'], 'my-equipment-api/loop/LOOP-LOG.md'); r.B = r.bw.S
+  r.l1 = hl(r, r.B[0], 'r1', '流水紀錄：一輪一段，給機器看', { col: C.teal, below: true, size: 26 })
+  r.t1 = hl(r, r.B[1], [70, 175, 870, 90], '結論在最前面：給人看', { col: OR, below: true, size: 26 })
+  r.p1 = hl(r, r.B[2], [10, 60, 1220, 420], '測試報告：6 條，點得開', { col: OR, below: true, size: 26 })
+  r.f5 = scr('be-e2e-04-reload', fitF('be-e2e-04-reload', { x: 240, y: 120, w: 1120, h: 680 }))
+  r.f5t = tip('E2 按 F5 之後：搜尋剛新增的 PW-GEN-003，還找得到 → 持久化的鐵證', { y: 816, size: 30, col: C.green })
+  r.you = box(L, 120, 280, 1360, 300, '看完報告，照報告上的網址自己點一遍：新增一筆、F5、還在\n第 7 節的選擇題，在同一個對話回給它\n最後照報告的指令，把兩個服務關掉', { size: 42, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.l1)); later(4000, () => { burl(r.bw, 'my-equipment-api/loop/LOOP-REPORT.html'); swap(r.B, r.B[1]); only(r, r.t1) }) },
+  r => { burl(r.bw, 'step4_loop_e2e/e2e/playwright-report/index.html'); swap(r.B, r.B[2]); only(r, r.p1) },
+  r => { only(r); hide(r.bw.g); show([r.f5, r.f5t]) },
+  r => { hide([r.f5, r.f5t]); show(r.you); glow(r.you) },
+])
+
+sc3(27, () => {
+  const r = {}; hd(27, 'step4')
+  r.bw = bwin(['be-srs-after', 'be-design-after', 'be-loop-report-sync'], 'docs/SRS-裝備物資API-delta.md'); r.B = r.bw.S
+  r.s1 = hl(r, r.B[0], 'h', '「step4 LOOP 後」：改了什麼、待你裁決的', { col: OR, below: true, size: 26 })
+  r.d1 = hl(r, r.B[1], 'ver', '設計文件版本也跟著升', { col: OR, below: true, size: 26 })
+  r.menu = box(L, 120, 300, 1360, 260, '菜改了，菜單跟著改\n下一個人接手，看文件就知道現在的 API 長什麼樣子', { size: 38, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 900 })
+  return r
+}, [
+  r => { show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.s1)); later(5000, () => { burl(r.bw, 'docs/DESIGN-裝備物資API-delta.md'); swap(r.B, r.B[1]); only(r, r.d1) }) },
+  r => { only(r); hide(r.bw.g); show(r.menu); glow(r.menu) },
+])
+
+sc3(28, () => {
+  const r = {}; hd(28, 'step4')
+  r.g = [['規格 Gate', ['六題裁決', 'SRS-delta、設計文件-delta 各四段', '四張圖、任務清單'], C.violet], ['程式 Gate', ['build 零警告', '測試全綠', 'Swagger 狀態碼、psql 查得到資料'], C.teal], ['交付 Gate', ['LOOP 報告、流水紀錄', '測試報告 6 比 6、被測的是你的作品', '文件標「step4 LOOP 後」'], C.gold]]
+    .map(([h, ls, col], i) => card(70 + i * 495, 150, 465, 400, h, ls, col, { size: 27, ts: 40, lh: 64 }))
+  r.pr = box(L, 70, 620, 1460, 150, '這三道，回公司直接當 PR 檢查表', { size: 42, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
+  return r
+}, [
+  r => { show(r.g[0]); glow(r.g[0]) },
+  r => { show(r.g[1]); glow(r.g[1]) },
+  r => { show(r.g[2]); glow(r.g[2]); later(2500, () => { show(r.pr); glow(r.pr) }) },
+])
+
+// ════════════════════════════ Step 5 ════════════════════════════
+chapter('Step 5', '回公司怎麼用', C.green)
+
+sc3(29, () => {
+  const r = {}; hd(29, 'step5')
+  r.three = [['1　帶走 harness 四件', '改成公司規則'], ['2　整理範本', '最成熟的 API，分複製區和共用區'], ['3　新需求都走', 'SDD＋LOOP']].map(([h, s], i) => card(70 + i * 495, 140, 465, 220, h, [s], [C.teal, C.gold, C.violet][i], { size: 28, ts: 34, lh: 50 }))
+  r.honest = card(70, 400, 1460, 300, '誠實講：今天的成果不是可以上線的版本', ['編碼併發（加鎖或重試）　·　帳密認證　·　資料量　·　harness 不管範圍', '這四條回公司要補', '測試全綠 ≠ 可上線'], C.coral, { size: 32, ts: 36, lh: 66 })
+  r.lang = box(L, 70, 400, 1460, 300, '方法不綁語言：四件換成你們技術棧的規則，流程一樣能用\n\n課後練習 Step 6：把前端課那行 TODO 變成真的問卷 API', { size: 34, fill: '#1c2f4a', stroke: C.violet, color: C.ink, weight: 800 })
+  return r
+}, [
+  r => stagger(r.three, 500),
+  r => { show(r.honest); glow(r.honest) },
+  r => { hide(r.honest); show(r.lang); glow(r.lang) },
+])
+
+sc3(30, () => {
+  const r = {}; hd(30, 'step5')
+  r.l = ['一、後端服從前端的契約，欄位名一個都不改', '二、SDD 先文件再程式，delta 只寫不同的地方', '三、LOOP 跑全鏈路，F5 還在才叫真的', '四、最後由你拍板、由你驗收'].map((t, i) => box(L, 70, 150 + i * 165, 1460, 130, t, { size: 42, fill: C.card, stroke: [C.teal, C.violet, C.green, C.gold][i], color: C.ink, weight: 900 }))
+  return r
+}, [
+  r => { show(r.l[0]); glow(r.l[0]) },
+  r => { show(r.l[1]); glow(r.l[1]) },
+  r => { show(r.l[2]); glow(r.l[2]) },
+  r => { show(r.l[3]); glow(r.l[3]) },
+])
+
+/* ---------- 播放器 ---------- */
+let cur=0,stepI=0,refs={},playing=false,timer=null,speed=1,stepStart=0,stepDur=1,remain=0,ended=false;
+const $=id=>document.getElementById(id);
+window.__askTips=[];
+const ANIM_ID='anim', ASK_URL='';
+window.__animIndex=scenes.map((sc,i)=>({n:i+1,title:sc.title,steps:sc.steps.map(x=>x[0])}));
+const chips=$('chips');
+/* 兩層章節：有 chapter() 時，上排是 Step，下排只列目前 Step 的段落 */
+const CH=(window.__chaps||[]);const stepsNav=$('steps');let chipShown=-2;
+if(CH.length){stepsNav.hidden=false;CH.forEach((c,ci)=>{const b=document.createElement('button');b.type='button';b.style.setProperty('--c',c.color);
+  b.innerHTML=`<b>${c.tag}</b><span>${c.title}</span>`;b.title=`${c.tag}　${c.title}`;b.setAttribute('aria-label',b.title);b.addEventListener('click',()=>{const i=scenes.findIndex(s=>s.chap===ci);if(i>=0){$('bStart').hidden=true;goto(i,0);}});stepsNav.appendChild(b);});}
+scenes.forEach((s,i)=>{const b=document.createElement('button');b.type='button';
+  const k=CH.length?scenes.slice(0,i+1).filter(x=>x.chap===s.chap).length:0;b.textContent=CH.length?`${k}. ${s.title}`:(i+1)+'. '+s.title;b.dataset.chap=s.chap;
+  b.addEventListener('click',()=>{goto(i,0);});chips.appendChild(b);});
+function syncNav(){if(!CH.length)return;const c=scenes[cur].chap;[...stepsNav.children].forEach((b,i)=>b.setAttribute('aria-current',i===c?'true':'false'));
+  if(chipShown!==c){[...chips.children].forEach(b=>{b.hidden=+b.dataset.chap!==c;});chipShown=c;chips.scrollLeft=0;updateFade();}
+  try{centerIn(stepsNav,stepsNav.children[c]);}catch(e){}}
+/* 只捲「那一排自己」，不要用 scrollIntoView（會連整個頁面或外層網頁一起捲） */
+function centerIn(box,el){if(!box||!el||el.hidden||box.scrollWidth<=box.clientWidth+1)return;
+  const b=box.getBoundingClientRect(),r=el.getBoundingClientRect();box.scrollLeft=Math.max(0,box.scrollLeft+(r.left-b.left)-(b.width-r.width)/2);}
+$('bFull').addEventListener('click',()=>{const el=$('player');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});});
+function durOf(t){return Math.min(15000,Math.max(4200,t.length*250+1300))/speed;}
+/* ---------- 語音 ---------- */
+const synth=('speechSynthesis' in window)?window.speechSynthesis:null;let voiceOn=!!synth,voices=[],stepToken=0;
+const CIRC='①②③④⑤⑥⑦⑧⑨⑩';
+function spoken(t){(window.__spoken||[]).forEach(([re,s])=>{t=t.replace(re,s);});return t.replace(/[\u2460-\u2469]/g,c=>(CIRC.indexOf(c)+1)+' 號').replace(/!(\d+)/g,'$1 號').replace(/(\d+):(\d+)/g,'$1 比 $2').replace(/＝/g,'等於').replace(/・/g,' ').replace(/○○/g,'某某').replace(/～/g,'到').replace(/→/g,'到').replace(/＋/g,'加').replace(/／/g,'、').replace(/([A-Za-z0-9.\-]+)\/([A-Za-z0-9.\-]+)/g,'$1 $2').replace(/[「」（）]/g,' ');}
+let CLOUD=false,curAudio=null;const audioCache=new Map();
+/* 預錄配音：window.__audio = {'段-句': {src, sec, who}}；播完自動下一句，暫停會記住位置 */
+const REC=window.__audio||{};const HAS_REC=Object.keys(REC).length>0;let recResume=null;
+function isRec(){return HAS_REC&&$('voiceSel').value==='rec';}
+function recFor(i,k){return REC[(i+1)+'-'+(k+1)];}
+if(HAS_REC)voiceOn=true;
+const CLOUD_VOICES=[['zh-TW-HsiaoChenNeural','☁ 曉臻（女）'],['zh-TW-YunJheNeural','☁ 雲哲（男）'],['zh-TW-HsiaoYuNeural','☁ 曉雨（女）']];
+function addCloudOptions(sel){if(!CLOUD)return;CLOUD_VOICES.slice().reverse().forEach(([id,label])=>{if([...sel.options].some(o=>o.value==='cloud:'+id))return;const o=document.createElement('option');o.value='cloud:'+id;o.textContent=label;sel.insertBefore(o,sel.firstChild);});}
+function loadVoices(){if(!synth&&!HAS_REC)return;const zh=synth?synth.getVoices().filter(v=>/^(zh|cmn)/i.test(v.lang)):[];
+  const sc=v=>(/TW/i.test(v.lang)?100:/HK/i.test(v.lang)?30:50)+(/Natural|Online/i.test(v.name)?20:0)+(/Google/i.test(v.name)?5:0);zh.sort((a,b)=>sc(b)-sc(a));voices=zh;
+  const sel=$('voiceSel'),prev=sel.value;sel.innerHTML='';
+  if(!zh.length&&!HAS_REC){sel.innerHTML='<option value="">預設中文</option>';}
+  zh.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name.replace(/^Microsoft\s+/,'').replace(/\s*Online \(Natural\)/,'').replace(/\s*-\s*Chinese.*$/,'')+'（'+v.lang+'）';sel.appendChild(o);});
+  addCloudOptions(sel);
+  if(HAS_REC){const o=document.createElement('option');o.value='rec';o.textContent='🎙 預錄雙人配音（小芸／阿哲）';sel.insertBefore(o,sel.firstChild);}
+  sel.value=[...sel.options].some(o=>o.value===prev)?prev:(sel.options[0]?sel.options[0].value:'');
+  const note=$('voiceNote');if(!zh.length&&!HAS_REC){note.textContent='這個瀏覽器找不到中文語音，會用預設聲音念；念不出來時字幕照常播放。建議用 Edge 或 Chrome。';note.hidden=false;}else note.hidden=true;}
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices;}else if(HAS_REC){loadVoices();const sel=$('voiceSel');sel.innerHTML='<option value="rec">🎙 預錄雙人配音（小芸／阿哲）</option>';}else{$('voiceNote').textContent='這個瀏覽器不支援語音，字幕照常播放。';$('voiceNote').hidden=false;$('bVoice').disabled=true;voiceOn=false;$('bVoice').textContent='🔇 無語音';}
+function isCloud(){return CLOUD&&$('voiceSel').value.startsWith('cloud:');}
+function stopAudio(){if(curAudio){curAudio.onended=null;curAudio.onerror=null;curAudio.pause();curAudio=null;}}
+function ttsFetch(text,voice){const k=voice+'|'+text;if(audioCache.has(k))return audioCache.get(k);
+  const p=fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:spoken(text),voice,rate:'0%'})})
+    .then(r=>{if(!r.ok)throw new Error('tts '+r.status);return r.json();}).then(j=>'data:'+j.mime+';base64,'+j.audio);
+  audioCache.set(k,p);p.catch(()=>audioCache.delete(k));return p;}
+function nextText(){const sc=scenes[cur];if(stepI+1<sc.steps.length)return sc.steps[stepI+1][0];const n=scenes[cur+1];return n?n.steps[0][0]:null;}
+function cloudSpeak(text,tok){const voice=$('voiceSel').value.slice(6);
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  const fail=()=>next(Math.max(300,stepDur-(performance.now()-stepStart)));
+  ttsFetch(text,voice).then(src=>{if(tok!==stepToken||!playing)return;stopAudio();curAudio=new Audio(src);curAudio.playbackRate=speed;
+    curAudio.onended=()=>next(500/speed);curAudio.onerror=fail;curAudio.play().catch(fail);}).catch(fail);
+  const nx=nextText();if(nx)ttsFetch(nx,voice).catch(()=>{});}
+function speak(text,tok){if(isCloud()){cloudSpeak(text,tok);return;}if(!synth){timer=setTimeout(()=>{if(tok===stepToken)advance();},durOf(text));return;}synth.cancel();const u=new SpeechSynthesisUtterance(spoken(text));u.lang='zh-TW';const v=voices.find(x=>x.name===$('voiceSel').value);if(v){u.voice=v;u.lang=v.lang;}u.rate=speed;
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  u.onend=()=>next(700/speed);
+  u.onerror=e=>{if(e.error==='interrupted'||e.error==='canceled')return;next(Math.max(300,stepDur-(performance.now()-stepStart)));};
+  setTimeout(()=>{if(tok===stepToken&&playing)synth.speak(u);},60);}
+function playRec(r,tok){stopAudio();const a=new Audio(r.src);a._rec=r.src;a.playbackRate=speed;curAudio=a;
+  const next=ms=>{if(tok!==stepToken||!playing)return;clearTimeout(timer);timer=setTimeout(()=>{if(tok===stepToken)advance();},ms);};
+  const fail=()=>{if(tok!==stepToken)return;stopAudio();speak(scenes[cur].steps[stepI][0],tok);};
+  if(recResume&&recResume.k===r.src){a.currentTime=recResume.t;}recResume=null;
+  a.onended=()=>next(600/speed);a.onerror=fail;a.play().catch(fail);}
+function startClock(){clearTimeout(timer);const tok=++stepToken;const r=voiceOn&&isRec()&&recFor(cur,stepI);
+  if(r){playRec(r,tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},(r.sec*1000)/speed+8000);}
+  else if(voiceOn&&(synth||isCloud())){speak(scenes[cur].steps[stepI][0],tok);timer=setTimeout(()=>{if(tok===stepToken)advance();},stepDur*2.5+5000);}
+  else timer=setTimeout(()=>{if(tok===stepToken)advance();},Math.max(300,remain));}
+function stopVoice(){stepToken++;if(synth)synth.cancel();stopAudio();}
+function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textContent=ch?`${ch.tag}　${ch.title}　›　${s.title}`:`第 ${cur+1} 段　${s.title}`;$('subtext').textContent=s.steps[stepI][0];const wb=$('who');if(s.who){wb.hidden=false;wb.textContent=s.who;wb.className='who '+(s.who==='小芸'?'x':'z');}else wb.hidden=true;syncNav();
+  $('pos').textContent=`${cur+1}／${scenes.length} 段　·　${stepI+1}／${s.steps.length} 句`;
+  [...chips.children].forEach((b,i)=>b.setAttribute('aria-current',i===cur?'true':'false'));
+  try{centerIn(chips,chips.children[cur]);}catch(e){}
+  fitSubText();
+  try{history.replaceState(null,'','#s'+(cur+1)+'-'+(stepI+1));}catch(e){}
+  try{if(window.parent!==window)window.parent.postMessage({type:'anim:state',anim:ANIM_ID,scene:cur+1,step:stepI+1,title:s.title,text:s.steps[stepI][0],total:scenes.length},'*');}catch(e){}
+  const w=$('askWhere');if(w)w.textContent=`正在看：第 ${cur+1} 段　${s.title}`;}
+let gotoTok=0;
+function goto(i,s){clearTimeout(timer);stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
+  instant=true;svg.classList.add('instant');layer.innerHTML='';L=layer;refs=scenes[i].build()||{};
+  for(let k=0;k<s;k++)scenes[i].steps[k][1](refs);
+  svg.getBoundingClientRect();
+  requestAnimationFrame(()=>{if(gt!==gotoTok)return;svg.classList.remove('instant');instant=false;runStep(s);});}
+function durNow(t){const r=voiceOn&&isRec()&&recFor(cur,stepI);return r?(r.sec*1000+600)/speed:durOf(t);}
+function runStep(s){stepI=s;recResume=null;const st=scenes[cur].steps[s];st[1](refs);setSub();stepDur=durNow(st[0]);remain=stepDur;stepStart=performance.now();if(playing)startClock();}
+function advance(){clearTimeout(timer);if(stepI+1<scenes[cur].steps.length)runStep(stepI+1);else if(cur+1<scenes.length)goto(cur+1,0);else{ended=true;setPlaying(false);$('bPlay').textContent='↺ 重播';}}
+function back(){if(stepI>0)goto(cur,stepI-1);else if(cur>0)goto(cur-1,scenes[cur-1].steps.length-1);}
+function setPlaying(p){clearTimeout(timer);if(p){$('bStart').hidden=true;}
+  if(p&&!playing){playing=true;resumeTimers();if(voiceOn&&isRec()&&recFor(cur,stepI)){const done=recResume?recResume.t*1000/speed:0;remain=stepDur-done;}else if(voiceOn&&(synth||isCloud()))remain=stepDur;stepStart=performance.now()-(stepDur-remain);startClock();$('bPlay').textContent='⏸ 暫停';}
+  else if(!p&&playing){playing=false;if(curAudio&&curAudio._rec)recResume={k:curAudio._rec,t:curAudio.currentTime};stopVoice();pauseTimers();remain=Math.max(0,stepDur-(performance.now()-stepStart));$('bPlay').textContent='▶ 播放';}}
+window.__dbg=()=>({cur,stepI,playing,curAudio});
+$('bPlay').addEventListener('click',()=>{if(ended){playing=true;$('bPlay').textContent='⏸ 暫停';goto(0,0);return;}setPlaying(!playing);});
+$('bStart').addEventListener('click',()=>{setPlaying(true);});
+['chips','bNext','bPrev','bNextScene','bPrevScene'].forEach(id=>$(id).addEventListener('click',()=>{$('bStart').hidden=true;}));
+function fwd(){if(stepI+1<scenes[cur].steps.length)goto(cur,stepI+1);else advance();}
+$('bNext').addEventListener('click',fwd);
+$('bPrev').addEventListener('click',back);
+$('bNextScene').addEventListener('click',()=>{if(cur+1<scenes.length)goto(cur+1,0);});
+$('bPrevScene').addEventListener('click',()=>{goto(stepI>0?cur:Math.max(0,cur-1),0);});
+function restartSentence(){if(!playing)return;recResume=null;stepDur=durNow(scenes[cur].steps[stepI][0]);remain=stepDur;stepStart=performance.now();startClock();}
+$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;goto(cur,stepI);});  // 暫停中也重設這一句，剩餘時間才會照新速度算
+$('voiceSel').addEventListener('change',()=>{stopVoice();recResume=null;goto(cur,stepI);});  // 換聲音：畫面和聲音一起從這一句開頭重來（跟換速度同一條路），不會畫面停在後半句
+$('bVoice').addEventListener('click',()=>{voiceOn=!voiceOn;$('bVoice').textContent=voiceOn?'🔊 語音：開':'🔇 語音：關';$('bVoice').classList.toggle('off',!voiceOn);stopVoice();goto(cur,stepI);});
+document.addEventListener('keydown',e=>{if(e.target&&/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.target&&e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key===' '){e.preventDefault();$('bPlay').click();}else if(e.key==='ArrowRight'){fwd();}else if(e.key==='ArrowLeft'){back();}else if(e.key==='f'||e.key==='F'){$('bFull').click();}});
+(function tick(){const f=playing?(performance.now()-stepStart)/stepDur:(stepDur-remain)/stepDur;$('barfill').style.width=Math.max(0,Math.min(1,f))*100+'%';requestAnimationFrame(tick);})();
+/* ---------- 深連結：#s5 或 #s5-3 直接跳到第 5 段第 3 句 ---------- */
+function parseHash(){const m=/^#s(\d+)(?:-(\d+))?/.exec(location.hash||'');if(!m)return null;
+  const sc=Math.min(scenes.length,Math.max(1,+m[1]))-1;const st=Math.max(0,Math.min(scenes[sc].steps.length-1,(+(m[2]||1))-1));return [sc,st];}
+const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})()||/embed/.test(location.hash);
+if(EMBED)document.documentElement.classList.add('embed');
+window.addEventListener('hashchange',()=>{const h=parseHash();if(h&&(h[0]!==cur||h[1]!==stepI))goto(h[0],h[1]);});
+window.addEventListener('message',e=>{const d=e.data||{};
+  if(d.type==='anim:goto'){const sc=Math.max(0,Math.min(scenes.length-1,(d.scene||1)-1));const st=Math.max(0,Math.min(scenes[sc].steps.length-1,(d.step||1)-1));goto(sc,st);if(d.play)setPlaying(true);}
+  else if(d.type==='anim:pause')setPlaying(false);});
+/* ---------- 放在小港網站上：雲端語音＋問小港 ---------- */
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function jumpLabel(id,sc,st){if(id!==ANIM_ID)return `▶ 另一支動畫：第 ${sc} 段`;const S=scenes[sc-1];return S?`▶ 跳到第 ${sc} 段${st?'・第 '+st+' 句':''}：${S.title}`:null;}
+function renderAnswer(text){const box=document.createElement('div');box.className='askmsg bot';
+  const jumps=[];const body=String(text).replace(/\[\[anim:([\w-]+):(\d+)(?:-(\d+))?\]\]/g,(m,id,sc,st)=>{jumps.push([id,+sc,st?+st:0]);return '';}).replace(/^\s*[*＊•-]\s*$/gm,'').replace(/^\s*(▶\s*)?看動畫[：:]\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+  box.innerHTML=esc(body).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*\*\s+/gm,'• ');
+  jumps.forEach(([id,sc,st])=>{const lab=jumpLabel(id,sc,st);if(!lab)return;const b=document.createElement('button');b.type='button';b.className='askjump';b.textContent=lab;
+    b.addEventListener('click',()=>{if(id===ANIM_ID){$('bStart').hidden=true;goto(sc-1,Math.max(0,Math.min(scenes[sc-1].steps.length-1,(st||1)-1)));}else location.href=`../${id}/index.html#s${sc}-${st||1}`;});box.appendChild(b);});
+  return box;}
+async function ask(q){const log=$('askLog');const me=document.createElement('div');me.className='askmsg me';me.textContent=q;log.appendChild(me);
+  const wait=document.createElement('div');wait.className='askmsg bot wait';wait.textContent='小港思考中…';log.appendChild(wait);log.scrollTop=log.scrollHeight;
+  try{const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,anim:ANIM_ID})});
+    const j=await r.json();wait.remove();if(!r.ok)throw new Error(j.message||('HTTP '+r.status));log.appendChild(renderAnswer(j.answer||''));}
+  catch(e){wait.textContent='這一題沒有問成功：'+(e.message||e)+'。請稍後再試。';wait.classList.remove('wait');}
+  log.scrollTop=log.scrollHeight;}
+function openAsk(open){const d=$('askDrawer');d.classList.toggle('open',open);d.setAttribute('aria-hidden',open?'false':'true');if(open){setPlaying(false);setTimeout(()=>$('askInput').focus(),300);}}
+$('askClose').addEventListener('click',()=>openAsk(false));
+$('askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('askInput').value.trim();if(!q)return;$('askInput').value='';ask(q);});
+const TIPS=(window.__askTips||[]);TIPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>ask(t));$('askTips').appendChild(b);});
+fetch('/api/config',{headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(j=>{if(!j)throw 0;
+  CLOUD=true;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
+  if(j.live&&!EMBED){const b=$('bAsk');b.hidden=false;b.addEventListener('click',()=>openAsk(!$('askDrawer').classList.contains('open')));}
+}).catch(()=>{if(ASK_URL&&!EMBED){const b=$('bAsk');const a=document.createElement('a');a.className='askbtn';a.href=ASK_URL;a.target='_blank';a.rel='noopener';a.textContent='💬 問小港（另開網頁）';a.style.textDecoration='none';b.replaceWith(a);}});
+/* ---------- 版面：把整個播放器（標題＋導覽＋舞台＋字幕＋控制列）塞進第一屏 ----------
+   做法：舞台寬度 = min(容器寬, 可用高度 × 16/9)。「可用高度」不是猜的，而是設一個寬度、量實際排出來的高度、
+   再修正寬度，重複幾次直到剛好貼齊可視區底部。視窗大小、全螢幕、字體載入、導覽列換行都會重算。
+   字幕：字級跟著舞台寬度（舞台寬 / 36，桌面 22～32px；全螢幕上限 40px；手機與嵌入模式最小 18px），框的高度固定為 --sub-n 行。
+   一行塞不下的長句，只有那一句會暫時縮字（最小 18px）。 */
+const RT=document.documentElement,SUB_FLOOR=18,SUB_LH=1.45,SUB_PAD=16;
+let fitting=false,fitQ=0,lastW=0,subBase=24,nBoost=0,mEl=null,mTxt=null;const mCache=new Map();
+const TEXTS=scenes.flatMap(sc=>sc.steps.map(x=>x[0]));
+/* 隱形的量尺：跟字幕框同樣的樣式，用來算「這個寬度、這個字級，最長的句子要幾行」 */
+function measurer(){if(mEl)return mEl;mEl=document.createElement('div');mEl.className='subline';mEl.setAttribute('aria-hidden','true');
+  mEl.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;height:auto;overflow:visible;width:100px';
+  mEl.innerHTML='<span class="who x">小芸</span><span></span>';mTxt=mEl.lastChild;$('subline').parentNode.appendChild(mEl);return mEl;}
+function maxLines(w,fs){const k=w+'|'+fs;if(mCache.has(k))return mCache.get(k);const m=measurer();m.style.width=w+'px';m.style.fontSize=fs+'px';
+  let n=1;for(const t of TEXTS){mTxt.textContent=t;n=Math.max(n,Math.round((m.offsetHeight-SUB_PAD)/(fs*SUB_LH)));}
+  if(mCache.size>300)mCache.clear();mCache.set(k,n);return n;}
+function fit(){
+  if(fitting)return;fitting=true;
+  try{
+    const pl=$('player'),sb=pl.querySelector('.stagebox'),sub=pl.querySelector('.sub');if(!pl||!sb||!sub)return;
+    const full=document.fullscreenElement===pl,embed=RT.classList.contains('embed'),cs=getComputedStyle(pl);
+    const pT=full?parseFloat(cs.paddingTop)||0:0,pB=full?parseFloat(cs.paddingBottom)||0:0,pX=full?(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0):0;
+    const maxW=Math.max(200,Math.floor(pl.clientWidth-pX)),minW=Math.min(maxW,400);   /* 矮到放不下時（例如手機橫放）寧可讓頁面捲動，也不要把舞台縮到看不清楚 */
+    const vh=full?pl.clientHeight:window.innerHeight,tail=full?pB:6;
+    const K=embed?44:36,fMin=(maxW<=640||embed)?18:22,fMax=full?40:(embed?26:32);
+    const apply=w=>{const fs=Math.round(Math.min(fMax,Math.max(fMin,w/K)));
+      RT.style.setProperty('--stage-w',w+'px');RT.style.setProperty('--sub-fs',fs+'px');
+      RT.style.setProperty('--sub-n',Math.max(2,maxLines(w,SUB_FLOOR))+nBoost);subBase=fs;};
+    const over=()=>{const a=sb.getBoundingClientRect(),b=sub.getBoundingClientRect();
+      return (full?pT:a.top+window.scrollY)+(a.bottom-a.top)+(b.bottom-a.bottom)+tail-vh;};
+    let w=Math.min(maxW,Math.max(minW,lastW||maxW)),o;
+    for(let i=0;i<8;i++){apply(w);o=over();const t=Math.min(maxW,Math.max(minW,w-o*16/9));if(Math.abs(t-w)<1.5)break;w=Math.round(t);}
+    for(let k=0;k<6&&o>0.5&&w>minW;k++){w=Math.max(minW,Math.floor(w-o*16/9)-1);apply(w);o=over();}   /* 保證不超出：寧可小一點點 */
+    lastW=w;fitSubText();updateFade();
+  }finally{fitting=false;}}
+/* 這一句字幕塞進固定高度的框；塞不下就一次縮 1px，最多縮到 18px */
+function fitSubText(){const sl=$('subline');if(!sl)return;let f=subBase;sl.style.setProperty('--sub-cur',f+'px');
+  for(let g=0;g<40&&sl.scrollHeight>sl.clientHeight+1&&f>SUB_FLOOR;g++){f-=1;sl.style.setProperty('--sub-cur',f+'px');}
+  if(sl.scrollHeight>sl.clientHeight+1&&nBoost<3){nBoost++;scheduleFit();}}   /* 量尺跟實際有落差時，多留一行 */
+function scheduleFit(){if(fitQ)return;fitQ=requestAnimationFrame(()=>{fitQ=0;fit();});}
+/* 章節膠囊太多放不下時：兩端淡出提示還有，滑鼠滾輪可以橫向滾 */
+function updateFade(){const o=chips.scrollWidth>chips.clientWidth+1;chips.style.setProperty('--fl',o&&chips.scrollLeft>2?'22px':'0px');
+  chips.style.setProperty('--fr',o&&chips.scrollLeft+chips.clientWidth<chips.scrollWidth-2?'22px':'0px');}
+chips.addEventListener('scroll',updateFade,{passive:true});
+chips.addEventListener('wheel',e=>{if(chips.scrollWidth<=chips.clientWidth+1||Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;e.preventDefault();chips.scrollLeft+=e.deltaY;},{passive:false});
+window.addEventListener('resize',()=>{nBoost=0;scheduleFit();});
+document.addEventListener('fullscreenchange',()=>{nBoost=0;lastW=0;scheduleFit();setTimeout(scheduleFit,150);});
+if(window.ResizeObserver){const ro=new ResizeObserver(scheduleFit);[document.querySelector('header.top'),$('steps'),$('chips'),document.querySelector('.sub')].forEach(e=>e&&ro.observe(e));}
+if(document.fonts){const refit=()=>{mCache.clear();scheduleFit();};if(document.fonts.ready)document.fonts.ready.then(refit);if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',refit);}
+fit();
+playing=false;{const h0=parseHash();goto(h0?h0[0]:0,h0?h0[1]:0);}
+})();
+</script>
+
+</html>

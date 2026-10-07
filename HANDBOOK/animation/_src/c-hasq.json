@@ -1,0 +1,1 @@
+{"a":"feval","purpose":"webviewPanel","js":"(document.body.innerText.includes('Submit answers')?'Q ':'')+([...document.querySelectorAll('button')].some(b=>b.getBoundingClientRect().width && /^(Stop|Interrupt)/.test(b.getAttribute('aria-label')||''))?'busy':'idle')"}

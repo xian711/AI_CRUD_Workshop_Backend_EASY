@@ -1,0 +1,63 @@
+=== PRE 1 ===
+cd step0_course_intro
+.\preflight.ps1
+=== PRE 2 ===
+cd step2_speedrun_kit\2.5_sample_api\sample-api\src\CrudTemplate.Api
+dotnet run --urls http://localhost:5080
+=== PRE 3 ===
+# 1. 複製範本 API 成你的工作專案（harness 四件在範本根目錄，會一起帶走）
+Copy-Item -Recurse step2_speedrun_kit\2.5_sample_api\sample-api step3_new_module\my-equipment-api
+
+# 2. 把 PRD 和最小樣板放進專案（AI 才讀得到需求和交件格式）——不複製任何答案檔
+Copy-Item step3_new_module\PRD-中心裝備物資-後端.md step3_new_module\my-equipment-api\
+Copy-Item step3_new_module\SRS-設計文件-最小樣板.md step3_new_module\my-equipment-api\
+
+# 3. 進入專案資料夾，在「這個資料夾」開 AI Agent（工作目錄＝專案根目錄）
+cd step3_new_module\my-equipment-api
+=== PRE 4 ===
+用 .NET CRUD 範本（人員 API）做新模組「中心裝備物資」的後端 API，走規格驅動開發（SDD）：先文件，再程式。
+先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔，和 PRD-中心裝備物資-後端.md，先不要寫程式。
+PRD 第 5 節的待釐清點和其他沒寫清楚的地方，用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 SRS-delta、設計文件-delta、UML 圖和任務清單；等我說「開工」才寫程式，每做完一個回報一行。
+=== PRE 5 ===
+# 驗收 1：Swagger 五路由各打一次（先 dotnet run 起 API，開 http://localhost:5080/swagger）
+#   GET /api/equipment/items       → 200，24 筆
+#   GET /api/equipment/items/E-001 → 200；E-999 → 404
+#   POST                           → 201＋Location，code/id 由後端產生
+#   PUT /{id}                      → 200；不存在 → 404
+#   DELETE /{id}                   → 204；再刪一次 → 404
+
+# 驗收 2：測試全綠
+dotnet test
+
+# 驗收 3：psql 直查資料庫，親眼看到 24 筆（密碼 12345）
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -p 5432 -d ai_crud_equipment -c "SELECT count(*) FROM equipment_item;"
+=== PRE 6 ===
+你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做，自己跑完，中途不要問我。
+受測：step3_new_module/my-equipment-api（API）＋ step4_loop_e2e/fullchain-app（前端）。先在背景把兩個都啟動（埠被占就自己換，前端的 API 位址要跟著改），跑 step4_loop_e2e 的 run-e2e，修到 6 條全綠。
+全綠後開一個子代理做對抗審查：先用 HTTP 實打 API 的 201／400／404，再用 Playwright 開瀏覽器逐頁截圖，對照 PRD 和契約挑問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html、測試報告，並更新 SRS-delta、設計文件-delta 和圖。
+=== PRE 7 ===
+cd step4_loop_e2e
+powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
+=== PRE 8 ===
+請盡力挑 step4_loop_e2e/e2e 這套全鏈路 E2E，和 step3_new_module/my-equipment-api 的毛病，不要誇獎。
+測試專找：假綠（只看畫面沒 reload、reload 後沒重新斷言）、只驗到前端快取沒驗到資料庫、共用 e2e 庫互相污染、猜的 selector。
+API 專找：測試沒抓到、但不符合 PRD-中心裝備物資-後端.md 或 contract-conventions-summary.md 的問題（狀態碼、錯誤鍵、訊息語言、code 格式）。
+每條附理由，能重現就附步驟；只回報，不改檔；找不到也說明你怎麼確認的。
+=== PRE 9 ===
+用 .NET CRUD 範本（人員 API）做「課程回饋問卷」的後端 API（POST／GET /api/survey），走規格驅動開發（SDD）：先文件，再程式。
+先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔、PRD-課程回饋問卷.md 和 useSurveyResponses.before.ts（前端現有的資料層：端點、欄位名、型別、中文單選值都以它為準），先不要寫程式。
+這份 PRD 是寫給前端的，後端要決定的事它沒寫：用選擇題逐題問我，每題標出建議和一句理由。
+我拍板後，照 SRS-設計文件-最小樣板.md 產出 docs/ 的 SRS-問卷API-delta.md、DESIGN-問卷API-delta.md、DIAGRAMS-問卷API.html 和 TASKS.md；等我說「開工」才寫程式，每做完一個回報一行。
+=== PRE 10 ===
+你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做（step6 的差別在第 7 節），自己跑完，中途不要問我。
+受測：step6_survey_api/my-survey-api（API）。先在背景啟動它（埠被占就自己換），修到 dotnet build 0 警告、dotnet test 全綠。
+全綠後開一個子代理做對抗審查：先用 HTTP 實打 POST／GET /api/survey 的 201／400／200，再跑 verify-seam.ps1，對照 PRD 和 useSurveyResponses.before.ts 挑問題，也挑測試的假綠。
+最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html，並更新 SRS-delta、設計文件-delta 和圖。
+=== PRE 11 ===
+# 前端課 repo 跟後端課 repo 放在同一層
+powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1
+
+# 前端課 repo 放在別的地方：加 -FrontendRepo
+powershell -ExecutionPolicy Bypass -File .\step6_survey_api\verify-seam.ps1 -FrontendRepo D:\code\AI_CRUD_Workshop_Frontend_EASY

@@ -1,0 +1,1 @@
+{"url": "file:///D:/AIWORK/pw-shots-tmp/crud-backend-2026-10-07/mdhtml-after/LOOP-LOG.html", "vp": [1240, 644], "dsf": 1.9, "wait": 600, "shots": [{"name": "be-loop-log", "boxes": {"h1": "h1", "r1": {"sel": "h1, h2, h3", "hasText": "第 1 輪"}, "rv": {"sel": "h1, h2, h3", "hasText": "對抗審查"}}}]}
