@@ -98,9 +98,10 @@
    - 資料庫或 migration
    - 環境（埠、PostgreSQL 沒開、套件）
    - 測試本身
-4. 修受測 API。修完先跑 `dotnet build -p:TreatWarningsAsErrors=true`（0 警告 0 錯誤）和 `dotnet test`（全綠），再跑 run-e2e。
-5. 每跑一次 run-e2e，就在 `LOOP-LOG.md` 追加一筆（第 5 節）。
-6. 6 條全綠，就把受測 API 啟動回來，進對抗審查（第 4 節）。
+4. **修之前，先留「修改前」的證據**：把那條紅燈的失敗截圖從 `test-results/` 複製到 `loop/screenshots/`，檔名 `r1-E3-before.png`（第幾輪－哪一條－修改前）。`test-results/` 下一輪會被清掉，不先複製就沒了。根因在 API 回應的，再把那一筆請求和回應（狀態碼＋主體）存成 `loop/evidence/r1-E3-before.txt`。
+5. 修受測 API。修完先跑 `dotnet build -p:TreatWarningsAsErrors=true`（0 警告 0 錯誤）和 `dotnet test`（全綠），再跑 run-e2e。變綠後，同一個畫面用同樣的視窗大小重拍 `r1-E3-after.png`；有存請求的，重打同一筆存成 `r1-E3-after.txt`。
+6. 每跑一次 run-e2e，就在 `LOOP-LOG.md` 追加一筆（第 5 節）。
+7. 6 條全綠，就把受測 API 啟動回來，進對抗審查（第 4 節）。
 
 ---
 
@@ -139,7 +140,7 @@
    - **App 的問題**：測試沒抓到、但不符合 PRD 或契約的地方。例如狀態碼不對、錯誤鍵是 PascalCase、訊息是英文、`code` 格式不對、種子跟前端對不上、Controller 裡有商業邏輯。
    - **測試的假綠**：E2E 或 `dotnet test` 斷言太鬆、只看畫面沒重整、選錯元素、靠 `nth` 的 selector、測試互相影響、筆數寫死。
 6. 處理方式：
-   - **App 的問題**：修受測 API，照第 3 節再跑一圈（build、test、run-e2e），確認 6 條還是全綠。改到畫面或回應的話，重打那幾筆 HTTP、重拍那幾張截圖。
+   - **App 的問題**：修之前先留「修改前」：那一筆 HTTP 請求和回應存成 `loop/evidence/NN-xxx-before.txt`；有畫面的，把審查截圖**複製一份**成 `loop/screenshots/NN-xxx-before.png`（原檔留著，報告其他段落還要用）。修受測 API，照第 3 節再跑一圈（build、test、run-e2e），確認 6 條還是全綠。修完重打同一筆存成 `NN-xxx-after.txt`；有畫面的，到同一個畫面、用同樣的視窗大小重拍 `NN-xxx-after.png`。**不准覆蓋修改前那份。**
    - **測試的問題**：只列出來，不准改。寫進報告，列成選擇題交人裁決。
 
 ### 4.1 模型
@@ -159,7 +160,7 @@
 | 測試報告：`step4_loop_e2e/e2e/playwright-report/index.html`＋`dotnet test` 結果摘要 | 人 | Playwright 報告由 run-e2e 自動產生；`dotnet test` 的結果寫進 LOOP-REPORT.html |
 | 文件同步：`docs/` 的 SRS-delta、設計文件-delta、圖 | 人、接手的人 | 改動處標「step4 LOOP 後」 |
 
-另外：`loop/screenshots/`（審查截圖）、`loop/http-check.md`（HTTP 實打結果）。
+另外：`loop/screenshots/`（審查截圖；修改前 `-before`、修改後 `-after`）、`loop/evidence/`（修改前後的 HTTP 請求和回應）、`loop/http-check.md`（HTTP 實打結果）。
 
 ### 5.1 `LOOP-LOG.md`：流水紀錄
 
@@ -186,18 +187,25 @@
 1. **結論在最前面**：一句話。例如「6 條全綠，dotnet test 89 條全綠，對抗審查挑到 3 條，修了 2 條，1 條要你裁決」。停在紅燈的話，寫停在哪一條、為什麼。
 2. **受測網址**：前端 `http://localhost:<前端埠>/equipment/crud`、API `http://localhost:<API 埠>/swagger`，加上兩個 PID。
 3. **每一輪**：紅了哪幾條、一句根因、改了哪個檔。一輪一列。
-4. **測試結果**：`dotnet build` 警告數、`dotnet test` 幾條通過（含新增的）、run-e2e 的總結行。
-5. **對抗審查**：先放 HTTP 實打的矩陣（請求、期望、實際、過不過），再放截圖。每條發現寫怎麼處理（修了／交人裁決）。
-6. **規格外調整**：PRD 沒寫、但為了測試改了的地方，一條一列。
-7. **要人裁決的事**：列成選擇題，每題 2～4 個選項，標出建議和一句理由。
-8. **文件同步**：SRS-delta、設計文件-delta、圖各改了哪幾段。
-9. **最後附總結行**：run-e2e 的「E2E 全綠：6 條 passed」、exit 0。
-10. **測試報告連結**：用相對路徑 `../../../step4_loop_e2e/e2e/playwright-report/index.html`。
+4. **每一個修好的問題（紅燈和審查挑到的都算）一段，固定四樣**：
+   1. **一句白話**：哪裡不對、使用者會遇到什麼。例如「採購日期留空，存檔失敗，還跳英文錯誤」。
+   2. **修改前、修改後並排**：有畫面的放兩張截圖；只有 API 的放兩段請求和回應（狀態碼＋主體的關鍵幾行）。各自標「修改前」「修改後」，下面一句說差在哪。
+   3. **示意圖**：邏輯的問題（資料怎麼轉、編碼怎麼算、先檢查還是先存）加一張小流程圖，畫「修改前怎麼走、修改後怎麼走」，壞掉的那一步標紅色。圖上的字用中文。
+   4. **改了哪個檔、哪幾行**，和證明修好的測試（測試名稱）。
+5. **測試結果**：`dotnet build` 警告數、`dotnet test` 幾條通過（含新增的）、run-e2e 的總結行。
+6. **對抗審查**：先放 HTTP 實打的矩陣（請求、期望、實際、過不過），再放截圖。每條發現寫怎麼處理（修了／交人裁決）；修了的，照第 4 點寫一段。
+7. **規格外調整**：PRD 沒寫、但為了測試改了的地方，一條一列。
+8. **要人裁決的事**：列成選擇題，每題 2～4 個選項，標出建議和一句理由。跟畫面或回應有關的，附那張截圖或那段回應。
+9. **文件同步**：SRS-delta、設計文件-delta、圖各改了哪幾段。
+10. **最後附總結行**：run-e2e 的「E2E 全綠：6 條 passed」、exit 0。
+11. **測試報告連結**：用相對路徑 `../../../step4_loop_e2e/e2e/playwright-report/index.html`。
 
 版面要求：
 
 - 字要大：內文 18px 以上，標題更大。
 - 圖文並茂：每一段審查發現，都配一張截圖或一段 HTTP 回應。
+- 修改前、修改後兩份並排，左邊修改前、右邊修改後。窄螢幕改成上下排。
+- 示意圖用 HTML 方塊加箭頭（或內嵌 SVG）畫，不用網路也看得到；不要用要連網才畫得出來的 mermaid。字 18px 以上。
 - 白話：少用術語，非用不可就加一句解釋。
 
 ### 5.3 測試報告

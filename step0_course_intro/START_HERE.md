@@ -65,12 +65,12 @@
 
 ## 開始之前：先跑前置檢查
 
-本資料夾內的 `preflight.ps1` 會檢查你的機器有沒有準備好，共 **11 項**（PASS／WARN／FAIL 三級，任一 FAIL 會擋住開課）：
+本資料夾內的 `preflight.ps1` 會檢查你的機器有沒有準備好，共 **12 項**（PASS／WARN／FAIL 三級，任一 FAIL 會擋住開課）：
 
 | # | 檢查項 | 級別 | 說明 |
 |:-:|--------|:---:|------|
 | 1 | .NET SDK ≥ 10 | FAIL | 生後端與跑測試的命脈 |
-| 2 | PostgreSQL 5432 可連 | FAIL | 資料要落地的地方 |
+| 2 | PostgreSQL 有裝、有開（5432） | FAIL | 資料要落地的地方。連不上時會分清楚是「沒裝」「裝了沒開」還是「埠號不是 5432」，照提示做 |
 | 3 | psql 找得到 | WARN | 找不到會改用手冊方式驗，不擋開課 |
 | 4 | 資料庫帳密可登入（postgres/12345） | FAIL | 用 psql 實跑 `SELECT 1` |
 | 5 | port 5080 空 | FAIL | 範本 API 與參考解 API 都用這埠 |
@@ -80,6 +80,7 @@
 | 9 | ExecutionPolicy 可執行腳本 | FAIL | Restricted/AllSigned 會擋腳本 |
 | 10 | AI Agent CLI（claude/codex/cursor） | WARN | 用 IDE 內建 Agent 可忽略 |
 | 11 | step4 e2e 依賴就緒（node_modules／playwright CLI） | WARN | 一鍵 E2E 才需要，step0~step3 不受影響 |
+| 12 | Swagger 等套件拿得到（NuGet） | FAIL | Swagger 不用另外裝：它是 NuGet 套件，第一次 `dotnet run` 自動下載。已下載、或連得上 nuget.org 就過；兩樣都沒有才 FAIL |
 
 ```powershell
 cd step0_course_intro

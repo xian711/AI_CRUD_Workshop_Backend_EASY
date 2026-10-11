@@ -5,7 +5,7 @@
 ## 快速開始（學員）
 
 ```powershell
-# 1. 前置檢查（.NET SDK、PostgreSQL、埠號、磁碟等 11 項）
+# 1. 前置檢查（.NET SDK、PostgreSQL、埠號、磁碟等 12 項）
 cd step0_course_intro
 .\preflight.ps1
 

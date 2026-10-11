@@ -29,6 +29,19 @@
 | `Program.cs` 樣式 | **共用（增量修改）** | 只加你的 DI 註冊行，不動其他段落 |
 | `Data/AppDbContext.cs` | **共用（增量修改）** | 加你的 DbSet、SEQUENCE、CHECK；snake_case 轉換等機制不動 |
 
+## 0.1 先分清楚：你是哪一種情況
+
+做法分兩種，**人員（Member）要不要留、migration 怎麼處理，完全不一樣**：
+
+| 情況 | 例子 | 人員（Member）系列 | migration |
+|------|------|------|------|
+| **A. 在專案裡「加」一個模組**（最常見） | 人員還要用，再加一個裝備物資。**本課 step3、step6 都是這種** | **一個都不動**：程式、測試、舊 migration 全部保留 | **只新增**一支：`migrations add Add<實體>Module` |
+| **B. 開一個全新專案，只要新實體** | 公司要一套全新的系統，不要人員 | 新實體做好、測試全綠後，才刪人員系列 | 只有**還沒上過任何環境**時可以：刪掉舊 migration，重生 `InitialCreate` |
+
+> **不確定是哪一種，就當 A。** 規格（PRD／SRS）沒寫要刪人員，就不准刪。
+> B 會把既有資料表的建立紀錄一起砍掉，資料庫已經有資料就不能這樣做——這時一律走 A（`CLAUDE.md` 第 7 條：不改既有 migration、只新增）。
+> 下面的步驟，兩種情況不一樣的地方都會標 **A／B**。
+
 ## 1. 改名對照表（全域）
 
 | 範本 | 新模組（例） | 出現位置 |
@@ -76,29 +89,42 @@ Copy-Item Mapping\MemberMapper.cs Mapping\VisitRecordMapper.cs
 Copy-Item Constants\MemberEnums.cs Constants\VisitRecordEnums.cs
 ```
 
-然後逐檔把 `Member`→`VisitRecord`、`members`→`visit-records`、欄位換成新實體的欄位。改完把**舊的 Member 系列檔刪掉**（新模組不需要人員），或保留當對照（正式專案建議刪）。
+然後逐檔把新檔裡的 `Member`→`VisitRecord`、`members`→`visit-records`、欄位換成新實體的欄位。舊的 Member 系列檔：
 
-改 `AppDbContext.cs`：
-- `DbSet<VisitRecord> VisitRecords`
-- SEQUENCE 常數改 `visit_record_seq`、`ToTable("visit_record", ...)`
-- CHECK constraint 依新實體的允許值欄位（由 `VisitRecordEnums` 常數組出）
+- **A（加模組）**：一個都不動。人員繼續用。
+- **B（全新專案）**：新實體做好、測試全綠後，才刪掉 Member 系列檔。
+
+改 `AppDbContext.cs`（**A：新增，人員那一段一個字都不改；B：新增後再拿掉人員那一段**）：
+- 新增 `DbSet<VisitRecord> VisitRecords`
+- 新增 SEQUENCE 常數 `visit_record_seq`、`ToTable("visit_record", ...)`
+- 新增 CHECK constraint，依新實體的允許值欄位（由 `VisitRecordEnums` 常數組出）
 
 改 `Program.cs`（只加兩行、不動其他）：
 - `builder.Services.AddSingleton<VisitRecordMapper>();`
 - `builder.Services.AddScoped<IVisitRecordService, VisitRecordService>();`
 
-### 步驟 3 — 重生 migration
+### 步驟 3 — migration
 
-範本既有的 Migrations 是「人員」的綱要，新模組要整組重生：
+**A（加模組，本課做法）：只新增一支，舊的一支都不動。**
 
 ```powershell
 # 於新專案根（有 .sln 那層）
+dotnet tool restore
+dotnet dotnet-ef migrations add AddVisitRecordModule --project src\CrudTemplate.Api
+```
+
+產生後打開看一眼：新的 migration **只應該建新實體的資料表、SEQUENCE、CHECK**；出現改人員資料表的內容，就是 `AppDbContext` 動到了人員那一段，回去改掉。
+
+**B（全新專案、只要新實體、還沒上過任何環境）：才可以整組重生。**
+
+```powershell
+# 於新專案根（有 .sln 那層）——人員系列已經刪掉之後
 Remove-Item -Recurse src\CrudTemplate.Api\Data\Migrations
 dotnet tool restore
 dotnet dotnet-ef migrations add InitialCreate --project src\CrudTemplate.Api
 ```
 
-> 鐵律：之後每次改綱要都 `migrations add` 新增，**不改既有 migration、不手改 DB**。
+> 鐵律：不管 A 或 B，之後每次改綱要都 `migrations add` 新增，**不改既有 migration、不手改 DB**。
 
 ### 步驟 4 — 改種子（Seed）
 
@@ -116,6 +142,8 @@ Copy-Item Integration\MembersApiTests.cs Integration\VisitRecordsApiTests.cs
 # http\members.http → http\visit-records.http（路由與範例 body 換掉）
 ```
 
+**A（加模組）：人員的測試全部保留，一條都不准刪**；跑 `dotnet test` 時，舊的加新的都要綠。
+
 斷言紀律照範本：清單斷「至少 N 筆」不斷「恰 N 筆」；POST 斷 id 格式不斷固定流水號。
 
 ### 步驟 6 — 驗收
@@ -127,7 +155,7 @@ dotnet run --project src\CrudTemplate.Api --urls http://localhost:5080
 # 開 http://localhost:5080/swagger，五端點各操作一次
 ```
 
-全域搜尋殘留，把漏改的字串清乾淨：
+全域搜尋殘留，把漏改的字串清乾淨。**A（加模組）只搜你新增的那幾個檔**（專案裡本來就還有人員，整包搜一定會命中）；**B（全新專案）才整包搜**：
 
 ```powershell
 Get-ChildItem src -Recurse -File | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' } | Select-String -Pattern 'Member|template'

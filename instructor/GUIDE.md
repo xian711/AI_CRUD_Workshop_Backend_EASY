@@ -66,7 +66,7 @@ step1 的「有／沒有 harness」A/B 是**拿模型當下的能力當基準**�
 
 ## 四、開課前人工檢查（自動化檢查做不到的）
 
-`preflight.ps1` 已自動驗 11 項：.NET SDK ≥10、PostgreSQL 5432 可連、psql 找得到、資料庫帳密可登入（postgres/12345，**僅限本機教室 DEMO**）、port 5080 未占用、port 3199 未占用（一鍵 E2E 用）、Node≥20+pnpm、磁碟≥2GB、ExecutionPolicy、AI Agent CLI 偵測、step4 e2e 依賴（node_modules／playwright CLI）。以下是自動化檢查做不到、需**逐位學員**當面確認的項目：
+`preflight.ps1` 已自動驗 12 項：.NET SDK ≥10、PostgreSQL 有裝有開（5432；連不上時分辨沒裝／沒開／埠號不對）、psql 找得到、資料庫帳密可登入（postgres/12345，**僅限本機教室 DEMO**）、port 5080 未占用、port 3199 未占用（一鍵 E2E 用）、Node≥20+pnpm、磁碟≥2GB、ExecutionPolicy、AI Agent CLI 偵測、step4 e2e 依賴（node_modules／playwright CLI）、Swagger 等 NuGet 套件拿得到（已下載或連得上 nuget.org）。以下是自動化檢查做不到、需**逐位學員**當面確認的項目：
 
 - [ ] AI Agent（Claude／Codex／Cursor 等）已**登入**且可用（preflight 只驗 CLI 存在，驗不了登入狀態）。
 - [ ] 帳號**額度足夠**跑完一輪生成（Entity→測試整套）。
