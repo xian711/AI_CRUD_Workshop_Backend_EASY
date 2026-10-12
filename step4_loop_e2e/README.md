@@ -96,7 +96,8 @@ AI 交回的東西大多在 `step3_new_module/my-equipment-api/loop/`。不用�
 
 > **想知道「切開關」在程式裡是怎麼做到的？** 看 [`fullchain-app/FULLCHAIN_NOTES.md`](fullchain-app/FULLCHAIN_NOTES.md)。
 > 它記錄了這包跟前端課成品的完整差異：`nuxt.config.ts` 加一條 devProxy、`useEquipmentItems.ts` 加一個 API 分支——
-> **呼叫端（`pages/equipment/crud/*.vue`）一行都沒改**。這就是「前端留接縫」的實作證據。
+> 最初接 API 時，**呼叫端（`pages/equipment/crud/*.vue`）一行都沒改**，這就是「前端留接縫」的實作證據。
+> 2026-10-12 另補上表單檢查和儲存錯誤處理（字數上限、數量只收整數、接住後端 400 顯示紅字），來由見手冊 Step 4 ⑧。
 
 所以這 6 條測試裡，好幾條都故意「**做一個動作 → reload → 再斷言**」——reload 是試金石：
 mock 會掉回種子，持久化才會留下。最後 E6 更直接用 Playwright 的 `request` 打 `/api/equipment/items`，
@@ -260,7 +261,7 @@ step4_loop_e2e/
 ├── run-e2e.ps1            ← 全鏈路一鍵跑（自管 DB＋後端＋前端生命週期）
 ├── tests.sha256           ← 測試檔基準（run-e2e 開跑前比對，對不上就拒跑）
 ├── tools/                 ← 講師重算基準的工具
-├── fullchain-app/         ← 前端成品：equipment 雙模式 Nuxt app（唯讀使用，別改）
+├── fullchain-app/         ← 前端成品：equipment 雙模式 Nuxt app（LOOP 時唯讀，別改；2026-10-12 補過一次表單檢查）
 ├── e2e/                   ← 獨立 Playwright 專案（6 條全鏈路測試）
 │   ├── tests/fullchain.spec.ts
 │   ├── screenshots/       ← 關鍵畫面截圖（手冊素材）

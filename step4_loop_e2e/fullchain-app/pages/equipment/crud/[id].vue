@@ -159,8 +159,13 @@
             <section>
               <h3 class="mb-md border-b border-outline-variant pb-xs text-body-medium font-heavy text-on-surface-variant">保管與存放</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
-                <EquipmentFormField label="保管人" name="keeper">
-                  <UInput v-model="form.keeper" placeholder="保管人姓名（選填）" class="w-full" />
+                <EquipmentFormField label="保管人" name="keeper" :error="fieldErrors.keeper">
+                  <UInput
+                    v-model="form.keeper"
+                    placeholder="保管人姓名（選填）"
+                    class="w-full"
+                    :aria-describedby="fieldErrors.keeper ? 'keeper-error' : undefined"
+                  />
                 </EquipmentFormField>
                 <EquipmentFormField label="保管人電話" name="keeperPhone" :error="fieldErrors.keeperPhone">
                   <UInput
@@ -171,8 +176,13 @@
                     :aria-describedby="fieldErrors.keeperPhone ? 'keeperPhone-error' : undefined"
                   />
                 </EquipmentFormField>
-                <EquipmentFormField label="存放地點" name="locationName">
-                  <UInput v-model="form.locationName" placeholder="例：後勤倉庫 A 區（選填）" class="w-full" />
+                <EquipmentFormField label="存放地點" name="locationName" :error="fieldErrors.locationName">
+                  <UInput
+                    v-model="form.locationName"
+                    placeholder="例：後勤倉庫 A 區（選填）"
+                    class="w-full"
+                    :aria-describedby="fieldErrors.locationName ? 'locationName-error' : undefined"
+                  />
                 </EquipmentFormField>
               </div>
             </section>
@@ -195,12 +205,13 @@
                 </EquipmentFormField>
               </div>
               <div class="mt-md">
-                <EquipmentFormField label="備註" name="specNote">
+                <EquipmentFormField label="備註" name="specNote" :error="fieldErrors.specNote">
                   <UTextarea
                     v-model="form.specNote"
                     :rows="3"
                     placeholder="補充說明（選填）"
                     class="w-full"
+                    :aria-describedby="fieldErrors.specNote ? 'specNote-error' : undefined"
                   />
                 </EquipmentFormField>
               </div>
@@ -222,6 +233,9 @@ import {
   EQUIPMENT_CATEGORIES,
   EQUIPMENT_STATUS_META,
   EQUIPMENT_STATUS_OPTIONS,
+  EQUIPMENT_TEXT_LIMITS,
+  EQUIPMENT_QTY_MAX,
+  EquipmentApiError,
   type EquipmentItem,
   type EquipmentItemInput,
 } from '~/composables/useEquipmentItems'
@@ -346,19 +360,42 @@ watch(() => route.query.mode, () => { if (route.params.id) load() })
 /** 保管人電話：台灣手機（09 開頭 10 碼）或市話（區碼＋7~8 碼，可含一個連字號）；選填，填了才驗 */
 const KEEPER_PHONE_PATTERN = /^(09\d{8}|0\d{1,2}-?\d{6,8})$/
 
+/** 字數上限訊息用的欄位中文名（訊息文字與後端 Q9 完全相同，兩邊紅字一致） */
+const TEXT_FIELD_LABELS: Record<keyof typeof EQUIPMENT_TEXT_LIMITS, string> = {
+  name: '項目名稱',
+  unit: '單位',
+  spec1: '規格說明',
+  keeper: '保管人',
+  keeperPhone: '保管人電話',
+  locationName: '存放地點',
+  specNote: '備註',
+}
+
+/** 字數上限規則：長度先去頭尾空白再算（驗證引擎已 trim），同後端 */
+function maxLengthRule(field: keyof typeof EQUIPMENT_TEXT_LIMITS) {
+  const max = EQUIPMENT_TEXT_LIMITS[field]
+  return { maxLength: max, message: `${TEXT_FIELD_LABELS[field]}長度不可超過 ${max} 字` }
+}
+
 function rulesFor(): FieldRules<EquipmentItemInput> {
   return {
     categoryKey: [{ required: true, message: '請選擇分類' }],
-    name: [{ required: true, message: '請選擇或輸入項目' }],
-    unit: [{ required: true, message: '請輸入單位' }],
-    spec1: [{ required: true, message: '請輸入規格說明' }],
-    keeperPhone: [{ pattern: KEEPER_PHONE_PATTERN, message: '電話格式錯誤（手機 09xxxxxxxx 或市話 0X-XXXXXXXX）' }],
+    name: [{ required: true, message: '請選擇或輸入項目' }, maxLengthRule('name')],
+    unit: [{ required: true, message: '請輸入單位' }, maxLengthRule('unit')],
+    spec1: [{ required: true, message: '請輸入規格說明' }, maxLengthRule('spec1')],
+    keeper: [maxLengthRule('keeper')],
+    keeperPhone: [
+      maxLengthRule('keeperPhone'),
+      { pattern: KEEPER_PHONE_PATTERN, message: '電話格式錯誤（手機 09xxxxxxxx 或市話 0X-XXXXXXXX）' },
+    ],
+    locationName: [maxLengthRule('locationName')],
     status: [{ required: true, message: '請選擇狀態' }],
+    specNote: [maxLengthRule('specNote')],
   }
 }
 
 // 錯誤欄位聚焦順序
-const FIELD_ORDER = ['categoryKey', 'name', 'qty', 'unit', 'spec1', 'keeper', 'keeperPhone', 'locationName', 'status', 'purchaseDate']
+const FIELD_ORDER = ['categoryKey', 'name', 'qty', 'unit', 'spec1', 'keeper', 'keeperPhone', 'locationName', 'status', 'purchaseDate', 'specNote']
 
 function focusFirstError(errors: Record<string, string>) {
   const key = FIELD_ORDER.find(field => errors[field])
@@ -378,6 +415,10 @@ async function save() {
     errors.qty = '請輸入數量'
   } else if (form.qty < 0) {
     errors.qty = '數量不可小於 0'
+  } else if (!Number.isInteger(form.qty)) {
+    errors.qty = '數量必須是整數'
+  } else if (form.qty > EQUIPMENT_QTY_MAX) {
+    errors.qty = `數量不可超過 ${EQUIPMENT_QTY_MAX}`
   }
   if (form.purchaseDate && form.purchaseDate > today) {
     errors.purchaseDate = '採購日期不可晚於今天'
@@ -413,9 +454,30 @@ async function save() {
       toast.add({ title: '已儲存變更', color: 'green', icon: 'i-heroicons-check-circle' })
     }
     navigateBack()
+  } catch (error) {
+    showSaveError(error)
   } finally {
     isSubmitting.value = false
   }
+}
+
+/**
+ * 儲存失敗：留在原頁、保留使用者填的內容。
+ * 後端 400 帶欄位錯誤 → 在對應欄位顯示紅字並聚焦；其他失敗（404、500、連不上）→ 只跳訊息，不整頁變錯誤頁。
+ */
+function showSaveError(error: unknown) {
+  const apiErrors = error instanceof EquipmentApiError ? error.fieldErrors : {}
+  const shown = Object.fromEntries(Object.entries(apiErrors).filter(([field]) => FIELD_ORDER.includes(field)))
+  const shownCount = Object.keys(shown).length
+  if (shownCount > 0) {
+    Object.assign(fieldErrors, shown)
+    focusFirstError(shown)
+    toast.add({ title: `請修正 ${shownCount} 個欄位`, color: 'red', icon: 'i-heroicons-exclamation-triangle' })
+    return
+  }
+  const bodyMessage = Object.values(apiErrors)[0] // 例如整份請求內容的錯誤（鍵為 $）
+  const message = bodyMessage ?? (error instanceof Error ? error.message : '儲存失敗')
+  toast.add({ title: message, color: 'red', icon: 'i-heroicons-exclamation-triangle' })
 }
 
 // view → edit：加上 mode=edit，保留 return

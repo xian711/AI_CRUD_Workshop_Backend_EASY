@@ -13,6 +13,7 @@ STYLE = {
     '阿哲': '台灣的男性講師，在課堂上帶學員看實際操作的畫面。標準國語，咬字清楚，台北人平常說話的語調；沉穩、清楚、語速中等，像在跟學員說話，不要像在念稿。台詞要逐字照念，不要改詞、不要加字。',
 }
 SPOKEN = [  # 念法：字幕不變，只改念出來的字
+    (r'Ctrl\+Shift\+V', 'Control Shift V'),
     (r'localhost:3100', 'localhost 三一零零'), (r'3100', '三一零零'), (r'console\.log', 'console 點 log'),
     (r'Ctrl\+C', 'Control C'), (r'Ctrl', 'Control'), (r'my-equipment-app', 'my equipment app'),
     (r'Set-ExecutionPolicy', 'Set Execution Policy'), (r'step6_survey', 'step 6 survey'), (r'IT-NBK-003', 'I T N B K 零零三'),
@@ -26,6 +27,11 @@ SPOKEN = [  # 念法：字幕不變，只改念出來的字
     (r'dotnet', 'dot net'), (r'\.NET', 'dot NET'), (r'psql', 'P S Q L'), (r'CLAUDE\.md', 'CLAUDE 點 md'), (r'AGENTS\.md', 'AGENTS 點 md'),
     (r'CODE-RULES-api', 'CODE RULES API'), (r'contract-conventions-summary', 'contract conventions summary'), (r'EF Core', 'E F Core'),
     (r'M-999', 'M 九九九'), (r'E-999', 'E 九九九'), (r'Ctrl\+C', 'Control C'), (r'cd 空格兩個點', 'cd 空格 兩個點'),
+    # 第六版
+    (r'3200', '三二零零'), (r'IT-LAP-00(\d)', r'I T L A P 零零\1'), (r'IT-TAB', 'I T T A B'),
+    (r'fullchain-app', 'full chain app'), (r'Program\.cs', 'Program 點 cs'), (r'nuget\.org', 'NuGet 點 org'),
+    (r'NU1101', 'N U 一一零一'), (r'NU1301', 'N U 一三零一'), (r'1400 px', '一千四百 px'), (r'1 agent', 'one agent'),
+    (r'ER 圖', 'E R 圖'), (r'PK', 'P K'), (r'UK', 'U K'), (r'1\.5', '一點五'),
     (r'devProxy', 'dev proxy'), (r'run-e2e', 'run E 2 E'), (r'camelCase', 'camel case'), (r'DIAGRAMS', 'DIAGRAMS'),
 ]
 
@@ -66,6 +72,7 @@ old = {}
 mf = os.path.join(OUT, 'manifest.json')
 if os.path.exists(mf):
     old = json.load(open(mf, encoding='utf-8'))
+BYFILE = {r['file']: r for r in old.values()}
 jobs = []
 for i, (chap, title, who, visual, lines) in enumerate(SCENES, 1):
     for k, l in enumerate(lines, 1):
@@ -82,6 +89,9 @@ def work(job):
     prev = old.get(sk)
     if prev and prev.get('file') == key + '.mp3' and os.path.exists(mp3):
         return sk, prev, 0
+    same = BYFILE.get(key + '.mp3')   # 段號改了但同一句話錄過：沿用
+    if same and os.path.exists(mp3):
+        return sk, dict(same, sub=sub), 0
     best, tokens = None, 0
     for attempt in range(3):
         try:

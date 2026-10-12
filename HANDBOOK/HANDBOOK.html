@@ -252,7 +252,7 @@
     <div class="step-head">
       <div class="step-num">0</div>
       <h2>下載教材、跑前置檢查</h2>
-      <a class="watch" href="animation-hands/index.html#s3-1">▶ 看動畫 第 3～7 段</a>
+      <a class="watch" href="animation-hands/index.html#s3-1">▶ 看動畫 第 3～8 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -303,12 +303,13 @@ git clone https://github.com/xian711/AI_CRUD_Workshop_Backend_EASY.git</code></p
         <li><strong>最要緊的五項</strong>：.NET 版本、PostgreSQL 有裝有開、帳密登得進去、5080 埠空著、Swagger 等套件拿得到。這五項是紅色 <code>[FAIL]</code>，就照下面「卡住時」處理。</li>
         <li>psql 顯示黃色 <code>[WARN]</code>「PATH 沒有，但在安裝目錄找到」：沒關係。它把完整路徑印出來了，之後照抄。</li>
         <li>其他黃色 <code>[WARN]</code> 多半是 Step 4 才用到的，不擋你。</li>
-        <li>動畫裡是舊版的 11 項；現在多了第 12 項「Swagger 等套件拿得到」，第 2 項也會分清楚「沒裝」還是「沒開」。</li>
-      </ol>
+              </ol>
 
       <div class="help">
         <b class="t">🚑 卡住時 <a class="watch" href="animation-hands/index.html#s7-1">▶ 看動畫</a></b>
         <ol>
+          <li><strong>第 1 項 .NET 版本不對</strong>：到 <code>https://dotnet.microsoft.com/download</code> 下載 .NET SDK 10，裝完關掉 VS Code 再打開，重跑 preflight。</li>
+          <li><strong>5080 埠被占用</strong>：多半是上一個 API 還在跑，回那個終端機按 Ctrl+C。不確定是誰在用，就不要關它，找講師。</li>
           <li><strong>第 2 項寫「沒裝 PostgreSQL」</strong>：這台電腦還沒裝資料庫。
             <figure><img src="images/v5/b0-6-pf-nopg.jpg" alt="第 2 項 FAIL：沒裝 PostgreSQL"></figure>
             <ol>
@@ -325,7 +326,7 @@ git clone https://github.com/xian711/AI_CRUD_Workshop_Backend_EASY.git</code></p
 Start-Service postgresql-x64-18</code></pre></li>
           <li><strong>第 2 項寫「只裝了一半」</strong>（有資料夾、沒有服務）：重新執行 PostgreSQL 安裝程式，裝完重跑 preflight。</li>
           <li><strong>第 2 項寫「服務在跑，但 5432 連不上」</strong>：多半是安裝時埠號不是 5432。最簡單的做法：重新安裝，埠號選 5432。不想重裝，找講師。</li>
-          <li><strong>第 12 項寫「連不上 nuget.org」</strong>：Swagger 不用另外裝。比喻：NuGet 是 .NET 的套件商店，Swagger 是商店裡的一個套件；第一次 <code>dotnet run</code> 會自己上商店下載。商店連不上，Swagger 就「沒裝」。
+          <li><strong>第 12 項寫「連不上 nuget.org」</strong> <a class="watch" href="animation-hands/index.html#s8-1">▶ 看動畫</a>：Swagger 不用另外裝。比喻：NuGet 是 .NET 的套件商店，Swagger 是商店裡的一個套件；第一次 <code>dotnet run</code> 會自己上商店下載。商店連不上，Swagger 就「沒裝」。
             <figure><img src="images/v5/b0-8-pf-nuget.jpg" alt="第 12 項 FAIL：連不上 nuget.org"></figure>
             <ol>
               <li>換一個網路（例如手機熱點）。</li>
@@ -336,7 +337,7 @@ cd ..\..\..\step0_course_intro
 .\preflight.ps1</code></pre></li>
               <li>寫的是「套件來源清單裡沒有 nuget.org」：貼這一行加回來，再重跑：
                 <pre><code>dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org</code></pre></li>
-              <li>公司網路要走 proxy（代理伺服器）：先問 IT 拿位址和埠號，在同一個終端機貼下面這行（換成你的位址），再跑一次 <code>dotnet restore</code>。dotnet 的紅字有 <code>NU1301</code>（連不上套件來源），多半就是這個問題。
+              <li>公司網路要走 proxy（代理伺服器）：先問 IT 拿位址和埠號，在同一個終端機貼下面這行（換成你的位址），再照上一點進 <code>sample-api</code> 資料夾跑 <code>dotnet restore</code>（在 <code>step0_course_intro</code> 跑會找不到專案）。dotnet 的紅字有 <code>NU1301</code>（連不上套件來源），多半就是這個問題。
                 <pre><code>$env:HTTPS_PROXY='http://位址:埠號'</code></pre></li>
             </ol>
           </li>
@@ -359,7 +360,7 @@ cd ..\..\..\step0_course_intro
     <div class="step-head">
       <div class="step-num">1</div>
       <h2>為什麼要給 AI 規矩（後端版）</h2>
-      <a class="watch" href="animation-hands/index.html#s8-1">▶ 看動畫 第 8～9 段</a>
+      <a class="watch" href="animation-hands/index.html#s9-1">▶ 看動畫 第 9～10 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -370,7 +371,7 @@ cd ..\..\..\step0_course_intro
         </ol>
       </div>
 
-      <h3>① 打開對照頁 <a class="watch" href="animation-hands/index.html#s8-1">▶ 看動畫</a></h3>
+      <h3>① 打開對照頁 <a class="watch" href="animation-hands/index.html#s9-1">▶ 看動畫</a></h3>
       <p>在終端機一行貼一次（第一行是回到教材資料夾）：</p>
       <pre><code>cd ..
 start step1_why_harness\COMPARE.html</code></pre>
@@ -403,7 +404,7 @@ open step1_why_harness/COMPARE.html</code></pre></details>
     <div class="step-head">
       <div class="step-num">2</div>
       <h2>把範本 API 跑起來、認識規矩</h2>
-      <a class="watch" href="animation-hands/index.html#s10-1">▶ 看動畫 第 10～15 段</a>
+      <a class="watch" href="animation-hands/index.html#s11-1">▶ 看動畫 第 11～16 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -415,13 +416,13 @@ open step1_why_harness/COMPARE.html</code></pre></details>
         </ol>
       </div>
 
-      <h3>① 把範本 API 跑起來 <a class="watch" href="animation-hands/index.html#s10-1">▶ 看動畫</a></h3>
+      <h3>① 把範本 API 跑起來 <a class="watch" href="animation-hands/index.html#s11-1">▶ 看動畫</a></h3>
       <p>在教材根目錄的終端機，一行貼一次：</p>
       <pre><code>cd step2_speedrun_kit\2.5_sample_api\sample-api\src\CrudTemplate.Api
 dotnet run --urls http://localhost:5080</code></pre>
       <figure class="wide"><img src="images/v5/b2-1-run.jpg" alt="Now listening on 5080"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第一次會自己建資料庫、灌 24 筆資料，畫面跑一大串。看到 <code>Now listening on: http://localhost:5080</code>，API 就起來了。<strong>這個終端機先別關。</strong></figcaption></figure>
 
-      <h3>② 用 Swagger 打 API <a class="watch" href="animation-hands/index.html#s11-1">▶ 看動畫</a></h3>
+      <h3>② 用 Swagger 打 API <a class="watch" href="animation-hands/index.html#s12-1">▶ 看動畫</a></h3>
       <p>瀏覽器開 <code>http://localhost:5080/swagger</code>。人員管理有五條路由：</p>
       <figure class="wide"><img src="images/v5/b2-2-swagger.jpg" alt="Swagger 五條路由"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>五條路由：查全部、新增、查一筆、修改、刪除。</figcaption></figure>
       <ol class="do">
@@ -433,7 +434,7 @@ dotnet run --urls http://localhost:5080</code></pre>
       </ol>
       <figure class="wide"><img src="images/v5/b2-4-404.jpg" alt="查不存在的回 404"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>回 <strong>404</strong>（找不到），訊息是中文「找不到人員 M-999」。</figcaption></figure>
 
-      <h3>③ 跑測試、直查資料庫 <a class="watch" href="animation-hands/index.html#s12-1">▶ 看動畫</a></h3>
+      <h3>③ 跑測試、直查資料庫 <a class="watch" href="animation-hands/index.html#s13-1">▶ 看動畫</a></h3>
       <p>按終端機右上角的「<strong>＋</strong>」開第二個，一行貼一次：</p>
       <pre><code>cd step2_speedrun_kit\2.5_sample_api\sample-api
 dotnet test</code></pre>
@@ -442,7 +443,7 @@ dotnet test</code></pre>
       <pre><code>$env:PGPASSWORD='12345'; &amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -d ai_crud_template -c "SELECT count(*) FROM template_member;"</code></pre>
       <figure class="wide"><img src="images/v5/b2-6-psql.jpg" alt="psql 查到 24"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>看到 24：畫面、API、資料庫三邊對上了。psql 路徑不一樣的，用 Step 0 前置檢查印出來的那個。</figcaption></figure>
 
-      <h3>④ 四份規矩放在哪 <a class="watch" href="animation-hands/index.html#s13-1">▶ 看動畫</a></h3>
+      <h3>④ 四份規矩放在哪 <a class="watch" href="animation-hands/index.html#s14-1">▶ 看動畫</a></h3>
       <p>左邊檔案總管依序點開 <code>step2_speedrun_kit</code> → <code>2.5_sample_api</code> → <code>sample-api</code>：</p>
       <figure class="narrow"><img src="images/v5/b2-7-harness.jpg" alt="sample-api 最上層的規矩"><figcaption><code>sample-api</code> 最上層這四份 <code>.md</code> 就是規矩（harness）。</figcaption></figure>
       <ol>
@@ -453,7 +454,7 @@ dotnet test</code></pre>
       </ol>
       <p>你不用逐條讀懂，那是寫給 AI 讀的。Step 3 複製範本時，四份一起帶過去。規矩寫錯，AI 會照著錯，而且錯得又快又整齊，所以內容要有人負責確認。</p>
 
-      <h3>⑤ 看分層圖 <a class="watch" href="animation-hands/index.html#s14-1">▶ 看動畫</a></h3>
+      <h3>⑤ 看分層圖 <a class="watch" href="animation-hands/index.html#s15-1">▶ 看動畫</a></h3>
       <p>在第二個終端機（目前在 <code>sample-api</code>）貼：</p>
       <pre><code>start ..\..\2.4_architecture_db\ARCHITECTURE_DB.html</code></pre>
       <p style="font-size:16px;color:var(--ink-soft)">開得了的話也看「POST 循序」那張：一筆新增從進來到存進資料庫，經過哪幾層。</p>
@@ -502,7 +503,7 @@ dotnet run --urls http://localhost:5080</code></pre>還是不行，看 Step 0「
     <div class="step-head">
       <div class="step-num">3</div>
       <h2>做新模組：裝備物資 API ★</h2>
-      <a class="watch" href="animation-hands/index.html#s16-1">▶ 看動畫 第 16～28 段</a>
+      <a class="watch" href="animation-hands/index.html#s17-1">▶ 看動畫 第 17～37 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -515,7 +516,7 @@ dotnet run --urls http://localhost:5080</code></pre>還是不行，看 Step 0「
       </div>
       <p>順序一句話：<strong>PRD → AI 出選擇題 → 你拍板 → AI 交文件和圖 → 你核過 → 說「開工」→ AI 寫程式 → 三路驗收。</strong>這就是 SDD：先文件、再程式。</p>
 
-      <h3>⓪ 準備工作區：複製範本 <a class="watch" href="animation-hands/index.html#s16-1">▶ 看動畫</a></h3>
+      <h3>⓪ 準備工作區：複製範本 <a class="watch" href="animation-hands/index.html#s17-1">▶ 看動畫</a></h3>
       <p>按終端機右上角的「＋」開一個新的，開頭是教材根目錄（<code>…\AI_CRUD_Workshop_Backend_EASY&gt;</code>）就對了。整段複製、貼上；出現 <code>&gt;&gt;</code> 再按一次 Enter：</p>
       <pre><code># 1. 複製範本 API 成你的工作專案（四份規矩在範本根目錄，會一起帶走）
 Copy-Item -Recurse step2_speedrun_kit\2.5_sample_api\sample-api step3_new_module\my-equipment-api
@@ -530,7 +531,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       <pre><code>$env:PGPASSWORD='12345'; &amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -d postgres -c "DROP DATABASE IF EXISTS ai_crud_equipment;"</code></pre>
       <figure><img src="images/v5/b3-1-copy.jpg" alt="複製完成，進入 my-equipment-api"><figcaption>最後開頭變成 <code>…\my-equipment-api&gt;</code> 就對了。參考解（<code>solution-api</code>）、參考文件（<code>docs/</code>）、講師的答案（<code>instructor/</code>）都不會進工作區。</figcaption></figure>
 
-      <h3>① 打開新專案、讀 PRD <a class="watch" href="animation-hands/index.html#s17-1">▶ 看動畫</a></h3>
+      <h3>① 打開新專案、讀 PRD <a class="watch" href="animation-hands/index.html#s18-1">▶ 看動畫</a></h3>
       <ol class="do">
         <li>選單「檔案」→「開啟資料夾」，選 <code>step3_new_module\my-equipment-api</code>。視窗會整個重開，這是正常的。<strong>原本的終端機會不見</strong>：選單「終端機」→「新增終端」再開一個，開頭是 <code>…\my-equipment-api&gt;</code> 就對了。</li>
       </ol>
@@ -541,7 +542,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       <figure class="wide"><img src="images/v5/b3-3-prd-fields.jpg" alt="PRD 第 3 節：13 個欄位"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 3 節是契約：13 個欄位，前端已經定好，<strong>欄位名一個字都不能改</strong>，改了前端就接不上。</figcaption></figure>
       <figure class="wide"><img src="images/v5/b3-4-prd-decisions.jpg" alt="PRD 第 5 節：六個待釐清"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 5 節留了六個決定給你拍板：編碼誰產生、id 怎麼產、字典建不建表、硬刪軟刪、分頁在哪做、日期能不能空。</figcaption></figure>
 
-      <h3>② 打開 Claude Code、選模型 <a class="watch" href="animation-hands/index.html#s18-1">▶ 看動畫</a></h3>
+      <h3>② 打開 Claude Code、選模型 <a class="watch" href="animation-hands/index.html#s19-1">▶ 看動畫</a></h3>
       <ol class="do">
         <li>點 VS Code <strong>右下角的「Claude Code」</strong>，打開對話。右下角沒有它，代表還沒裝好或還沒登入，舉手找講師。</li>
         <li>點輸入框下面的模型名稱，選 <strong>Opus 5.5</strong>；同一個選單裡的 <strong>Effort 拉到 High</strong>（effort＝AI 想多深）。寫文件要想得深。</li>
@@ -549,7 +550,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </ol>
       <figure><img src="images/v5/b3-5-model.jpg" alt="選 Opus 5.5、Effort High"><figcaption>選 Opus 5.5，Effort 拉到 High。</figcaption></figure>
 
-      <h3>③ 貼起手 prompt <a class="watch" href="animation-hands/index.html#s19-1">▶ 看動畫</a></h3>
+      <h3>③ 貼起手 prompt <a class="watch" href="animation-hands/index.html#s20-1">▶ 看動畫</a></h3>
       <p>這段<strong>貼在 Claude Code 的對話輸入框</strong>，按送出（<code>step3_new_module/PROMPTS.md</code> 也有同一段）：</p>
       <pre><code>用 .NET CRUD 範本（人員 API）做新模組「中心裝備物資」的後端 API，走規格驅動開發（SDD）：先文件，再程式。
 先讀 CLAUDE.md、AGENTS.md 指到的 harness 規則檔，和 PRD-中心裝備物資-後端.md，先不要寫程式。
@@ -557,7 +558,7 @@ cd step3_new_module\my-equipment-api</code></pre>
 我拍板後，照 SRS-設計文件-最小樣板.md 產出 SRS-delta、設計文件-delta、UML 圖和任務清單；等我說「開工」才寫程式，每做完一個回報一行。</code></pre>
       <figure class="wide"><img src="images/v5/b3-6-prompt.jpg" alt="起手 prompt 貼進輸入框"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>貼進輸入框；下面看得到 Opus 5.5 High 和 Auto。它會先讀規矩和 PRD，先不寫程式。</figcaption></figure>
 
-      <h3>④ 一題一題拍板 <a class="watch" href="animation-hands/index.html#s20-1">▶ 看動畫</a></h3>
+      <h3>④ 一題一題拍板 <a class="watch" href="animation-hands/index.html#s21-1">▶ 看動畫</a></h3>
       <p>讀完它先出選擇題，一批四題，上面的分頁可以切換。每題都有標「建議」的選項和一句理由。</p>
       <figure class="wide"><img src="images/v5/b3-7-q1.jpg" alt="第一題：編碼誰產生"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>上面一排是這一批的題目；紅框是它建議的選項，下面一行是理由和代價。</figcaption></figure>
       <ol class="do">
@@ -592,7 +593,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </table>
       </div>
 
-      <h4>Q7 保管人：存編號，還是存文字？</h4>
+      <h4>Q7 保管人：存編號，還是存文字？ <a class="watch" href="animation-hands/index.html#s22-1">▶ 看動畫</a></h4>
       <p>這題 PRD 沒寫，是它照「釐清規矩」第一條自己找到的：<strong>欄位指向別的資料（例如人）時，要問存「編號」還是存「文字」。</strong></p>
       <figure class="wide"><img src="images/v5/b3-7b-q7.jpg" alt="Q7：保管人存編號還是存文字"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>兩個選項都寫了代價。紅框是它建議的「存文字」。</figcaption></figure>
       <figure><img src="images/v5/b3-7c-keeper-sch.jpg" alt="示意圖：陳建豪改名之後"><figcaption>示意圖：同一件事（人員改名），兩種存法的結果不一樣。</figcaption></figure>
@@ -602,18 +603,18 @@ cd step3_new_module\my-equipment-api</code></pre>
         <li><strong>本課選存文字</strong>：PRD 說前端一行都不改，前端契約就是兩個文字欄。它把代價寫進了 SRS-delta 第 4 段「待定與風險」第 7 條。正式系統建議存編號，前後端一起改。</li>
       </ol>
 
-      <h4>沒選建議的，要補自己的理由</h4>
+      <h4>沒選建議的，要補自己的理由 <a class="watch" href="animation-hands/index.html#s23-1">▶ 看動畫</a></h4>
       <p>Q10、Q11 實拍時沒選它建議的。它在文件裡留了一句「請補你的理由」。在同一個對話打兩句理由，它就寫進 SRS-delta 第 1 段：</p>
       <figure class="wide"><img src="images/v5/b3-8b-reasons.jpg" alt="在對話框補 Q10、Q11 的理由"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>Q10：前端只擋負數，後端多擋上限，畫面填得進去、存檔卻失敗。Q11：不是「其他」的分類，前端本來就只能從清單選；「其他」可以自己打字，所以本課不驗品名屬不屬於分類。最後一句請它把「誰拍板」寫成「學員」：它原本填了電腦上的帳號名稱。</figcaption></figure>
       <p style="font-size:16px;color:var(--ink-soft)">它也可能追加一題「範本原有的人員模組要保留嗎？」：選<strong>保留</strong>（人員的程式、49 條測試、舊的 migration 都不動，新模組只用「新增」的 migration）。</p>
       <div class="help">
-        <b class="t">🚑 AI 沒問就直接開始寫程式？ <a class="watch" href="animation-hands/index.html#s21-1">▶ 看動畫</a></b>
+        <b class="t">🚑 AI 沒問就直接開始寫程式？ <a class="watch" href="animation-hands/index.html#s24-1">▶ 看動畫</a></b>
         別讓它跑：按停止，貼這段：
         <pre><code>停，先不要寫程式、不要建檔案。先照 SRS-設計文件-最小樣板.md 的「釐清規矩」，用選擇題逐題問我，我拍板後再產出文件和任務清單，等我說「開工」。</code></pre>
         <p>它想自己決定分類要不要建表、想改範本的正本文件、測試紅了想刪測試：都叫它停，改成用選擇題問你。</p>
       </div>
 
-      <h3>⑤ 先看文件，再說開工 <a class="watch" href="animation-hands/index.html#s22-1">▶ 看動畫</a></h3>
+      <h3>⑤ 先看文件，再說開工 <a class="watch" href="animation-hands/index.html#s25-1">▶ 看動畫</a></h3>
       <p>拍板後，它在 <code>docs</code> 資料夾交四個檔：<strong>SRS-delta、設計文件-delta、圖、任務清單</strong>。程式一行都還沒寫。它停下來問下一步：選「<strong>我先核文件</strong>」。問要不要開 Chrome，選 No，跟它說文件你自己看。</p>
       <figure class="wide"><img src="images/v5/b3-9-next.jpg" alt="下一步：我先核文件"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>選「我先核文件，之後再說（建議）」。</figcaption></figure>
       <ol class="do">
@@ -622,7 +623,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       <figure class="wide"><img src="images/v5/b3-10-srs.jpg" alt="SRS-delta 第 1 段：16 題的裁決"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>SRS-delta 第 1 段：你答過的 16 題都在這裡。Q10、Q11 的理由，是你補的那兩句。</figcaption></figure>
       <figure class="wide"><img src="images/v5/b3-10b-risk.jpg" alt="SRS-delta 第 4 段：待定與風險"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 4 段「待定與風險」：選了就有代價，代價寫在這裡。第 7 條是保管人存文字，第 8、9 條是你沒選建議的 Q11、Q10。</figcaption></figure>
 
-      <h3>⑥ 看設計文件和五張圖 <a class="watch" href="animation-hands/index.html#s23-1">▶ 看動畫</a></h3>
+      <h3>⑥ 看設計文件和五張圖 <a class="watch" href="animation-hands/index.html#s26-1">▶ 看動畫</a></h3>
       <ol class="do" start="2">
         <li><strong>設計文件-delta</strong>：第 1 段哪一層新增哪些檔、哪些只加不改，<code>Common</code> 和人員模組完全不動。最後一段「遵守規矩的證據」寫完程式才會填。</li>
       </ol>
@@ -635,7 +636,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       <p style="font-size:16px;color:var(--ink-soft)">下面的圖是實拍那次 Step 4 LOOP 之後的版本：LOOP 修好的東西會標「step4 LOOP 後」。你在這一步看到的圖不會有這些標記。</p>
 
       <div class="diag">
-        <h4>圖① 分層架構圖：一筆請求經過哪幾層</h4>
+        <h4>圖① 分層架構圖：一筆請求經過哪幾層 <a class="watch" href="animation-hands/index.html#s27-1">▶ 看動畫</a></h4>
         <p><span class="k">一句話：</span>一筆請求從前端進來，經過哪幾層才到資料庫；哪些檔是新寫的、哪些只加幾行、哪些完全不動。</p>
         <p><span class="k">怎麼看：</span></p>
         <ol>
@@ -657,7 +658,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </div>
 
       <div class="diag">
-        <h4>圖② 資料表圖（ER 圖）：資料表長什麼樣</h4>
+        <h4>圖② 資料表圖（ER 圖）：資料表長什麼樣 <a class="watch" href="animation-hands/index.html#s28-1">▶ 看動畫</a></h4>
         <p><span class="k">一句話：</span>只有一張資料表 <code>equipment_item</code>；分類、項目碼不建表，是程式裡的常數。</p>
         <p><span class="k">怎麼看：</span></p>
         <ol>
@@ -678,7 +679,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </div>
 
       <div class="diag">
-        <h4>圖③ 新增一筆的循序圖：id 和編碼在哪一步產生</h4>
+        <h4>圖③ 新增一筆的循序圖：id 和編碼在哪一步產生 <a class="watch" href="animation-hands/index.html#s29-1">▶ 看動畫</a></h4>
         <p><span class="k">一句話：</span>新增一筆時，id 和編碼在哪一步、由誰產生；驗證失敗和撞號時各回什麼。</p>
         <p><span class="k">怎麼看：</span></p>
         <ol>
@@ -700,7 +701,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </div>
 
       <div class="diag">
-        <h4>圖④ 狀態碼圖：每條路由會回什麼</h4>
+        <h4>圖④ 狀態碼圖：每條路由會回什麼 <a class="watch" href="animation-hands/index.html#s30-1">▶ 看動畫</a></h4>
         <p><span class="k">一句話：</span>五條路由各會回哪些狀態碼，哪些回應包在統一的信封（ModelResult）裡。</p>
         <p><span class="k">怎麼看：</span></p>
         <ol>
@@ -725,7 +726,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       </div>
 
       <div class="diag">
-        <h4>圖⑤ 修改時編碼怎麼處理（流程圖）</h4>
+        <h4>圖⑤ 修改時編碼怎麼處理（流程圖） <a class="watch" href="animation-hands/index.html#s31-1">▶ 看動畫</a></h4>
         <p><span class="k">一句話：</span>修改一筆時，什麼情況編碼不變、什麼情況重新取號（就是 Q12 的拍板）。</p>
         <p><span class="k">怎麼看：</span>菱形是判斷，箭頭上的字是判斷結果；方框是動作。從上往下走。</p>
         <figure class="mid"><img src="images/v5/b3-d5.jpg" alt="PUT 時編碼怎麼處理"></figure>
@@ -740,11 +741,11 @@ cd step3_new_module\my-equipment-api</code></pre>
         <p><span class="k">看完你要答得出來：</span>只改保管人電話，編碼會不會變？</p>
         <details><summary>對答案</summary><p>不會。分類和品名沒變，前綴就沒變，保留舊編碼。</p></details>
       </div>
-      <p><strong>看不清、看不懂的圖，就請它重畫。</strong>實拍那次，圖① 原本太寬，要左右捲很久才看到資料庫。一句話「改成由上往下排，寬度不超過 1400px，顏色和內容不變」，它就重畫了：</p>
+      <p><strong>看不清、看不懂的圖，就請它重畫</strong> <a class="watch" href="animation-hands/index.html#s32-1">▶ 看動畫</a>。實拍那次，圖① 原本太寬，要左右捲很久才看到資料庫。一句話「改成由上往下排，寬度不超過 1400px，顏色和內容不變」，它就重畫了：</p>
       <figure class="wide"><img src="images/v5/b3-d1-redraw.jpg" alt="圖① 重畫前後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>左：重畫之前，右半邊要捲很久才看得到。右：重畫之後，改成上下排，捲一點就看完。上面講解用的就是重畫後的版本。</figcaption></figure>
       <p>文件的最低門檻寫在 <code>SRS-設計文件-最小樣板.md</code>：SRS-delta 四段、設計文件-delta 四段、圖至少四張，缺一樣就退回。想看填好的樣子，<code>step3_new_module/docs/</code> 有參考文件——先自己做，卡住再開。</p>
 
-      <h3>⑦ 換 Sonnet、說開工 <a class="watch" href="animation-hands/index.html#s24-1">▶ 看動畫</a></h3>
+      <h3>⑦ 換 Sonnet、說開工 <a class="watch" href="animation-hands/index.html#s33-1">▶ 看動畫</a></h3>
       <ol class="do">
         <li><strong>看任務清單</strong>：打開 <code>docs\TASKS.md</code>，每一項都小到能單獨驗收；你拍板的每一題，都對得到一項任務。最上面寫了預期測試總數。</li>
         <li>把模型換成 <strong>Sonnet 5.5</strong>（有規矩和範本，寫程式用便宜的就夠）。</li>
@@ -756,7 +757,7 @@ cd step3_new_module\my-equipment-api</code></pre>
       <figure class="wide"><img src="images/v5/b3-15-go.jpg" alt="輸入框打開工"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>打「開工」，送出。下面看得到 Sonnet 5.5。</figcaption></figure>
       <p>做完它會回報：測試幾條全綠、build 有沒有警告，還會列「跟文件原本寫的不同，已改文件」。實拍那次是 97 條全綠、0 警告，改了文件的 5 個地方。<strong>程式跟文件對得上，才算做完</strong>：這就是 SDD。</p>
 
-      <h3>⑧ 三路驗收：先把你的 API 開起來 <a class="watch" href="animation-hands/index.html#s25-1">▶ 看動畫</a></h3>
+      <h3>⑧ 三路驗收：先把你的 API 開起來 <a class="watch" href="animation-hands/index.html#s34-1">▶ 看動畫</a></h3>
       <p>AI 說的不算，你親眼看到才算。在 <code>my-equipment-api</code> 的終端機，一行貼一次（AI 已經幫你開著 API 的話，跳過這一步，直接開 Swagger）：</p>
       <pre><code>cd src\CrudTemplate.Api
 dotnet run --urls http://localhost:5080</code></pre>
@@ -786,7 +787,7 @@ dotnet run --urls http://localhost:5080</code></pre>
 }</code></pre>
       <figure><img src="images/v5/b3-17b-post.jpg" alt="POST：送出的內容和 201 回應"><figcaption>上面是送出的內容，下面是回應：201。<code>id</code>、<code>code</code>（<code>PW-GEN-003</code>）是後端算的；沒填的選填欄位回 <code>null</code>（沒有值）。實拍這筆 id 是 <code>E-027</code>：之前試送過、刪掉過，取號器往後數了。你的號碼不一樣是正常的。</figcaption></figure>
 
-      <h3>⑨ 三路驗收：測試和資料庫 <a class="watch" href="animation-hands/index.html#s26-1">▶ 看動畫</a></h3>
+      <h3>⑨ 三路驗收：測試和資料庫 <a class="watch" href="animation-hands/index.html#s35-1">▶ 看動畫</a></h3>
       <p><strong>第二路：測試。</strong>按終端機右上角的「＋」開第二個（開頭是 <code>…\my-equipment-api&gt;</code>），貼：</p>
       <pre><code>dotnet test</code></pre>
       <figure class="wide"><img src="images/v5/b3-18-test.jpg" alt="測試全綠"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>失敗 0 就好。實拍那次 102 條：開工時 97 條，修小落差又多 5 條。條數以你的任務清單為準。</figcaption></figure>
@@ -794,7 +795,7 @@ dotnet run --urls http://localhost:5080</code></pre>
       <pre><code>$env:PGPASSWORD='12345'; &amp; "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -p 5432 -d ai_crud_equipment -c "SELECT count(*) FROM equipment_item;"</code></pre>
       <figure class="wide"><img src="images/v5/b3-19-psql.jpg" alt="psql 查到 24 列"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>24 列（你剛新增又刪掉那一筆不算）。<strong>範本的人員也是 24 筆：庫名打錯一樣看到 24，要看清楚是 <code>ai_crud_equipment</code>。</strong></figcaption></figure>
 
-      <h3>⑩ 有小落差：看到什麼、期望什麼、只改這個 <a class="watch" href="animation-hands/index.html#s27-1">▶ 看動畫</a></h3>
+      <h3>⑩ 有小落差：看到什麼、期望什麼、只改這個 <a class="watch" href="animation-hands/index.html#s36-1">▶ 看動畫</a></h3>
       <p>驗收一定會有小落差。實拍這次是採購日期送空字串。你也可以試一次：回 Swagger 的 POST，在 body 的 <code>"status": "normal"</code> 後面加一個逗號，下一行加 <code>"purchaseDate": ""</code>，按 Execute。</p>
       <p>回 400 是對的（Q6 拍板「送空字串回 400」），<strong>但錯誤訊息是英文、鍵名多了 <code>$.</code>，還多一條 <code>request</code></strong>。契約要求：鍵名（錯誤清單裡指出「哪一欄錯」的名字）要跟前端的欄位名一模一樣，例如 <code>purchaseDate</code>（第一個字小寫，這種寫法叫 camelCase）；訊息要中文。前端才接得起來。</p>
       <figure><img src="images/v5/b3-20-gap-before.jpg" alt="修改前：400 英文訊息"><figcaption><strong>修改前</strong>：鍵名是 <code>$.purchaseDate</code>，訊息是一長串英文，還多一條 <code>request</code>。</figcaption></figure>
@@ -844,7 +845,7 @@ dotnet run --urls http://localhost:5080</code></pre>
     <div class="step-head">
       <div class="step-num">4</div>
       <h2>LOOP：AI 自己測、自己修、分身挑錯</h2>
-      <a class="watch" href="animation-hands/index.html#s29-1">▶ 看動畫 第 29～36 段</a>
+      <a class="watch" href="animation-hands/index.html#s38-1">▶ 看動畫 第 38～52 段</a>
     </div>
     <div class="step-body">
       <div class="goal">
@@ -852,6 +853,7 @@ dotnet run --urls http://localhost:5080</code></pre>
         <ol>
           <li>貼<strong>一個 prompt</strong>，AI 把<strong>你自己的</strong> <code>my-equipment-api</code> 修到 6 條全鏈路測試全部通過，再叫分身挑錯。</li>
           <li>看懂它交的報告；自己新增一筆、按 F5，還在。</li>
+          <li>看懂<strong>前後端規則要一致</strong>：後端擋下的，前端也要先擋、擋不到的也要接得住（⑧）。</li>
           <li>記住兩條鐵律：同一問題修兩次沒好就停；不准改測試。</li>
         </ol>
       </div>
@@ -863,7 +865,7 @@ dotnet run --urls http://localhost:5080</code></pre>
         <li>交報告給你驗收。同一個問題修兩次還沒好，就停下來回報。</li>
       </ol>
 
-      <h3>① 回到教材根目錄、開新對話 <a class="watch" href="animation-hands/index.html#s29-1">▶ 看動畫</a></h3>
+      <h3>① 回到教材根目錄、開新對話 <a class="watch" href="animation-hands/index.html#s38-1">▶ 看動畫</a></h3>
       <ol class="do">
         <li>Step 3 的 API 先按 Ctrl+C 停掉。</li>
         <li>選單「檔案」→「開啟資料夾」，選回教材最外層的 <code>AI_CRUD_Workshop_Backend_EASY</code>。左邊要同時看得到 <code>step3_new_module</code>、<code>step4_loop_e2e</code>。</li>
@@ -871,7 +873,7 @@ dotnet run --urls http://localhost:5080</code></pre>
       </ol>
       <figure class="wide"><img src="images/v5/b4v6-1-newchat.jpg" alt="教材根目錄、新的 Claude Code 對話"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>左邊是教材根目錄；右邊是新的 Claude Code 對話，LOOP prompt 貼好了，下面是 Sonnet 5.5、Auto。</figcaption></figure>
 
-      <h3>② 貼 LOOP prompt <a class="watch" href="animation-hands/index.html#s30-1">▶ 看動畫</a></h3>
+      <h3>② 貼 LOOP prompt <a class="watch" href="animation-hands/index.html#s39-1">▶ 看動畫</a></h3>
       <pre><code>你是 LOOP 工程師，照 step4_loop_e2e/LOOP-規矩.md 做，自己跑完，中途不要問我。
 受測：step3_new_module/my-equipment-api（API）＋ step4_loop_e2e/fullchain-app（前端）。先在背景把兩個都啟動（埠被占就自己換，前端的 API 位址要跟著改），跑 step4_loop_e2e 的 run-e2e，修到 6 條全綠。
 全綠後開一個子代理做對抗審查：先用 HTTP 實打 API 的 201／400／404，再用 Playwright 開瀏覽器逐頁截圖，對照 PRD 和契約挑問題，也挑測試的假綠。
@@ -882,17 +884,17 @@ dotnet run --urls http://localhost:5080</code></pre>
         <li><strong>送出後大約 20～30 分鐘。</strong>電腦不要讓它睡眠。跳出要不要連你自己的 Chrome，選 No，跟它說「不用連我的瀏覽器，繼續」。（它自己開的測試瀏覽器不一樣，讓它跑。）</li>
       </ul>
 
-      <h3>③ 它自己起服務、自己跑測試 <a class="watch" href="animation-hands/index.html#s31-1">▶ 看動畫</a></h3>
+      <h3>③ 它自己起服務、自己跑測試 <a class="watch" href="animation-hands/index.html#s40-1">▶ 看動畫</a></h3>
       <p>它先查埠，再把你的 API 和前端開起來，跑 6 條全鏈路測試。實拍這次，前端預設的 3199 被別的專案占著：<strong>它沒有去關別人的程式，自己換成 3200</strong>，前端的 API 位址、測試的網址也跟著改，還把這件事寫進報告。</p>
       <figure class="wide"><img src="images/v5/b4v6-2-ports.jpg" alt="報告：3199 被占，前端改用 3200"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>報告第 1 段：受測網址、行程編號（PID）、怎麼關，還有「為什麼是 3200」。</figcaption></figure>
       <p>實拍那次第 1 輪就 6 條全綠，<code>dotnet test</code> 102 條也全綠。<strong>第一輪可能全綠，也可能有紅燈，兩種都正常。</strong>有紅燈，它會先留下「修改前」的截圖，再判因、修、再跑。</p>
 
-      <h3>④ 全綠之後：子代理挑錯 <a class="watch" href="animation-hands/index.html#s32-1">▶ 看動畫</a></h3>
+      <h3>④ 全綠之後：子代理挑錯 <a class="watch" href="animation-hands/index.html#s41-1">▶ 看動畫</a></h3>
       <figure class="wide"><img src="images/v5/b4v6-4-agent.jpg" alt="1 agent：子代理在工作"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>輸入框下面出現「1 agent」，就是子代理在工作。它用比寫程式高一級的 <strong>Opus 5.5</strong>：寫程式的 AI 審自己，就像自己改自己的考卷。</figcaption></figure>
       <p>子代理做三件事：用 HTTP 真的打 API 104 次（合法的、缺欄位的、超長的、壞掉的 JSON 都打）；開瀏覽器一頁一頁截圖；讀全部程式和測試。實拍那次挑到 11 條：<strong>修了 2 條，9 條交給你裁決</strong>（動到你拍板的、前端的、測試的，規矩都不准它自己改）。9 條整理成 8 題：3 條測試的問題併成一題，另外多一題問「修好的 2 條要不要留」。</p>
 
       <div class="help">
-        <b class="t">🚑 卡住時：先分清楚是哪一種 <a class="watch" href="animation-hands/index.html#s33-1">▶ 看動畫</a></b>
+        <b class="t">🚑 卡住時：先分清楚是哪一種 <a class="watch" href="animation-hands/index.html#s42-1">▶ 看動畫</a></b>
         <div class="table-scroll">
         <table>
           <thead><tr><th>你看到的</th><th>這是什麼</th><th>你要做的</th></tr></thead>
@@ -906,40 +908,40 @@ dotnet run --urls http://localhost:5080</code></pre>
         </div>
       </div>
 
-      <h3>⑤ 修好的：一條一條看修改前、修改後 <a class="watch" href="animation-hands/index.html#s34-1">▶ 看動畫</a></h3>
+      <h3>⑤ 修好的：一條一條看修改前、修改後 <a class="watch" href="animation-hands/index.html#s43-1">▶ 看動畫</a></h3>
       <p>打開報告。在教材根目錄的終端機，一行貼一次：</p>
       <pre><code>start step3_new_module\my-equipment-api\loop\LOOP-REPORT.html
 start step4_loop_e2e\e2e\playwright-report\index.html</code></pre>
       <figure class="wide"><img src="images/v5/b4v6-3-top.jpg" alt="報告：結論在最前面"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>結論在最前面：6 條全綠、111 條測試全綠、挑到 11 條、修了 2 條、9 條要你裁決，還先講最要緊的一件。</figcaption></figure>
       <p>修好的每一條，報告都固定四樣：<strong>一句白話、修改前和修改後並排、示意圖、改了哪個檔和哪條測試證明</strong>（這是 <code>LOOP-規矩.md</code> 規定的）。這兩條只有 API、沒有畫面，所以「修改前、修改後」放的是同一筆請求的兩次回應。</p>
 
-      <h4>F1　文字裡夾著看不見的 NUL 字元，存檔變 500</h4>
+      <h4>F1　文字裡夾著看不見的 NUL 字元，存檔變 500 <a class="watch" href="animation-hands/index.html#s44-1">▶ 看動畫</a></h4>
       <figure class="wide"><img src="images/v5/b4v6-5-f1.jpg" alt="F1：修改前 500、修改後 400"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>從 Excel 複製貼上的文字，偶爾夾著一個看不見的字元，PostgreSQL 不收。修改前：一路送到資料庫才失敗，回 500（伺服器錯誤），不知道哪一欄錯。修改後：檢查欄位那一步就擋下，回 400，指出是「項目名稱」。</figcaption></figure>
       <p><strong>看示意圖抓重點：</strong>問題不是「擋不擋」，是「在哪一步擋」。越早擋，訊息越清楚；拖到資料庫才失敗，就只剩一個看不懂的 500。</p>
 
-      <h4>F2　請求內容是空的，錯誤訊息是英文</h4>
+      <h4>F2　請求內容是空的，錯誤訊息是英文 <a class="watch" href="animation-hands/index.html#s45-1">▶ 看動畫</a></h4>
       <figure class="wide"><img src="images/v5/b4v6-6-f2.jpg" alt="F2：空 body 的 400 改成中文"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>修改前：鍵名是空字串、訊息英文，還多一條假錯誤。修改後：只剩一條，鍵名 <code>$</code>（代表整份內容）、訊息「請求內容不可為空」。跟 Step 3 的小落差是同一個地方（統一產生 400 的 <code>Program.cs</code>），這次補上另一種情況。</figcaption></figure>
 
-      <h3>⑥ 要你裁決的：先看報告和畫面，再回答 <a class="watch" href="animation-hands/index.html#s34-1">▶ 看動畫</a></h3>
+      <h3>⑥ 要你裁決的：先看報告和畫面，再回答 <a class="watch" href="animation-hands/index.html#s46-1">▶ 看動畫</a></h3>
       <p>報告第 7 段「要你裁決的事」：每題 2～4 個選項、標出建議和理由，跟畫面有關的附了截圖。實拍那次 8 題，<strong>最要緊的是 Q2</strong>：</p>
       <figure class="wide"><img src="images/v5/b4v6-9-q2.jpg" alt="裁決 Q2：前端整頁變錯誤頁"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>Q2：前端擋不住、後端擋下時，前端整頁變錯誤頁，要怎麼處理？</figcaption></figure>
       <figure><img src="images/v5/b4v6-7-f4-shot.jpg" alt="按儲存前、按儲存後"><figcaption>實拍重現：項目打了 56 個字，前端沒擋；按儲存，後端回 400，前端沒接住，整頁變「500 新增品項失敗」，剛填的內容全不見。</figcaption></figure>
-      <figure><img src="images/v5/b4v6-8-f4-sch.jpg" alt="示意圖：前後端規則不一樣"><figcaption>示意圖：後端擋下來是對的（Q9 拍板最多 50 字）；錯在前端沒有同一條規則，被擋下也沒接住。</figcaption></figure>
+      <figure><img src="images/v5/b4v6-8-f4-sch.jpg" alt="示意圖：前後端規則不一樣"><figcaption>示意圖：後端擋下來是對的（Q9 拍板最多 50 字）；錯在前端沒有同一條規則，被擋下也沒接住。示意圖寫 51 個字、實拍打 56 個字，都是「超過 50」。</figcaption></figure>
       <ol>
-        <li><strong>這是邏輯問題，不是某一行打錯</strong>：前端、後端各自都「沒寫錯」，但兩邊的規則不一樣，合起來就壞。</li>
-        <li>它建議「改前端」，但本課的前提是前端一行不改，前端是契約。所以實拍選「<strong>先維持現狀</strong>」，請它把「前端要加字數上限、數量只收整數、接住 400」寫進 SRS-delta 第 4 段，回報給前端。</li>
+        <li><strong>這是邏輯問題，不是某一行打錯</strong>：後端的檢查是對的；前端少了同一條檢查，也沒處理後端回的 400。前端、後端各自的測試都綠，不代表串起來是對的。</li>
+        <li>它建議「改前端」，但本課的前提是前端一行不改，前端是契約。所以實拍選「<strong>先維持現狀</strong>」，請它把「前端要加字數上限、數量只收整數、接住 400」寫進 SRS-delta 第 4 段，回報給前端。<strong>回報之後怎麼修，看下面 ⑧。</strong>教材附的前端已經修好，你跑 LOOP 時，這一題多半不會出現。<br><strong>還是出現了：</strong>先核對你的後端字數上限跟 Q9（名稱 50、單位 10、規格 200、保管人 50、電話 20、存放地點 100、備註 500）一不一樣，再確認教材是新版（在教材根目錄打 <code>git pull</code>）。核對完一樣選「先維持現狀」，寫進報告，找講師。</li>
         <li><strong>建議的不一定要選。</strong>選了不建議的，記得說理由，它會寫進文件。</li>
       </ol>
-      <p>另一題也值得看：Q3「編號被重複使用」。</p>
+      <p>另一題也值得看：Q3「編號被重複使用」 <a class="watch" href="animation-hands/index.html#s47-1">▶ 看動畫</a>。</p>
       <figure class="wide"><img src="images/v5/b4v6-9b-q3.jpg" alt="裁決 Q3：編號被重複使用"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>筆電 <code>IT-LAP-003</code> 改成平板之後，下一台新筆電又拿到 <code>IT-LAP-003</code>：同一個號碼貼在兩台實物上。這是你在 Step 3 拍板的兩題（Q1「最大號加 1」、Q12「舊號空著不補」）合在一起才出現的，它不能自己改，所以問你。實拍選建議：先改文件寫清楚，程式不動。</figcaption></figure>
       <p>看完，在<strong>同一個對話</strong>一次回答：</p>
       <figure class="wide"><img src="images/v5/b4v6-10-answer.jpg" alt="在對話裡回答 Q1～Q8"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>實拍那次的回答：Q2 選「先維持現狀」並寫明要回報前端，其他都選建議。看不懂的就選建議的；寫著要講師處理的，舉手。</figcaption></figure>
       <p>它照你的裁決改文件、補測試，再跑一輪確認沒弄壞，最後更新報告。實拍那次補了 8 條測試，最後 <code>dotnet test</code> 119 條全綠、E2E 6 條全綠。</p>
 
-      <h3>⑦ 驗收：測試報告、紀錄、文件、自己點一遍 <a class="watch" href="animation-hands/index.html#s35-1">▶ 看動畫</a></h3>
+      <h3>⑦ 驗收：測試報告、紀錄、文件、自己點一遍 <a class="watch" href="animation-hands/index.html#s48-1">▶ 看動畫</a></h3>
       <figure class="wide"><img src="images/v5/b4-9-pw.jpg" alt="測試報告：6 條綠"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>測試報告：6 條都是綠的，每一條點得開看細節。</figcaption></figure>
       <figure class="wide"><img src="images/v5/b4v6-11-log.jpg" alt="LOOP-LOG：每一輪一段"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>流水紀錄 <code>loop/LOOP-LOG.md</code>：一輪一段。這是第 2 輪（修 F1、F2 之後）：用了哪些埠、跑了什麼、測試幾條、改了哪個檔、修改前後的證據放哪。審查、你的裁決、重畫圖① 也各記一段。</figcaption></figure>
-      <figure class="wide"><img src="images/v5/b4v6-12-srs.jpg" alt="SRS-delta：step4 LOOP 後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>SRS-delta 第 4 段「待定與風險」：第 12～14 條標「step4 LOOP 後」，寫了你的裁決。第 13 條就是 Q2：要回報前端的三件事（字數上限、數量只收整數、接住 400）。程式改了、你裁決了，文件就跟著改。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/b4v6-12-srs.jpg" alt="SRS-delta：step4 LOOP 後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>SRS-delta 第 4 段「待定與風險」：第 12～14 條標「step4 LOOP 後」，寫了你的裁決。實拍的第 13 條就是 Q2：要回報前端的三件事（字數上限、數量只收整數、接住 400）。你的號碼可能不同，找寫著「要回報前端」的那一條。程式改了、你裁決了，文件就跟著改。</figcaption></figure>
       <div class="table-scroll">
       <table>
         <thead><tr><th>核什麼</th><th>看到這樣就對了</th></tr></thead>
@@ -949,11 +951,67 @@ start step4_loop_e2e\e2e\playwright-report\index.html</code></pre>
           <tr><td>測試報告</td><td>6 條綠（或停在紅燈、報告寫清楚停在哪一條、為什麼）</td></tr>
           <tr><td>流水紀錄</td><td><code>loop/LOOP-LOG.md</code> 一輪一段：紅了哪幾條、根因、改了哪個檔</td></tr>
           <tr><td>文件同步</td><td><code>docs/</code> 的 SRS-delta、設計文件-delta、圖有標「step4 LOOP 後」</td></tr>
-          <tr><td>自己點一遍</td><td>照報告上的網址（實拍是 3200）：新增一筆 → 按 F5 → <strong>那一筆還在</strong>。點完照報告寫的指令，把兩個服務關掉</td></tr>
+          <tr><td>自己點一遍</td><td>照報告上的網址（實拍是 3200）：新增一筆 → 按 F5 → <strong>那一筆還在</strong>。再按「新增品項」：分類選「其他」（別的分類只能從選單挑項目），填好其他必填欄，項目打超過 50 個字、按儲存 → <strong>欄位下面出現紅字，填的內容還在</strong>；把項目改短、數量打 <code>1.5</code>、按儲存 → 數量欄紅字（⑧ 講為什麼）。<strong>都驗完，</strong>再照報告寫的指令，把兩個服務關掉</td></tr>
         </tbody>
       </table>
       </div>
       <figure><img src="images/v5/b4v6-13-reload.jpg" alt="新增一筆、F5 之後還在"><figcaption>按 F5 之後，用名字搜，剛新增的那一筆還在（編碼 <code>OT-OTH-002</code> 是後端算的）。這就是持久化的鐵證。</figcaption></figure>
+
+      <h3>⑧ 回報前端之後：請 AI 修前端（看實拍就好，不用照做） <a class="watch" href="animation-hands/index.html#s49-1">▶ 看動畫</a></h3>
+      <div class="goal">
+        <b class="t">⭐ 這一段是本課最重要的邏輯問題</b>
+        <ol>
+          <li><strong>這一段看就好，不用照做：教材附的 <code>fullchain-app</code> 已經照這次回報修好了</strong>（2026-10-12 起）。你跑 LOOP 時，⑥ 的 Q2 多半不會再出現。</li>
+          <li>這一段帶你看實拍：回報之後，前端怎麼修、怎麼證明修好。你在 ⑦「自己點一遍」已經親手驗過結果。</li>
+        </ol>
+      </div>
+      <p><strong>先給比喻：前端是櫃台，後端是倉庫。</strong>修之前，櫃台不量尺寸就收件，包裹送到倉庫才被退；退件時，櫃台還把整張單子撕了（整頁變錯誤頁、填的全不見）。要修兩件事：</p>
+      <ol>
+        <li><strong>第一道防線：櫃台用同一把尺先量。</strong>後端規定的字數上限、數量只收整數，前端也照一樣的數字先檢查，當場紅字，不白跑一趟。</li>
+        <li><strong>第二道防線：倉庫退件，櫃台把原因寫回單子。</strong>有些規則前端沒檢查（例如看不見的 NUL 字元，見 F1）；也有人會繞過畫面，直接打 API。所以後端一定要擋。被後端擋下時，前端要讀出「哪一欄、什麼原因」，把紅字放回那一欄。</li>
+      </ol>
+      <p>兩道都要。只有第一道：遇到前端沒檢查的規則，還是整頁壞掉。只有第二道：每次都要送到後端才知道錯，使用者白等。</p>
+      <figure><img src="images/v5/b4v7-4-sch.jpg" alt="示意圖：前端兩道防線"><figcaption>示意圖：修好之後，按儲存會走兩條路。左邊前端自己擋得到的，當場紅字；右邊前端沒檢查的，後端擋下、前端接住，一樣是紅字。</figcaption></figure>
+
+      <p><strong>實拍怎麼做：</strong>LOOP 的規矩說前端是契約、不准改，所以修前端要<strong>另開一個新對話、明確授權</strong>。實拍貼的是這三行（模型 Sonnet 5.5、Auto）：</p>
+      <p style="font-size:16px;color:var(--ink-soft)">實拍的 SRS-delta 是第 13 條；你的號碼可能不同。</p>
+      <pre><code>你現在換成前端工程師。SRS-delta 第 4 段第 13 條「要回報前端的三件事」，我授權你修 step4_loop_e2e/fullchain-app（LOOP 時前端不准改；這次是回報之後的修正）。照它的 CLAUDE.md 做，後端不動。
+修之前先重現、截圖；修好後同樣操作再截一次。照 LOOP-規矩 交修改前後和示意圖，補進 LOOP-REPORT。
+跑 run-e2e 確認 6 條還是綠的，再開一個子代理挑錯：前端的規則跟後端一不一致。最後把第 13 條標「已修」。</code></pre>
+      <figure class="wide"><img src="images/v5/b4v7-1-prompt.jpg" alt="修前端的 prompt"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>新對話，三行：誰授權、改哪裡、怎麼證明。第一行的「我授權你修」一定要寫，不然它會照 LOOP 規矩拒絕改前端。</figcaption></figure>
+      <p style="font-size:16px;color:var(--ink-soft)">再說一次：你的教材已經修好，這段不用貼。以後在公司遇到「後端擋了、前端沒擋」，就照這三行的寫法交給 AI。</p>
+
+      <p><strong>它做了什麼（實拍約 17 分鐘）：</strong></p>
+      <ol>
+        <li>先寫一支重現腳本，同一組情境在修改前跑一次：超過上限、數量小數、夾 NUL 的，全部整頁變錯誤頁；剛好在上限的，正常不擋。截圖存成「修改前」。</li>
+        <li>改兩個程式檔（都在 <code>fullchain-app</code>），再補一份說明檔 <code>FULLCHAIN_NOTES.md</code>：加字數上限和整數檢查；儲存失敗時讀出後端的錯誤，紅字放回那一欄。</li>
+        <li>同一組情境再跑一次：不合法的全部留在原頁、紅字在對的欄位、填的內容還在；剛好在上限的不被誤擋。截圖存成「修改後」。審查後又補了 2 個情境，共 14 個。</li>
+        <li>跑 <code>run-e2e</code>：6 條全綠（跑了兩次）；後端的 <code>dotnet test</code> 還是 119 條全綠，後端一行都沒動。</li>
+        <li>叫子代理（Opus 5.5）比對前端和後端的規則，挑到 6 條：修了 1 條，5 條交給你裁決（下面講）。</li>
+      </ol>
+
+      <h4>修改前、修改後：三件事各一張</h4>
+      <figure class="wide"><img src="images/v5/b4v7-fix-name.jpg" alt="項目 51 個字：修改前後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第一件，字數上限。修改前：項目打 51 個字，按儲存，整頁變「500 新增品項失敗」。修改後：同樣的操作，項目欄下面紅字「項目名稱長度不可超過 50 字」，不送出，打好的字也不會被截掉。紅字裡的數字跟後端 Q9 一樣；文字照實拍那套後端寫，你的後端訊息可能略有不同，看數字就好。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/b4v7-fix-qty.jpg" alt="數量 1.5：修改前後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第二件，數量只收整數。修改前：打 1.5 也能送，被後端擋下，整頁錯誤。修改後：數量欄下面紅字「數量必須是整數」。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/b4v7-fix-nul.jpg" alt="NUL 字元：修改前後"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第三件，接住後端的 400。項目夾了一個看不見的 NUL 字元，這版前端沒檢查，照樣送出。修改前：後端回 400，整頁錯誤。修改後：一樣送出、一樣被後端擋下，但前端讀出是「項目」這一欄，把後端的訊息「項目名稱含有不允許的控制字元」放在欄位下面，其他欄位的內容都還在。</figcaption></figure>
+      <p><strong>看示意圖抓重點：</strong>前兩張是第一道防線（前端先擋，請求根本沒送出去）；第三張是第二道防線（前端沒檢查，送出去、被擋、接住）。</p>
+
+      <h4>子代理挑到的：修 1 條，5 條交給你</h4>
+      <ol>
+        <li><strong>修了：「備註」被後端擋下時沒有紅字。</strong>它改程式時，把「哪幾欄要顯示紅字」的清單漏了備註。這是寫程式的 AI 自己漏的，換一個分身來審才抓到：<strong>審的跟寫的不能是同一個。</strong></li>
+        <li><strong>交給你：5 條小差異</strong>，整理成 4 題（F-Q1～F-Q4），例如前後端的必填訊息用字不同、後端電話規則會收全形數字、採購日期遇到 5 位數年份或跨午夜。嚴重度都是「低」，只有繞過畫面直接打 API、或很少見的輸入才會遇到。實拍選「先不動，我看報告再說」。</li>
+      </ol>
+      <figure class="wide"><img src="images/v5/b4v7-5-summary.jpg" alt="它的總結：檔案位置、服務還開著"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>最後它回報：改了哪些檔（資料夾和檔名分開寫）、服務還開著（網址和行程編號）、怎麼關，還說「你選了先看報告，所以沒有 commit」。</figcaption></figure>
+      <div class="help">
+        <b class="t">🔎 報告要誠實：它自己承認了一個意外</b>
+        實拍時，它的第一版重現腳本不小心把種子資料 <code>E-001</code> 存回去，只有「更新日期」（<code>updatedAt</code>）變成當天。它發現後用一句 psql 還原，<strong>而且主動寫進報告</strong>：「這是手動改資料，違反『不准手改資料』的精神，所以寫在這裡讓你知道」。之後它把腳本改成「自己新增一筆再改、跑完刪掉」。<br>
+        驗收時就看這種地方：報告有沒有寫「出了什麼意外、怎麼還原、以後怎麼避免」。筆數一樣是 24 筆還不夠：要確認 <code>E-001</code> 的更新日期和其他欄位，都跟修改前一樣（報告裡有寫它怎麼確認的）。
+      </div>
+      <div class="why">
+        <b class="t">💡 為什麼這一段最重要</b>
+        後端擋得對，前端少了同一條檢查、也沒接住退件，合起來就壞掉：這種<strong>邏輯問題</strong>，前端、後端各自的測試都是綠的，抓不到。要抓到它，要有人（或子代理）站在使用者的位置，從畫面一路打到資料庫。抓到之後，規則要寫在同一個地方（這次是 SRS-delta 寫著「要回報前端」的那一條，和後端 Q9 的字數裁決），兩邊照同一份做。
+      </div>
+
 
       <details><summary>6 條全鏈路測試各驗什麼</summary>
         <p>好幾條都故意「做一個動作 → F5 → 再檢查」：<strong>假資料一 F5 就回到 24 筆，真的存進資料庫才會留下。</strong></p>
@@ -1002,7 +1060,7 @@ API 專找：測試沒抓到、但不符合 PRD-中心裝備物資-後端.md 或
     <div class="step-head">
       <div class="step-num">5</div>
       <h2>回公司怎麼用</h2>
-      <a class="watch" href="animation-hands/index.html#s37-1">▶ 看動畫 第 37～38 段</a>
+      <a class="watch" href="animation-hands/index.html#s53-1">▶ 看動畫 第 53～54 段</a>
     </div>
     <div class="step-body">
       <p><strong>下一個 API 模組，只有一條路：</strong></p>
@@ -1065,6 +1123,7 @@ API 專找：測試沒抓到、但不符合 PRD-中心裝備物資-後端.md 或
         <li><b>Step 3</b>　三路驗收：Swagger 五條路由狀態碼對、<code>dotnet test</code> 全綠、psql 查 <code>ai_crud_equipment</code> 24 列</li>
         <li><b>Step 4</b>　貼一個 LOOP prompt，6 條全綠（或停在紅燈、報告寫清楚原因），被測 API 是你自己的 <code>my-equipment-api</code>，子代理挑過錯</li>
         <li><b>Step 4</b>　看過報告、測試報告、流水紀錄；文件標了「step4 LOOP 後」；自己新增一筆、按 F5，還在</li>
+        <li><b>Step 4</b>　新增品項選「其他」，項目打超過 50 個字、數量打 1.5，按儲存：欄位下面紅字、填的內容還在（在關服務之前驗）；說得出「前後端規則要一致」的兩道防線（前端先擋、擋不到的接住）</li>
         <li><b>Step 4</b>　說得出兩條鐵律：同一問題修兩次沒好就停；不准改測試、不准放寬標準</li>
       </ul>
     </div>

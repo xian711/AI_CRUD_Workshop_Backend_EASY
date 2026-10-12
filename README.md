@@ -18,7 +18,7 @@ step6 是**課後練習**，課堂不做。
 
 > 想先看一遍 AI 怎麼做？用瀏覽器打開 **`HANDBOOK/animation/index.html`**：教學動畫（講課版），看 AI 照 harness、SDD（規格驅動開發：先文件、再程式；程式改了，文件跟著改）、LOOP、對抗審查把裝備物資接上 .NET API＋PostgreSQL，全程實拍（Windows 版，約 19 分鐘，有字幕和雙人預錄配音）。
 >
-> 要邊看邊做，打開 **`HANDBOOK/animation-hands/index.html`**：手把手版（跟著做），Step 0～5 每一步都示範點哪裡、貼哪一段、看到什麼就對了（約 19 分鐘）。
+> 要邊看邊做，打開 **`HANDBOOK/animation-hands/index.html`**：手把手版（跟著做），Step 0～5 每一步都示範點哪裡、貼哪一段、看到什麼就對了（54 段、約 28 分鐘；含 Step 4「回報前端、修好教材前端」的實拍）。
 
 ## 課程地圖
 

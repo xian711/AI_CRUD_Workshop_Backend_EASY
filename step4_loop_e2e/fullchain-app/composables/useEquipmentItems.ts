@@ -74,6 +74,20 @@ export const ITEM_CODE_MAP: Record<string, string> = {
   加壓式免電力緊急淨水設備: 'PWP', 重力式緊急濾水器: 'GWF', 免電力緊急消毒劑製造設備: 'DSF',
 }
 
+/** 各文字欄的字數上限（同後端 Q9：EquipmentItemRequest 的 StringLength；前端先擋，省一趟 400） */
+export const EQUIPMENT_TEXT_LIMITS = {
+  name: 50,
+  unit: 10,
+  spec1: 200,
+  keeper: 50,
+  keeperPhone: 20,
+  locationName: 100,
+  specNote: 500,
+} as const
+
+/** 數量上限＝後端 int 上限（同後端 Q10：不設業務上限，只受整數型別限制） */
+export const EQUIPMENT_QTY_MAX = 2147483647
+
 /** 狀態 → 中文顯示（enum 值嚴格照 SPEC；預設 normal） */
 export const EQUIPMENT_STATUS_META: Record<EquipmentStatus, string> = {
   normal: '正常',
@@ -301,6 +315,37 @@ function messageFromError(error: unknown, fallback: string): string {
   return message && message.trim() ? message : fallback
 }
 
+/**
+ * API 回 400 時，帶回「哪個欄位錯了」：鍵＝欄位名（camelCase），值＝後端繁中訊息。
+ * 頁面據此在對應欄位下顯示紅字，不用整頁變錯誤頁，也不會清掉使用者填的內容。
+ * 沒有欄位層級錯誤時（404、500、連不上）fieldErrors 為空物件，只有 message。
+ */
+export class EquipmentApiError extends Error {
+  readonly fieldErrors: Record<string, string>
+
+  constructor(message: string, fieldErrors: Record<string, string> = {}) {
+    super(message)
+    this.name = 'EquipmentApiError'
+    this.fieldErrors = fieldErrors
+  }
+}
+
+/** 取 400 的 errors（{ 欄位: [訊息, …] }）；每個欄位只留第一條訊息 */
+function fieldErrorsFromError(error: unknown): Record<string, string> {
+  const errors = (error as { data?: { errors?: Record<string, string[] | string> } })?.data?.errors
+  if (!errors || typeof errors !== 'object') return {}
+  const result: Record<string, string> = {}
+  for (const [field, value] of Object.entries(errors)) {
+    const first = Array.isArray(value) ? value[0] : value
+    if (typeof first === 'string' && first.trim()) result[field] = first
+  }
+  return result
+}
+
+function apiErrorFrom(error: unknown, fallback: string): EquipmentApiError {
+  return new EquipmentApiError(messageFromError(error, fallback), fieldErrorsFromError(error))
+}
+
 /** 從 FetchError 取 HTTP 狀態碼（相容 ofetch 的 statusCode / response.status） */
 function statusOf(error: unknown): number | undefined {
   const e = error as { statusCode?: number; response?: { status?: number } }
@@ -365,7 +410,7 @@ export function useEquipmentItems() {
     try {
       result = await $fetch<EquipmentEnvelope>(API_BASE, { method: 'POST', body: toRequestBody(input) })
     } catch (error) {
-      throw new Error(messageFromError(error, '新增品項失敗'))
+      throw apiErrorFrom(error, '新增品項失敗')
     }
     const created = fromDto(unwrap(result, '新增品項失敗'))
     store.value = [created, ...store.value] // 增量更新快取（不重新全量拉取）
@@ -392,7 +437,7 @@ export function useEquipmentItems() {
     try {
       result = await $fetch<EquipmentEnvelope>(`${API_BASE}/${id}`, { method: 'PUT', body: toRequestBody(input) })
     } catch (error) {
-      throw new Error(messageFromError(error, `更新品項 ${id} 失敗`))
+      throw apiErrorFrom(error, `更新品項 ${id} 失敗`)
     }
     const updated = fromDto(unwrap(result, `更新品項 ${id} 失敗`))
     store.value = store.value.map(item => (item.id === id ? updated : item)) // 增量替換快取
