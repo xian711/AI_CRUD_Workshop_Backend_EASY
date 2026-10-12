@@ -10,7 +10,7 @@ OUT = os.path.join(HERE, 'out-be')
 # 只放場景真的用到的截圖
 src = open(os.path.join(HERE, 'scenes-be.js'), encoding='utf-8').read()
 imgs = [f[:-4] for f in os.listdir(os.path.join(OUT, 'images')) if f.endswith('.jpg')]
-used = sorted(n for n in imgs if re.search(r"['\"]" + re.escape(n) + r"['\"]", src))
+used = sorted(n for n in imgs if re.search(r"['\"]" + re.escape(n) + r"['\"]", src) or re.fullmatch(r'bv6-diag-\d-(svg|head)', n))
 
 if os.path.exists(DST):
     shutil.rmtree(DST)
@@ -23,7 +23,7 @@ for n in used:
 shutil.copytree(os.path.join(OUT, 'audio'), os.path.join(DST, 'audio'))
 
 # 原始檔：場景、繪圖工具、播放器、組裝與截圖腳本（不含實拍原圖 raw/，也不含本機專用的腳本）
-SRC_FILES = ['scenes-be.js', 'mk-be.sh', 'build_be_data.py', 'be-plan.md', 'after.html',
+SRC_FILES = ['scenes-be.js', 'scenes-be6-lec-body.js', 'scenes-be.v1.js', 'mk-be6.py', 'be6-import.py', 'after.v1.html', 'mk-be.sh', 'build_be_data.py', 'be-plan.md', 'after.html',
              'v3-helpers.js', 'helpers-crud.js', 'helpers.js', 'engine-v3.html', 'be-data.js',
              'prep.py', 'build.py', 'check.mjs', 'sheet.py', 't-v3.mjs', 't-v3-play.mjs', 't-installed.mjs', 'install.py',
              'vsc-lib.mjs', 'driver.mjs', 'send.mjs', 'build-wait.sh', 'dlg.ps1', 'ocr-find.ps1',
@@ -38,7 +38,7 @@ shutil.copy(os.path.join(HERE, 'raw', 'meta-extra.json'), os.path.join(DST, '_sr
 if os.path.exists(os.path.join(HERE, 'SRC-README.md')):
     shutil.copy(os.path.join(HERE, 'SRC-README.md'), os.path.join(DST, '_src', 'README.md'))
 TTS = os.path.join(os.path.dirname(HERE), 'tts-audition')
-for f in ['script_be.py', 'make_be_audio.py', 'tts.py', '講稿風格卡.md']:
+for f in ['script_be.py', 'script_be.v1.py', 'make_be_audio.py', 'tts.py', '講稿風格卡.md']:
     if os.path.exists(os.path.join(TTS, f)):
         shutil.copy(os.path.join(TTS, f), os.path.join(DST, '_src', f))
 if os.path.exists(os.path.join(HERE, 'audio-be', 'manifest.json')):

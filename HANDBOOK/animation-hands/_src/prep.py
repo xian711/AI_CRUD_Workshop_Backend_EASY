@@ -52,7 +52,7 @@ for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
     im.save(os.path.join(out, 'images', name + '.jpg'), quality=82, optimize=True)
     used.append(name)
 # 手冊裡的圖解（沿用講師做好的投影片圖）
-HB = 'D:/AI_CRUD_Workshop_Frontend_EASY/HANDBOOK/images'
+HB = 'D:/AIWORK/_AICLASS/AI_CRUD_Workshop_Frontend_EASY/HANDBOOK/images'
 for src, name in [('step3_paradigm.jpg', 'hb-step3-paradigm'), ('step5_value_curve.jpg', 'hb-step5-value'), ('overview_metaphor.jpg', 'hb-overview')]:
     im = Image.open(os.path.join(HB, src)).convert('RGB')
     if im.size[0] > 1920:

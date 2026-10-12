@@ -21,6 +21,8 @@ FIX = {
     # LOOP 對話裡背景指令的輸出印了本機暫存路徑（含 Windows 帳號），整行蓋掉
     'bc21-ports': [('fill', 734, 617, 1842, 647, BG)],
     'bc23-green': [('fill', 734, 616, 1842, 646, BG)],
+    # 第六版：對話裡印了使用者另一個專案的資料夾（占用 3199 的那個），換成「另一個專案」
+    'bv6-22-decide': [('retext', 935, 412, 1216, 446, '另一個專案', (43, 43, 43), (204, 204, 204), 'C:/Windows/Fonts/msjh.ttc', 22)],
 }
 used = []
 for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
@@ -50,7 +52,7 @@ for f in sorted(glob.glob(os.path.join(RAW, '*.png'))):
     im.save(os.path.join(out, 'images', name + '.jpg'), quality=82, optimize=True)
     used.append(name)
 # 手冊裡的圖解（沿用講師做好的投影片圖）
-HB = 'D:/AI_CRUD_Workshop_Frontend_EASY/HANDBOOK/images'
+HB = 'D:/AIWORK/_AICLASS/AI_CRUD_Workshop_Frontend_EASY/HANDBOOK/images'
 for src, name in [('step3_paradigm.jpg', 'hb-step3-paradigm'), ('step5_value_curve.jpg', 'hb-step5-value'), ('overview_metaphor.jpg', 'hb-overview')]:
     im = Image.open(os.path.join(HB, src)).convert('RGB')
     if im.size[0] > 1920:
