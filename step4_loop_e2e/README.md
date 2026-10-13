@@ -4,8 +4,8 @@
 AI 會自己跑全鏈路 E2E、紅了自己判因再修、全綠後自己開子代理挑錯，最後交回紀錄、報告和測試報告。
 
 > **和前端 mock 課最大的差別＝「持久化」。**
-> 前端課的 E2E 每次 reload 資料就重置回 24 筆（記憶體 mock）；這一課的 E2E **新增／編輯／刪除都真的寫進 PostgreSQL**——
-> reload 之後改動「仍在」，才證明你真的把前端接上了後端。這門課的 E2E 就是圍著這件事設計的。
+> 前端課的 E2E 每次按 F5 重新整理，資料就重置回 24 筆（記憶體 mock）；這一課的 E2E **新增／編輯／刪除都真的寫進 PostgreSQL**——
+> F5 之後改動「仍在」，才證明你真的把前端接上了後端。這門課的 E2E 就是圍著這件事設計的。
 
 ---
 
@@ -16,7 +16,7 @@ AI 會自己跑全鏈路 E2E、紅了自己判因再修、全綠後自己開子�
 > **比喻：一問一答，就像主管手把手帶新人。** 每一步都要交代、要盯，主管的時間全耗在教。
 > LOOP 的做法是先把規矩（harness）和示範樣本（範本）放好，再給一個會亮紅綠燈的驗收標準（E2E）。
 > **你下一個指令，AI 就照公司規定自己做、自己驗，還會叫出另一個分身（子代理）挑錯；你只看最後的報告。**
-> LOOP 會留兩種紀錄：紀錄 MD（`LOOP-LOG.md`）是給機器看的流水帳；報告 HTML（`LOOP-REPORT.html`）才是給人看的，圖文並茂。
+> LOOP 會留兩種紀錄：紀錄 MD（`LOOP-LOG.md`）是流水帳，一輪一段，有紅燈時才翻；報告 HTML（`LOOP-REPORT.html`）才是你一定要看的，圖文並茂。
 > 子代理審查分兩段：先用 HTTP 實打 API（狀態碼、回應形狀），再用 Playwright 真的開瀏覽器逐頁截圖。
 
 | 沒有 LOOP（人在迴圈裡） | 有 LOOP（AI 在迴圈裡） |
@@ -25,7 +25,7 @@ AI 會自己跑全鏈路 E2E、紅了自己判因再修、全綠後自己開子�
 | 人是瓶頸，改 5 次就累了 | 人只看最後結果，AI 跑幾輪都不喊累 |
 
 **關鍵前提：要先有「可自動執行的驗證」。** 全鏈路 E2E 就是這裡的驗證——它真的開瀏覽器、真的點按鈕、
-真的打到後端、真的落庫，再 reload 驗資料還在，紅綠不騙人。
+真的打到後端、真的落庫，再按 F5 重新整理，驗資料還在，紅綠不騙人。
 
 ### 一圈 LOOP 怎麼轉
 
@@ -90,7 +90,7 @@ AI 交回的東西大多在 `step3_new_module/my-equipment-api/loop/`。不用�
 | | 前端 mock（上一課） | 全鏈路 API 模式（這一課） |
 |---|---|---|
 | 資料放哪 | 瀏覽器記憶體 | PostgreSQL 資料表 `equipment_item` |
-| reload 後 | 改動消失、重置回 24 筆種子 | **改動仍在**（真的落庫） |
+| F5 重新整理後 | 改動消失、重置回 24 筆種子 | **改動仍在**（真的落庫） |
 | 編碼 `PW-GEN-003` 誰算 | 前端算 | **後端**在交易內算（前端只做預覽） |
 | 測試怎麼證明 | 看畫面就夠 | 看畫面 **＋** 直接打 API 拿 JSON 對證 |
 
@@ -99,7 +99,7 @@ AI 交回的東西大多在 `step3_new_module/my-equipment-api/loop/`。不用�
 > 最初接 API 時，**呼叫端（`pages/equipment/crud/*.vue`）一行都沒改**，這就是「前端留接縫」的實作證據。
 > 2026-10-12 另補上表單檢查和儲存錯誤處理（字數上限、數量只收整數、接住後端 400 顯示紅字），來由見手冊 Step 4 ⑧。
 
-所以這 6 條測試裡，好幾條都故意「**做一個動作 → reload → 再斷言**」——reload 是試金石：
+所以這 6 條測試裡，好幾條都故意「**做一個動作 → F5 重新整理 → 再斷言**」（斷言：測試裡檢查「結果是不是我預期的」那一行）。F5 是試金石：
 mock 會掉回種子，持久化才會留下。最後 E6 更直接用 Playwright 的 `request` 打 `/api/equipment/items`，
 在後端 JSON 裡找到前端剛新增的那一筆，這是「資料真的進了資料庫」的鐵證。
 
@@ -108,10 +108,10 @@ mock 會掉回種子，持久化才會留下。最後 E6 更直接用 Playwright
 | 編號 | 驗什麼 | 對應觀念 |
 |------|--------|----------|
 | E1 | API 模式進 `/equipment/crud`，表格與「共 24 筆」（資料來自 PostgreSQL） | **Read**（資料源是 DB 不是 mock） |
-| E2 | 新增一台發電機 → 筆數 +1 → **reload 後那一筆仍在**，用編碼搜得到 | **Create ＋ 持久化** |
+| E2 | 新增一台發電機 → 筆數 +1 → **F5 後那一筆仍在**，用編碼搜得到 | **Create ＋ 持久化** |
 | E3 | 新增後讀畫面上的 code，斷言格式為「類別2碼-項目3碼-流水3碼」且前綴正確 | **後端產碼**（前端只預覽） |
-| E4 | 編輯第一列數量＋狀態 → **reload 後新值仍生效** | **Update ＋ 持久化** |
-| E5 | 刪除第一列 → **reload 後用編碼搜尋查無**（硬刪除，真的從 DB 移除） | **Delete ＋ 持久化** |
+| E4 | 編輯第一列數量＋狀態 → **F5 後新值仍生效** | **Update ＋ 持久化** |
+| E5 | 刪除第一列 → **F5 後用編碼搜尋查無**（真的刪掉，從 DB 移除） | **Delete ＋ 持久化** |
 | E6 | 前端新增一筆 → 直接 `request.get('/api/equipment/items')` → JSON 裡找得到 | **API 層鐵證** |
 
 > **測試之間「不」重置資料庫**——那是 mock 思維。資料庫由 `run-e2e.ps1` 於「每一輪」重建成乾淨 24 筆；
@@ -137,25 +137,25 @@ powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1
 > ```
 > # 指定任一被測 API 專案：
 > powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1 -ApiDir D:\path\to\my-equipment-api
-> # 老師救援：走官方參考解 fallback（只證驗收與 LOOP，不證學生生成完整度）：
+> # 老師救援：改測官方參考解（備用方案；只證驗收與 LOOP，不證學生生成完整度）：
 > powershell -ExecutionPolicy Bypass -File .\run-e2e.ps1 -UseCheckpoint
 > ```
 >
-> 腳本開頭與報告最後都會印出**被測 API 的 resolved 絕對路徑**與**被測 DB 名稱**，一眼看出這盞綠燈屬於誰。
+> 腳本開頭與報告最後都會印出**被測 API 的完整路徑**與**被測 DB 名稱**，一眼看出這盞綠燈屬於誰。
 > 想確認評量真的在驗你的作品，可做**負向驗證**：故意弄壞 `my-equipment-api`（例如改壞一個狀態碼），
 > 再跑一次 → E2E **必須變紅**；紅得起來，綠才有意義。
 
-它依序做（每一步失敗就 fail-closed、teardown、exit 1）：
+它照順序做下面六步。任何一步失敗，就停下來、關掉自己開的服務、回報失敗（exit 1）：
 
-1. **重建 e2e 資料庫**：用 `psql` 冪等 DROP＋CREATE `ai_crud_equipment_e2e`（庫名尾碼 `_e2e` 才准 DROP，防呆）。
-2. **啟後端**（背景，:5080）：連線字串用環境變數指向 `_e2e` 庫；輪詢 `GET /api/equipment/items` 到 200 且 24 筆（migrate＋seed 完成）。
-3. **啟前端** fullchain-app（背景，:3199，`NUXT_PUBLIC_USE_API=true`）：輪詢 `/equipment/crud` 到 200 且含 App marker。
-4. **備 e2e 相依**：`node_modules`＋playwright 就緒才跳過 `npm install`；`npx playwright install chromium` 冪等。
-5. **跑測試**：Playwright 6 條，解析摘要，**恰好 6 條、無 failed/skipped/flaky** 才綠，否則 exit 1。測試報告寫到 `e2e/playwright-report/index.html`。
-6. **teardown**（無論成敗）：只停「自己啟的」後端與前端（記 PID、`taskkill /T` 殺整棵樹釋放埠）；e2e 庫留著下輪重建。
+1. **重建 e2e 資料庫**：用 `psql` 刪掉再建一個 `ai_crud_equipment_e2e`，重跑幾次結果都一樣。庫名結尾是 `_e2e` 才准刪，防止刪錯庫。
+2. **啟動後端**（在背景，埠 5080）：連到 `_e2e` 庫；每隔幾秒問一次 `GET /api/equipment/items`，等到回 200、有 24 筆（資料表和種子資料都好了）。
+3. **啟動前端** fullchain-app（在背景，埠 3199，`NUXT_PUBLIC_USE_API=true`）：每隔幾秒問一次 `/equipment/crud`，等到頁面出來。
+4. **準備測試工具**：`node_modules` 和 playwright 已經裝好，就跳過 `npm install`；`npx playwright install chromium` 重跑也沒關係。
+5. **跑測試**：Playwright 6 條。**剛好 6 條、沒有失敗、沒有跳過、沒有時好時壞（flaky）**才算綠，否則 exit 1。測試報告寫到 `e2e/playwright-report/index.html`。
+6. **收拾**（teardown，不管成功失敗都做）：只關「自己開的」後端和前端（記下行程編號 PID，連它叫出來的子程式一起關），把埠讓出來；e2e 庫留著，下一輪再重建。
 
-> **收尾保證**：dev 庫 `ai_crud_equipment` 全程不碰（e2e 只用 `_e2e` 庫）；自己啟動的服務跑完就關、釋放埠；
-> 上一輪若崩了留下殘留進程，這一輪開頭會先依 `.run-pids` 記錄清掉，再重來（自我修復）。
+> **收尾保證**：開發用的庫 `ai_crud_equipment` 全程不碰（e2e 只用 `_e2e` 庫）；自己開的服務跑完就關、把埠讓出來；
+> 上一輪如果中途當掉、留下沒關的程式，這一輪開頭會先照 `.run-pids` 的紀錄關掉，再重來。
 
 **沿用已啟動的服務（`-ReuseRunning`，LOOP 用）**
 
@@ -184,8 +184,8 @@ Exit code：`0`＝恰好 6 條全綠；`1`＝任一 FAIL／服務拉不起來／
 
 先講清楚這 6 條「是什麼、不是什麼」，別把名稱喊得比覆蓋還大：
 
-- **是**：**功能＋持久化驗證**——真的開瀏覽器、真的打後端、真的落庫、reload 後真的還在，紅綠不騙人。
-- **不是**：**視覺回歸**（pixel 比對 baseline）。這 6 條沒有 `toHaveScreenshot` baseline，也只跑桌機。
+- **是**：**功能＋持久化驗證**——真的開瀏覽器、真的打後端、真的落庫、F5 後真的還在，紅綠不騙人。
+- **不是**：**外觀比對**（拿截圖跟標準圖一格一格比，看版面有沒有跑掉）。這 6 條沒有標準圖，也只跑桌機。
 
 測試流程中會對關鍵畫面主動截圖，存到 [`e2e/screenshots/`](./e2e/screenshots/)（檔名有序）：
 
@@ -194,8 +194,8 @@ Exit code：`0`＝恰好 6 條全綠；`1`＝任一 FAIL／服務拉不起來／
 | `01_list.png` | API 模式列表（共 24 筆，來自 PostgreSQL） |
 | `02_new_form_filled.png` | 新增表單填好、待儲存 |
 | `03_after_create_list.png` | 新增後回列表（+1） |
-| `04_after_reload_persisted.png` | **reload 後那一筆仍在**（持久化鐵證） |
-| `05_after_delete_gone.png` | 刪除並 reload 後查無 |
+| `04_after_reload_persisted.png` | **F5 後那一筆仍在**（持久化鐵證） |
+| `05_after_delete_gone.png` | 刪除並按 F5 後查無 |
 
 另外 Playwright 設 `screenshot: 'only-on-failure'`——測試**紅了**會自動在 `e2e/test-results/` 存一張當下畫面。
 這是**失敗診斷**（誠實命名，不是「視覺審查」）：一眼看出是「按鈕點不到」還是「畫面根本沒載出來」；

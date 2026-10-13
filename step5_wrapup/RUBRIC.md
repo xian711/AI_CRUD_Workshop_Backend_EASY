@@ -9,7 +9,7 @@
 | 1 | 需求釐清品質 | 15 | 六題裁決（編碼規則、id 產生、刪除策略、分頁位置、字典要不要建表、選填欄）**每題都有理由**，能說明「為何這樣裁、為何不那樣做」 |
 | 2 | API 契約正確性 | 20 | 路由、狀態碼（201+Location／404／204／400）、camelCase 驗證鍵、ModelResult 封裝與前端 `useEquipmentItems.ts` 期待的 13 欄一致，swagger 可實際打通 CRUD |
 | 3 | 資料庫與 migration | 15 | migration 可從乾淨資料庫跑到底、`equipment_item` 表結構（snake_case、CHECK、唯一索引）與種子 24 筆正確，psql 查表對得上前端 mock 內容 |
-| 4 | 測試與驗證 | 20 | `dotnet test` 測試數「恰好 N」且全綠、涵蓋 C／R／U／D 與驗證失敗情境，失敗案例要能讓測試 exit 1（不是假綠） |
+| 4 | 測試與驗證 | 20 | `dotnet test` 測試數「恰好 N」且全綠、涵蓋 C／R／U／D 與驗證失敗情境，失敗案例要能讓測試 exit 1（不是假綠：假綠＝測試亮綠燈，卻沒驗到該驗的） |
 | 5 | LOOP 紅→綠實作 | 15 | 真實紅 → 判因（能分辨是測試本身寫錯、API bug、還是資料庫 bug）→ 修 → 綠，有前後輸出對照（AI 跑 LOOP 時，`LOOP-LOG.md` 每輪紀錄＋`LOOP-REPORT.html` 就是證據） |
 | 6 | 收工證據完整性 | 15 | 全鏈路 E2E（瀏覽器→Nuxt→API→PostgreSQL）跑過至少一次，前端切到真後端模式資料仍在（F5 不消失） |
 

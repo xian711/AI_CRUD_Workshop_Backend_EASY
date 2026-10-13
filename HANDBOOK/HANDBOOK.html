@@ -216,15 +216,21 @@
 
   <h2 style="font-size:22px;margin:26px 0 6px">先認得這幾個詞</h2>
   <div class="terms">
+    <div><b>CRUD</b>：資料的四個基本動作：新增、查詢、修改、刪除。像手機通訊錄：加人、找人、改電話、刪人。</div>
     <div><b>API</b>：後端開給前端的窗口。前端說「給我清單」，API 回資料。</div>
+    <div><b>路由</b>：API 的一個服務項目：一個網址加一個動作（GET 查、POST 新增、PUT 修改、DELETE 刪除）。像銀行的櫃台：同一家銀行，存款、提款各有各的櫃台。</div>
     <div><b>Swagger</b>：API 的操作面板，用瀏覽器就能點、就能試。</div>
     <div><b>狀態碼</b>：三位數的回條。200 成功、201 新增成功、204 刪除成功、400 資料不對、404 找不到。</div>
+    <div><b>JSON</b>：前後端傳資料用的格式，一行一個「欄位名: 內容」，像一張填好的表單。</div>
+    <div><b>埠</b>：同一台電腦上，程式收件用的分機號碼：API 用 5080，資料庫用 5432。一個號碼只能給一個程式用，所以 5080 被占著，API 就開不起來。</div>
     <div><b>PostgreSQL／psql</b>：資料庫，和它附的查詢工具。</div>
-    <div><b>harness（規矩）</b>：寫給 AI 讀的公司規則，像滷包。</div>
+    <div><b>種子資料</b>：第一次啟動時，自動放進資料庫的示範資料（24 筆）。</div>
+    <div><b>harness（規矩）</b>：寫給 AI 讀的公司規則，像滷包：你不用懂每一味藥材（每一條規則），但要知道它放在哪；換一鍋（複製範本開新模組）時要一起帶走。</div>
     <div><b>範本 API</b>：已經做好、驗過的「人員」API，AI 照著做。</div>
     <div><b>PRD</b>：需求說明書：要記什麼、要能做什麼。也叫 SPEC。</div>
     <div><b>SRS-delta／設計文件-delta</b>：AI 整理的文件，只寫「跟人員範本不一樣」的地方。</div>
     <div><b>SDD（規格驅動開發）</b>：先文件、再程式；程式改了，文件跟著改。</div>
+    <div><b>自動測試／全綠</b>：程式自己檢查程式，一條測一件事，通過就亮綠燈。像出廠檢驗清單：全綠只代表清單上的項目都過了，清單沒寫的就沒檢查。</div>
     <div><b>LOOP</b>：AI 自己「改程式 → 跑測試 → 再改」，直到全部通過。</div>
     <div><b>全鏈路 E2E</b>：程式自己開瀏覽器，從畫面一路打到資料庫，再判定對不對。</div>
     <div><b>子代理</b>：AI 叫出來的分身，專門挑錯。</div>
@@ -301,7 +307,7 @@ git clone https://github.com/xian711/AI_CRUD_Workshop_Backend_EASY.git</code></p
       <figure class="wide"><img src="images/v5/b0-5-preflight.jpg" alt="前置檢查 12 項：可以開課"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>最後一行寫「可以開課」就過關。版本、空間數字跟你的不一樣，沒關係。</figcaption></figure>
       <ol>
         <li><strong>最要緊的五項</strong>：.NET 版本、PostgreSQL 有裝有開、帳密登得進去、5080 埠空著、Swagger 等套件拿得到。這五項是紅色 <code>[FAIL]</code>，就照下面「卡住時」處理。</li>
-        <li>psql 顯示黃色 <code>[WARN]</code>「PATH 沒有，但在安裝目錄找到」：沒關係。它把完整路徑印出來了，之後照抄。</li>
+        <li>psql 顯示黃色 <code>[WARN]</code>「PATH 沒有，但在安裝目錄找到」：沒關係。PATH 是 Windows 找程式的清單；不在清單上，就要打完整路徑。它把完整路徑印出來了，之後照抄。</li>
         <li>其他黃色 <code>[WARN]</code> 多半是 Step 4 才用到的，不擋你。</li>
               </ol>
 
@@ -460,7 +466,7 @@ dotnet test</code></pre>
       <p>網頁最上面是「① 請求的一生」，先看它分三個框：</p>
       <ol>
         <li><strong>藍框＝前端</strong>（Nuxt 程式）：瀏覽器和轉接站 devProxy。</li>
-        <li><strong>紫框＝後端 API</strong>（.NET 程式，埠 5080）：Controller、Service、EF Core 三格合起來，就是 API。</li>
+        <li><strong>紫框＝後端 API</strong>（.NET 程式，埠 5080）：Controller、Service、EF Core 三格合起來，就是 API。EF Core 是翻譯員，把程式裡的資料翻成資料庫指令。</li>
         <li><strong>灰框＝資料庫</strong>（PostgreSQL）。</li>
       </ol>
       <p>前端和後端 API 是兩個分開的程式，中間用 HTTP 溝通。像餐廳：前端是外場，API 是廚房，外場只能從出菜口把點單遞進廚房。</p>
@@ -549,7 +555,7 @@ cd step3_new_module\my-equipment-api</code></pre>
         <li>點 <code>PRD-中心裝備物資-後端.md</code>，按 <strong>Ctrl+Shift+V</strong> 看預覽。</li>
       </ol>
       <figure class="wide"><img src="images/v5/b3-3-prd-fields.jpg" alt="PRD 第 3 節：13 個欄位"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 3 節是契約：13 個欄位，前端已經定好，<strong>欄位名一個字都不能改</strong>，改了前端就接不上。</figcaption></figure>
-      <figure class="wide"><img src="images/v5/b3-4-prd-decisions.jpg" alt="PRD 第 5 節：六個待釐清"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 5 節留了六個決定給你拍板：編碼誰產生、id 怎麼產、字典建不建表、硬刪軟刪、分頁在哪做、日期能不能空。</figcaption></figure>
+      <figure class="wide"><img src="images/v5/b3-4-prd-decisions.jpg" alt="PRD 第 5 節：六個待釐清"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>第 5 節留了六個決定給你拍板：編碼誰產生、id 怎麼產、分類清單要不要建資料表、刪除是真的刪掉還是做記號、分頁在哪做、日期能不能空。</figcaption></figure>
 
       <h3>② 打開 Claude Code、選模型 <a class="watch" href="animation-hands/index.html#s19-1">▶ 看動畫</a></h3>
       <ol class="do">
@@ -681,7 +687,7 @@ cd step3_new_module\my-equipment-api</code></pre>
           <li>14 欄：PRD 的 13 欄，加一個異動日期。每欄寫了必填還是可空、最多幾個字：就是你在 Q9 拍板的字數。</li>
           <li>保管人、保管人電話是兩個文字欄：就是 Q7「存文字」。</li>
           <li>取號器從 25 開始：種子用掉 E-001～E-024（Q2）。</li>
-          <li>分類 10 個值、項目碼 51 個，是程式常數（Q3）。</li>
+          <li>分類 10 個值、項目碼 51 個，是程式常數（Q3）。程式常數像印在菜單上的品項，資料表像寫在白板上的品項；印好的菜單要改，就得重印。</li>
         </ol>
         <p><span class="k">看完你要答得出來：</span>分類清單要加一個新分類，要改哪裡？</p>
         <details><summary>對答案</summary><p>主要改程式裡的常數（分類不是資料表）。但資料表上有一條「分類只能是這 10 個值」的檢查，也要跟著改，所以還要再出一支 migration（改資料表的腳本）。</p></details>
@@ -695,7 +701,7 @@ cd step3_new_module\my-equipment-api</code></pre>
           <li>最上面一排是四個角色：前端畫面、API 入口、商業邏輯、資料庫。由上往下是時間順序，圓圈數字是第幾步。</li>
           <li>實線箭頭：叫對方做事。虛線箭頭：回覆。</li>
           <li><code>alt</code> 框是分岔：框裡用橫線分成兩種情況，只會走其中一條。</li>
-          <li>交易：一組動作要嘛全部成功，要嘛全部取消。第 5 步開交易、第 15 步提交，中間失敗就全部取消，不會留下半筆資料。</li>
+          <li>交易：一組動作要嘛全部成功，要嘛全部取消。第 5 步開交易、第 15 步提交，中間失敗就全部取消，不會留下半筆資料。比喻：ATM 轉帳。扣你的錢、加對方的錢，要嘛都做、要嘛都不做；不會只扣錢沒入帳。</li>
         </ol>
         <figure class="big"><img src="images/v5/b3-d3.jpg" alt="POST 新增的循序圖"><p class="swipe-note">← 圖很寬，可以左右捲 →</p></figure>
         <p><span class="k">圖裡有什麼：</span></p>
@@ -764,7 +770,7 @@ cd step3_new_module\my-equipment-api</code></pre>
         <li>在輸入框打「<strong>開工</strong>」送出。它照任務清單一項一項做，每做完一項回報一行。實拍那次大約 7 分鐘。</li>
       </ol>
       <figure class="wide"><img src="images/v5/b3-15-go.jpg" alt="輸入框打開工"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>打「開工」，送出。下面看得到 Sonnet 5.5。</figcaption></figure>
-      <p>做完它會回報：測試幾條全綠、build 有沒有警告，還會列「跟文件原本寫的不同，已改文件」。實拍那次是 97 條全綠、0 警告，改了文件的 5 個地方。<strong>程式跟文件對得上，才算做完</strong>：這就是 SDD。</p>
+      <p>做完它會回報：測試幾條全綠、build（把程式碼組成能跑的程式）有沒有警告，還會列「跟文件原本寫的不同，已改文件」。實拍那次是 97 條全綠、0 警告，改了文件的 5 個地方。<strong>程式跟文件對得上，才算做完</strong>：這就是 SDD。</p>
 
       <h3>⑧ 三路驗收：先把你的 API 開起來 <a class="watch" href="animation-hands/index.html#s34-1">▶ 看動畫</a></h3>
       <p>AI 說的不算，你親眼看到才算。在 <code>my-equipment-api</code> 的終端機，一行貼一次（AI 已經幫你開著 API 的話，跳過這一步，直接開 Swagger）：</p>
@@ -839,7 +845,7 @@ dotnet run --urls http://localhost:5080</code></pre>
       </ol>
       <div class="help">
         <b class="t">🚑 時間不夠、跟不上</b>
-        上課到第 85 分鐘左右（Step 3 做到一半）還沒有一支跑得起來的 API，講師會用 checkpoint 腳本把參考解套到你的專案（套完 89 條全綠、psql 查得到 24 列），讓你跟上三路驗收和 Step 4。它只證明「驗收和 LOOP」，不證明你自己生成得完整。
+        上課到第 85 分鐘左右（Step 3 做到一半）還沒有一支跑得起來的 API，講師會用 checkpoint 腳本（像遊戲讀檔：直接跳到存好的進度）把參考解套到你的專案（套完 89 條全綠、psql 查得到 24 列），讓你跟上三路驗收和 Step 4。它只證明「驗收和 LOOP」，不證明你自己生成得完整。
       </div>
 
       <div class="why">
@@ -889,6 +895,7 @@ dotnet run --urls http://localhost:5080</code></pre>
 最後照規矩交 LOOP-LOG.md、LOOP-REPORT.html、測試報告，並更新 SRS-delta、設計文件-delta 和圖。</code></pre>
       <ul>
         <li><strong>「中途不要問我」：</strong>它會一路跑完。需要你決定的事（要不要推翻你拍板的、測試本身有沒有問題、前端的問題），它寫進報告，跑完後在對話裡用選擇題問你。</li>
+        <li><strong>「假綠」：</strong>測試亮綠燈，但沒驗到該驗的。像考卷只檢查有沒有寫名字、不看答案：分數好看，卻什麼都沒證明。所以要叫分身專門挑。</li>
         <li>鐵律、埠被占怎麼辦、要交哪些檔，都寫在 <code>step4_loop_e2e/LOOP-規矩.md</code>，AI 會自己讀。</li>
         <li><strong>送出後大約 20～30 分鐘。</strong>電腦不要讓它睡眠。跳出要不要連你自己的 Chrome，選 No，跟它說「不用連我的瀏覽器，繼續」。（它自己開的測試瀏覽器不一樣，讓它跑。）</li>
       </ul>

@@ -263,11 +263,11 @@ chapter('Step 4', 'LOOP＋對抗審查', C.violet)
 sc3(23, () => {
   const r = {}; hd(23, 'step4')
   r.loop = flowRow(140, [['改程式', C.teal], ['跑 6 條測試', C.violet], ['有紅：再改', C.coral], ['全綠：停', C.green]], { w: 330, gap: 30 })
-  const tests = [['E1', '清單載入：共 24 筆，資料來自 PostgreSQL'], ['E2', '新增後 reload，那一筆還在'], ['E3', '新增後編碼格式：類別2碼-項目3碼-流水3碼'], ['E4', '編輯後 reload，新值還在'], ['E5', '刪除後 reload，那一筆真的消失'], ['E6', '直打 API：前端新增的出現在後端 GET']]
+  const tests = [['E1', '清單載入：共 24 筆，資料來自 PostgreSQL'], ['E2', '新增後重新整理，那一筆還在'], ['E3', '新增後編碼格式：類別2碼-項目3碼-流水3碼'], ['E4', '編輯後重新整理，新值還在'], ['E5', '刪除後重新整理，那一筆真的消失'], ['E6', '直打 API：前端新增的出現在後端 GET']]
   r.tbl = grp(L); R(r.tbl, 70, 290, 1460, 490, { fill: C.card, stroke: C.line, sw: 3 })
-  r.rows = tests.map(([k, t], i) => { const g = grp(r.tbl, false); const y = 310 + i * 76; R(g, 90, y, 1420, 64, { fill: /reload/.test(t) ? '#173a3c' : '#1c2f4a', rx: 10 })
+  r.rows = tests.map(([k, t], i) => { const g = grp(r.tbl, false); const y = 310 + i * 76; R(g, 90, y, 1420, 64, { fill: /重新整理/.test(t) ? '#173a3c' : '#1c2f4a', rx: 10 })
     T(g, 120, y + 43, k, { size: 30, weight: 900, fill: C.teal }); T(g, 200, y + 43, t, { size: 28 }); return g })
-  r.stone = tip('reload 是試金石：mock 會掉回種子，真的落庫才會留下', { y: 806, size: 30, col: C.gold })
+  r.stone = tip('重新整理是試金石：mock 會掉回種子，真的落庫才會留下', { y: 806, size: 30, col: C.gold })
   r.iron = [['鐵律 1', '不准改測試、不准放寬標準', C.red], ['鐵律 2', '同一個問題修兩次沒好，停下回報', C.red]].map(([h, s, col], i) => card(70 + i * 745, 290, 715, 170, h, [s], col, { size: 30, ts: 38 }))
   r.file = card(70, 490, 1460, 300, 'step4_loop_e2e/LOOP-規矩.md（給 AI 讀，也是 harness 的一份）', ['鐵律、埠不寫死、審查怎麼做', '修好的每一條：修改前、修改後、示意圖', 'prompt 只要說「照規矩做」'], C.violet, { size: 30, ts: 32, lh: 62 })
   return r
@@ -412,7 +412,7 @@ sc3(32, () => {
 
 sc3(33, () => {
   const r = {}; hd(33, 'step4')
-  r.g = [['規格 Gate', ['選擇題的裁決和理由', 'SRS-delta、設計文件-delta', '看得懂的圖、任務清單'], C.violet], ['程式 Gate', ['build 零警告', '測試全綠', 'Swagger 狀態碼、psql 查得到資料'], C.teal], ['交付 Gate', ['LOOP 報告、修改前後＋示意圖', '測試報告 6 比 6、被測的是你的作品', '文件標「step4 LOOP 後」'], C.gold]]
+  r.g = [['規格關卡', ['選擇題的裁決和理由', 'SRS-delta、設計文件-delta', '看得懂的圖、任務清單'], C.violet], ['程式關卡', ['build 零警告', '測試全綠', 'Swagger 狀態碼、psql 查得到資料'], C.teal], ['交付關卡', ['LOOP 報告、修改前後＋示意圖', '測試報告 6 比 6、被測的是你的作品', '文件標「step4 LOOP 後」'], C.gold]]
     .map(([h, ls, col], i) => card(70 + i * 495, 150, 465, 400, h, ls, col, { size: 26, ts: 40, lh: 64 }))
   r.pr = box(L, 70, 620, 1460, 150, '這三道，回公司直接當 PR 檢查表', { size: 42, fill: '#2a2410', stroke: C.gold, color: C.gold, weight: 900 })
   return r

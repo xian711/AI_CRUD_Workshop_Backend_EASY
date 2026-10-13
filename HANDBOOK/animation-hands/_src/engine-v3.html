@@ -108,27 +108,6 @@
   html.embed header.top, html.embed section.after, html.embed .hint{display:none}
   html.embed .wrap{padding-block:4px 6px}
   html.embed .subline{padding:6px 14px}
-  /* ---- 問小港側欄 ---- */
-  .askbtn{font:inherit;font-size:16px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
-  .askbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-  .askdrawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:#0e2133;border-left:1px solid var(--line);box-shadow:-10px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column;z-index:50;transform:translateX(105%);transition:transform .3s ease}
-  .askdrawer.open{transform:none}
-  .askhead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
-  .askhead h3{margin:0;font-size:20px;font-weight:900;flex:1}
-  .askhead button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer}
-  .askwhere{font-size:14px;color:var(--gold);padding:8px 16px 0}
-  .asklog{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
-  .askmsg{border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
-  .askmsg.me{align-self:flex-end;background:var(--gold);color:#10263a;font-weight:700;max-width:85%}
-  .askmsg.bot{background:var(--card);border:1px solid var(--line)}
-  .askmsg.wait{color:var(--mut)}
-  .askjump{display:inline-block;margin:6px 6px 0 0;font:inherit;font-size:14px;font-weight:800;color:#10263a;background:var(--teal);border:0;border-radius:8px;padding:4px 10px;cursor:pointer;white-space:normal;text-align:left}
-  .askform{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line)}
-  .askform input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:#081522;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-  .askform button{font:inherit;font-weight:800;background:var(--gold);color:#10263a;border:0;border-radius:10px;padding:0 14px;cursor:pointer}
-  .askform input:focus-visible{outline:3px solid var(--teal)}
-  .asktips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px}
-  .asktips button{font:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
   @media (prefers-reduced-motion: reduce){
     #stage *{transition-duration:.01s!important;animation:none!important}
   }
@@ -180,7 +159,6 @@
       <button id="bVoice" type="button" title="開關語音">🔊 語音：開</button>
       <label for="voiceSel">聲音<select id="voiceSel"><option value="">預設中文</option></select></label>
       <label for="speedSel">速度<select id="speedSel"><option value="0.75">0.75×（慢）</option><option value="1" selected>1×（正常）</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×（快）</option></select></label>
-      <button id="bAsk" type="button" class="askbtn" hidden>💬 問小港</button>
       <button id="bFull" type="button" title="全螢幕（F）">⛶ 全螢幕</button>
       <span class="pos" id="pos">1 段</span>
     </div>
@@ -192,13 +170,6 @@
 <!--{{AFTER}}-->
 </div>
 
-<aside class="askdrawer" id="askDrawer" aria-label="問小港" aria-hidden="true">
-  <div class="askhead"><h3>💬 問小港</h3><button type="button" id="askClose">關閉</button></div>
-  <div class="askwhere" id="askWhere"></div>
-  <div class="asklog" id="askLog" aria-live="polite"></div>
-  <div class="asktips" id="askTips"></div>
-  <form class="askform" id="askForm"><label for="askInput" class="sr" hidden>問題</label><input id="askInput" autocomplete="off" placeholder="看不懂的地方直接問，例如：五選一怎麼選？"><button type="submit">送出</button></form>
-</aside>
 <script>
 (function(){
 const NS='http://www.w3.org/2000/svg';
@@ -248,7 +219,7 @@ function stagger(list,gap,fn=show){list.forEach((e,i)=>later(i*gap,()=>fn(e)));}
 /* ---------- 播放器 ---------- */
 let cur=0,stepI=0,refs={},playing=false,timer=null,speed=1,stepStart=0,stepDur=1,remain=0,ended=false;
 const $=id=>document.getElementById(id);
-const ANIM_ID='{{ANIM_ID}}', ASK_URL='{{ASK_URL}}';
+const ANIM_ID='{{ANIM_ID}}';
 window.__animIndex=scenes.map((sc,i)=>({n:i+1,title:sc.title,steps:sc.steps.map(x=>x[0])}));
 const chips=$('chips');
 /* 兩層章節：有 chapter() 時，上排是 Step，下排只列目前 Step 的段落 */
@@ -331,7 +302,7 @@ function setSub(){const s=scenes[cur];const ch=CH[s.chap];$('scenelabel').textCo
   fitSubText();
   try{history.replaceState(null,'','#s'+(cur+1)+'-'+(stepI+1));}catch(e){}
   try{if(window.parent!==window)window.parent.postMessage({type:'anim:state',anim:ANIM_ID,scene:cur+1,step:stepI+1,title:s.title,text:s.steps[stepI][0],total:scenes.length},'*');}catch(e){}
-  const w=$('askWhere');if(w)w.textContent=`正在看：第 ${cur+1} 段　${s.title}`;}
+}
 let gotoTok=0;
 function goto(i,s){clearTimeout(timer);if(HAS_REC){const q=recFor(i,s);if(q)preAudio(q.src);preloadAhead(i,s,3);}stopVoice();recResume=null;timers.forEach(t=>clearTimeout(t.id));timers=[];frozen.forEach(a=>{try{a.finish();}catch(e){}});frozen=[];svg.classList.remove('paused');ended=false;cur=i;stepI=s;const gt=++gotoTok;
   instant=true;svg.classList.add('instant');layer.innerHTML='';L=layer;refs=scenes[i].build()||{};
@@ -371,29 +342,6 @@ window.addEventListener('hashchange',()=>{const h=parseHash();if(h&&(h[0]!==cur|
 window.addEventListener('message',e=>{const d=e.data||{};
   if(d.type==='anim:goto'){const sc=Math.max(0,Math.min(scenes.length-1,(d.scene||1)-1));const st=Math.max(0,Math.min(scenes[sc].steps.length-1,(d.step||1)-1));goto(sc,st);if(d.play)setPlaying(true);}
   else if(d.type==='anim:pause')setPlaying(false);});
-/* ---------- 放在小港網站上：雲端語音＋問小港 ---------- */
-function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function jumpLabel(id,sc,st){if(id!==ANIM_ID)return `▶ 另一支動畫：第 ${sc} 段`;const S=scenes[sc-1];return S?`▶ 跳到第 ${sc} 段${st?'・第 '+st+' 句':''}：${S.title}`:null;}
-function renderAnswer(text){const box=document.createElement('div');box.className='askmsg bot';
-  const jumps=[];const body=String(text).replace(/\[\[anim:([\w-]+):(\d+)(?:-(\d+))?\]\]/g,(m,id,sc,st)=>{jumps.push([id,+sc,st?+st:0]);return '';}).replace(/^\s*[*＊•-]\s*$/gm,'').replace(/^\s*(▶\s*)?看動畫[：:]\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();
-  box.innerHTML=esc(body).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^\s*\*\s+/gm,'• ');
-  jumps.forEach(([id,sc,st])=>{const lab=jumpLabel(id,sc,st);if(!lab)return;const b=document.createElement('button');b.type='button';b.className='askjump';b.textContent=lab;
-    b.addEventListener('click',()=>{if(id===ANIM_ID){$('bStart').hidden=true;goto(sc-1,Math.max(0,Math.min(scenes[sc-1].steps.length-1,(st||1)-1)));}else location.href=`../${id}/index.html#s${sc}-${st||1}`;});box.appendChild(b);});
-  return box;}
-async function ask(q){const log=$('askLog');const me=document.createElement('div');me.className='askmsg me';me.textContent=q;log.appendChild(me);
-  const wait=document.createElement('div');wait.className='askmsg bot wait';wait.textContent='小港思考中…';log.appendChild(wait);log.scrollTop=log.scrollHeight;
-  try{const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,anim:ANIM_ID})});
-    const j=await r.json();wait.remove();if(!r.ok)throw new Error(j.message||('HTTP '+r.status));log.appendChild(renderAnswer(j.answer||''));}
-  catch(e){wait.textContent='這一題沒有問成功：'+(e.message||e)+'。請稍後再試。';wait.classList.remove('wait');}
-  log.scrollTop=log.scrollHeight;}
-function openAsk(open){const d=$('askDrawer');d.classList.toggle('open',open);d.setAttribute('aria-hidden',open?'false':'true');if(open){setPlaying(false);setTimeout(()=>$('askInput').focus(),300);}}
-$('askClose').addEventListener('click',()=>openAsk(false));
-$('askForm').addEventListener('submit',e=>{e.preventDefault();const q=$('askInput').value.trim();if(!q)return;$('askInput').value='';ask(q);});
-const TIPS=(window.__askTips||[]);TIPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>ask(t));$('askTips').appendChild(b);});
-fetch('/api/config',{headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(j=>{if(!j)throw 0;
-  CLOUD=!HAS_REC;const sel=$('voiceSel');const keep=sel.value;addCloudOptions(sel);sel.value=(HAS_REC&&keep==='rec')?'rec':sel.options[0].value;voiceOn=true;$('bVoice').disabled=false;$('bVoice').textContent='🔊 語音：開';$('voiceNote').hidden=true;
-  if(j.live&&!EMBED){const b=$('bAsk');b.hidden=false;b.addEventListener('click',()=>openAsk(!$('askDrawer').classList.contains('open')));}
-}).catch(()=>{if(ASK_URL&&!EMBED){const b=$('bAsk');const a=document.createElement('a');a.className='askbtn';a.href=ASK_URL;a.target='_blank';a.rel='noopener';a.textContent='💬 問小港（另開網頁）';a.style.textDecoration='none';b.replaceWith(a);}});
 /* ---------- 版面：把整個播放器（標題＋導覽＋舞台＋字幕＋控制列）塞進第一屏 ----------
    做法：舞台寬度 = min(容器寬, 可用高度 × 16/9)。「可用高度」不是猜的，而是設一個寬度、量實際排出來的高度、
    再修正寬度，重複幾次直到剛好貼齊可視區底部。視窗大小、全螢幕、字體載入、導覽列換行都會重算。

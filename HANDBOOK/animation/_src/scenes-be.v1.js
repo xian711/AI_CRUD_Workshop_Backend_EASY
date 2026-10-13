@@ -50,7 +50,7 @@ sc3(2, () => {
 
 sc3(3, () => {
   const r = {}; hd(3, '開場')
-  const items = [['Step 0', '前置檢查 11 項', C.mut, 0], ['Step 1', '有規矩、沒規矩差在哪', C.coral, 0], ['Step 2', '玩範本 API', C.teal, 1], ['Step 3', 'SDD 做裝備物資後端', C.pink, 1], ['Step 4', 'LOOP 全鏈路＋對抗審查', C.violet, 1], ['Step 5', '總結、回公司', C.green, 0]]
+  const items = [['Step 0', '前置檢查 12 項', C.mut, 0], ['Step 1', '有規矩、沒規矩差在哪', C.coral, 0], ['Step 2', '玩範本 API', C.teal, 1], ['Step 3', 'SDD 做裝備物資後端', C.pink, 1], ['Step 4', 'LOOP 全鏈路＋對抗審查', C.violet, 1], ['Step 5', '總結、回公司', C.green, 0]]
   r.c = items.map(([a, b, col, key], i) => { const g = grp(L); const x = 70 + (i % 3) * 495, y = 130 + Math.floor(i / 3) * 270
     R(g, x, y, 465, 235, { fill: key ? '#203f5a' : C.card, stroke: col, sw: key ? 6 : 3 })
     T(g, x + 30, y + 70, a, { size: 40, weight: 900, fill: col }); T(g, x + 30, y + 150, b, { size: 32, weight: 800 })

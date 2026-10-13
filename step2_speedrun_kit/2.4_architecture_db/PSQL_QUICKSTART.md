@@ -5,7 +5,7 @@
 
 ## 先找到 psql 的絕對路徑
 
-Windows 安裝的 PostgreSQL **預設不會把 psql 加進 PATH**，所以直接打 `psql` 通常會說找不到。它在安裝目錄裡：
+Windows 安裝的 PostgreSQL **預設不會把 psql 加進 PATH**（PATH 是 Windows 找程式的清單；不在清單上，就要打完整路徑），所以直接打 `psql` 通常會說找不到。它在安裝目錄裡：
 
 ```
 C:\Program Files\PostgreSQL\<版號>\bin\psql.exe

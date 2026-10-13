@@ -27,8 +27,6 @@ def main():
     ap.add_argument('--meta', help='capture 腳本產生的 meta.json（截圖尺寸與標註框座標）')
     ap.add_argument('--after', help='動畫下方的文字版速查 HTML 片段（<section class="after">…</section>）')
     ap.add_argument('--anim-id', default='anim', help='動畫代號（英數與 -），問答網站用它對應段落，例如 dashboard')
-    ap.add_argument('--ask-url', default='', help='不在問答網站上播放時，「問小港」按鈕要開的網址（沒有就不顯示）')
-    ap.add_argument('--tips', default='', help='問答側欄的建議問題，用 | 分隔')
     ap.add_argument('--engine', help='改用自訂播放器（預設 assets/engine.html）')
     ap.add_argument('--extra-helpers', nargs='*', default=[], help='接在 helpers.js 後面的小工具檔')
     a = ap.parse_args()
@@ -50,10 +48,9 @@ def main():
     h = (eng.replace('/*{{SCENES}}*/', helpers + '\n' + scenes)
             .replace('{{TITLE}}', a.title).replace('{{H1}}', a.h1).replace('{{SUBTITLE}}', a.subtitle)
             .replace('<!--{{AFTER}}-->', after)
-            .replace('{{ANIM_ID}}', a.anim_id).replace('{{ASK_URL}}', a.ask_url)
-            .replace('const ANIM_ID=', 'window.__askTips=' + json.dumps([t for t in a.tips.split('|') if t.strip()], ensure_ascii=False) + ';\nconst ANIM_ID=', 1)
+            .replace('{{ANIM_ID}}', a.anim_id)
             .replace('<span class="pos" id="pos">1 段</span>', f'<span class="pos" id="pos">1／{n} 段</span>'))
-    for tok in ['{{TITLE}}', '{{H1}}', '{{SUBTITLE}}', '{{SCENES}}', '{{ANIM_ID}}', '{{ASK_URL}}']:
+    for tok in ['{{TITLE}}', '{{H1}}', '{{SUBTITLE}}', '{{SCENES}}', '{{ANIM_ID}}']:
         if tok in h:
             sys.exit(f'placeholder left: {tok}')
 

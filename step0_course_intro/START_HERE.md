@@ -59,7 +59,7 @@
 
 1. 跑 `preflight.ps1`（見下一節），把 `[FAIL]` 項目全部處理掉（`[WARN]` 多為 step4 才需要，可稍後再補）。
 2. 確認 **PostgreSQL 已裝好、5432 埠可連、帳號 `postgres` 密碼 `12345` 可登入**——這是後端課的命脈，preflight 會自動幫你驗。**`postgres/12345` 僅限本機教室 DEMO，不得沿用公司／正式環境的帳密**；正式環境請改用環境變數帶密碼。
-3. 先讓範本 API 跑一次：進 `step2_speedrun_kit/2.5_sample_api/sample-api/`，`dotnet run`（首次會還原 NuGet 套件、自動建資料庫並 Migrate＋Seed）。首跑最花時間，務必課前先跑。
+3. 先讓範本 API 跑一次：進 `step2_speedrun_kit/2.5_sample_api/sample-api/`，`dotnet run`（首次會還原 NuGet 套件、自動建資料庫、建好資料表，再放進 24 筆示範資料（種子資料））。首跑最花時間，務必課前先跑。
 4. 若要做 step4 全鏈路：`step4_loop_e2e/fullchain-app/` 先 `pnpm install` 一次，E2E 首跑會下載 Chromium（約 150MB），離線教室務必課前先跑。
 5. 確認你的 AI Agent（Claude Code／Codex／Cursor 等）**已登入且有額度**——這項 preflight 無法自動檢查，要自己確認。
 
@@ -89,4 +89,4 @@ cd step0_course_intro
 
 看到「前置檢查全數通過，可以開課！」（含 WARN 也算通過）再進入 step1。若有 `[FAIL]` 項目，照腳本印出的修復提示處理後重跑一次。
 
-> psql 提醒：本機 psql **不在 PATH**，preflight 會自動去 `C:\Program Files\PostgreSQL\*\bin\` 找並印出絕對路徑。step2 之後凡是要用 psql 的地方，都用那個絕對路徑（或範例給的路徑）。
+> psql 提醒：本機 psql **不在 PATH**（PATH 是 Windows 找程式的清單；不在清單上，就要打完整路徑），preflight 會自動去 `C:\Program Files\PostgreSQL\*\bin\` 找並印出絕對路徑。step2 之後凡是要用 psql 的地方，都用那個絕對路徑（或範例給的路徑）。
