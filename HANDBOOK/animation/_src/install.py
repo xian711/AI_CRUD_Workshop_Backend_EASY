@@ -25,7 +25,7 @@ shutil.copytree(os.path.join(OUT, 'audio'), os.path.join(DST, 'audio'))
 # 原始檔：場景、繪圖工具、播放器、組裝與截圖腳本（不含實拍原圖 raw/，也不含本機專用的腳本）
 SRC_FILES = ['scenes-be.js', 'scenes-be6-lec-body.js', 'scenes-be.v1.js', 'mk-be6.py', 'be6-import.py', 'after.v1.html', 'mk-be.sh', 'build_be_data.py', 'be-plan.md', 'after.html',
              'v3-helpers.js', 'helpers-crud.js', 'helpers.js', 'engine-v3.html', 'be-data.js',
-             'prep.py', 'build.py', 'check.mjs', 'sheet.py', 't-v3.mjs', 't-v3-play.mjs', 't-installed.mjs', 'install.py',
+             'prep.py', 'build.py', 'check.mjs', 'sheet.py', 't-v3.mjs', 't-v3-play.mjs', 't-installed.mjs', 't-latency2.mjs', 't-pause-freeze.mjs', 'install.py',
              'vsc-lib.mjs', 'driver.mjs', 'send.mjs', 'build-wait.sh', 'dlg.ps1', 'ocr-find.ps1',
              'cap-page.mjs', 'cap-swagger.mjs', 'cap-diag.mjs', 'md2html.py', 't-diag.mjs', 'pg-be-prd.json', 'pg-be-srs.json', 'pg-be-design.json', 'pg-be-tasks.json', 'pg-be-report.json', 'pg-be-pw.json', 'pg-be-log.json', 'pg-be-srsafter.json', 'pg-be-designafter.json', 'mk-c-bdocs.py', 'mk-c-bq.py', 'mk-c-bc01.py', 'mk-c-be03a.py', 'mk-c-be10.py',
              'pg-step1-2.json', 'pg-arch.json', 'pg-be-diag.json', 'c-hasq.json', 'c-busy2.json', 'c-qtext.json', 'handbook-pres.txt']

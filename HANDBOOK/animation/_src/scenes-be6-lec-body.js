@@ -30,7 +30,29 @@ function baShow(r, g, bf, af, o = {}) {
 chapter('開場', '把假資料變真的', C.teal)
 
 //@OLD 1 1
-//@OLD 2 2
+
+// 第 2 段（2026-10-13 改）：上方方塊分成三個虛線框（前端／後端 API／資料庫），教材圖也加了同樣的框
+sc3(2, () => {
+  const r = {}; hd(2, '開場')
+  const fr = (x, w, label, col) => { const g = grp(L); R(g, x, 156, w, 148, { fill: 'none', stroke: col, sw: 3, dash: '12 8', rx: 18 }); T(g, x + 12, 146, label, { size: 24, weight: 900, fill: col }); return g }
+  r.feF = fr(62, 487, '前端（Nuxt 程式）', C.teal)
+  r.apiF = fr(557, 733, '後端 API（.NET 程式，埠 5080）：這三格合起來', C.violet)
+  r.dbF = fr(1298, 239, '資料庫', C.coral)
+  r.nodes = flowRow(170, [['瀏覽器', C.teal], ['devProxy\n前端轉接站', C.teal], ['Controller\n收件、回狀態碼', C.violet], ['Service\n做真正的事', C.violet], ['EF Core\n物件翻成 SQL', C.violet], ['PostgreSQL\n資料表', C.coral]], { w: 225, gap: 22 })
+  r.life = scr('be02-arch-life-svg', fitF('be02-arch-life-svg', { x: 70, y: 320, w: 1460, h: 480 }))
+  r.src = tip('教材 step2 的 ARCHITECTURE_DB.html：① 請求的一生', { y: 806, size: 26, col: C.teal })
+  r.fe = box(L, 62, 340, 487, 130, '前端課\n做的是這兩格', { size: 32, fill: '#173a3c', stroke: C.teal, color: C.ink, weight: 800 })
+  r.be = box(L, 557, 340, 980, 130, '這堂課：做後端 API，接上資料庫\n前後端是兩個程式，中間用 HTTP 溝通', { size: 32, fill: '#2a1f3f', stroke: C.violet, color: C.ink, weight: 800 })
+  r.real = tip('資料在資料庫查得到，才叫真的', { y: 806, size: 36, col: C.gold })
+  return r
+}, [
+  r => { show(r.feF); stagger(r.nodes.slice(0, 2), 400); later(1200, () => show([r.life, r.src])) },
+  r => { show(r.apiF); glow(r.apiF); stagger(r.nodes.slice(2, 5), 300) },
+  r => { glow([r.nodes[2], r.nodes[3]]) },
+  r => { show([r.dbF, r.nodes[5]]); glow([r.nodes[4], r.nodes[5]]) },
+  r => { hide([r.life, r.src]); show(r.fe); glow(r.feF); later(2000, () => { show(r.be); glow([r.apiF, r.dbF]) }); later(4500, () => { show(r.real); glow(r.real) }) },
+])
+
 //@OLD 3 3
 
 // ════════════════════════════ Step 0 ════════════════════════════

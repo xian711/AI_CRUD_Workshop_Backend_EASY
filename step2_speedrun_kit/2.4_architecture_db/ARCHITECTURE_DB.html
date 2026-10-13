@@ -86,11 +86,25 @@
   <h2>① 請求的一生</h2>
   <p class="desc">你在瀏覽器按一下「儲存」，資料怎麼一路跑到 PostgreSQL 再回來？跟著箭頭走一遍。</p>
   <div class="diagram">
-    <svg viewBox="0 0 1100 430" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+    <svg viewBox="0 0 1100 490" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
       <defs>
         <marker id="fArr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#C8232C"/></marker>
         <marker id="fBack" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1a7f37"/></marker>
       </defs>
+      <text x="550" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#C8232C">去程（紅）：請求帶著 JSON 往右送</text>
+      <g transform="translate(0,60)">
+
+      <!-- 前後端分離：三個大框（前端／後端 API／資料庫） -->
+      <g font-size="15" font-weight="700">
+        <rect x="8" y="-20" width="360" height="250" rx="12" fill="#f3f8ff" stroke="#1565c0" stroke-width="2" stroke-dasharray="8 5"/>
+        <text x="188" y="6" text-anchor="middle" fill="#1565c0">前端（Nuxt 程式，埠 3100）</text>
+        <rect x="378" y="-20" width="564" height="250" rx="12" fill="#f8f3ff" stroke="#6a3fb5" stroke-width="2" stroke-dasharray="8 5"/>
+        <text x="660" y="6" text-anchor="middle" fill="#6a3fb5">後端 API（.NET 程式，埠 5080）：這三格合起來就是 API</text>
+        <rect x="952" y="-20" width="140" height="250" rx="12" fill="#f5f5f5" stroke="#666" stroke-width="2" stroke-dasharray="8 5"/>
+        <text x="1022" y="6" text-anchor="middle" fill="#555">資料庫</text>
+      </g>
+      <rect x="333" y="28" width="80" height="24" rx="12" fill="#fff" stroke="#C8232C" stroke-width="1.5"/>
+      <text x="373" y="45" text-anchor="middle" font-size="13" font-weight="700" fill="#C8232C">HTTP 請求</text>
 
       <!-- boxes -->
       <g font-size="15">
@@ -130,7 +144,6 @@
       <line x1="550" y1="95" x2="583" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
       <line x1="745" y1="95" x2="778" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
       <line x1="930" y1="95" x2="963" y2="95" stroke="#C8232C" stroke-width="2" marker-end="url(#fArr)"/>
-      <text x="550" y="52" text-anchor="middle" font-size="15" font-weight="700" fill="#C8232C">去程（紅）：請求帶著 JSON 往右送</text>
 
       <!-- return arrows (green, bottom) -->
       <line x1="963" y1="128" x2="932" y2="128" stroke="#1a7f37" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#fBack)"/>
@@ -161,14 +174,16 @@
       <text x="550" y="310" text-anchor="middle" font-size="14" fill="#2a6a3a">→ Nuxt 收到 { success, message, data } → 取出 data → 畫面更新，資料永久保存在 PostgreSQL</text>
 
       <!-- envelope note -->
-      <rect x="300" y="352" width="500" height="56" rx="6" fill="#fff4e0" stroke="#e6a23c"/>
+      <rect x="260" y="352" width="580" height="56" rx="6" fill="#fff4e0" stroke="#e6a23c"/>
       <text x="550" y="375" text-anchor="middle" font-size="13.5" fill="#7a5b00">關鍵：對外是 camelCase JSON（bloodType），DB 內是 snake_case（blood_type）</text>
       <text x="550" y="395" text-anchor="middle" font-size="13.5" fill="#7a5b00">中間由 EF 命名轉換＋Mapperly 自動翻譯，你不用手寫逐欄改名</text>
+      </g>
     </svg>
   </div>
   <div class="notes">
     <b>白話重點</b>
     <ul>
+      <li><b>前後端分離：</b>前端（Nuxt）和後端 API（.NET）是兩個各自啟動的程式。圖上的 Controller、Service、EF Core 三格合起來，就是後端 API；它們都在 5080 這一個程式裡。像餐廳：前端是外場，API 是廚房，外場只能從出菜口（HTTP）把點單遞進廚房。</li>
       <li>開發期瀏覽器不直接打後端，而是先到 Nuxt（3100），由 <code>devProxy</code> 同源轉發到 API（5080）——所以本版後端還沒設定 CORS 也能動。</li>
       <li>去程（紅）是「請求往右送」，回程（綠）是「資料往左回」。每一層只做自己該做的事，這就是「分層」。</li>
       <li>前端只要把記憶體 mock 換成打這支 API，這條動線就通了——資料從此存進資料庫，F5 也不會消失。</li>

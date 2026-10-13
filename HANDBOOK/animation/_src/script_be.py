@@ -11,7 +11,14 @@ X, Z = '小芸', '阿哲'
 
 SCENES = [
  # ── 開場 ──
- old(1), old(2), old(3),
+ old(1),
+ ('開場', '請求的一生', X, '三個虛線框（前端／後端 API／資料庫）＋教材圖：瀏覽器 → devProxy →（HTTP）→ Controller → Service → EF Core → PostgreSQL → 原路回來', [
+   old(2, 1),
+   '前端和後端是兩個分開的程式。devProxy 用 HTTP 把請求轉給 5080，那裡就是後端 API。紫色框裡的三格合起來，就是 API。',
+   old(2, 2),
+   old(2, 3),
+   '前端課做的是前端這兩格。這堂課做後端 API，再接上資料庫。資料在資料庫查得到，才叫真的。']),
+ old(3),
  # ── Step 0 ──
  ('Step 0', '前置檢查：12 項', Z, '實拍：preflight 12 項（前半、後半）→ 最要緊五項 → psql 路徑 → 可以開課', [
    '開始前，照手冊的清單裝好 .NET SDK 10、PostgreSQL 18、Node.js、pnpm、Git，和 VS Code 裡的 Claude Code。',
