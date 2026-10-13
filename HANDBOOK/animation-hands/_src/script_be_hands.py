@@ -72,8 +72,9 @@ SCENES = [
    '左邊檔案總管點開 Step 2 的資料夾，再點開 2.5_sample_api、sample-api。',
    '最上層這四份 md 就是規矩，也叫 harness：CLAUDE、CODE-RULES、契約摘要、使用說明。',
    '你不用逐條讀懂，但 CLAUDE 點 md 只有四十幾行，打開掃一遍，確認鐵律跟你們公司一致。']),
- ('Step 2', '看分層圖', Z, '實拍：start ARCHITECTURE_DB.html → 分層架構', [
+ ('Step 2', '看分層圖', Z, '實拍：start ARCHITECTURE_DB.html → ① 請求的一生（前端／後端 API 兩個框）→ ② 分層架構', [
    '在第二個終端機貼畫面上這一行，用 start 打開分層圖。',
+   '網頁最上面是「請求的一生」。藍框是前端，紫框是後端 API，兩個是分開的程式，中間用 HTTP 溝通。往下看的分層，全都在紫框裡。',
    '請求從 Controller 進來，交給 Service 做事，再經過 EF Core 寫進 PostgreSQL。',
    'Controller 只收件、回狀態碼；商業邏輯都在 Service。Step 3 的新模組也會照這個分層做。']),
  ('Step 2', '檢查點：範本跑對了嗎', X, '打勾卡：dotnet run、Swagger 200／404、49 條綠、psql 24、Ctrl+C 停掉；Swagger 打不開', [

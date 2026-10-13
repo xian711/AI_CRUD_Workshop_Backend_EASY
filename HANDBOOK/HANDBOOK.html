@@ -457,6 +457,15 @@ dotnet test</code></pre>
       <h3>⑤ 看分層圖 <a class="watch" href="animation-hands/index.html#s15-1">▶ 看動畫</a></h3>
       <p>在第二個終端機（目前在 <code>sample-api</code>）貼：</p>
       <pre><code>start ..\..\2.4_architecture_db\ARCHITECTURE_DB.html</code></pre>
+      <p>網頁最上面是「① 請求的一生」，先看它分三個框：</p>
+      <ol>
+        <li><strong>藍框＝前端</strong>（Nuxt 程式）：瀏覽器和轉接站 devProxy。</li>
+        <li><strong>紫框＝後端 API</strong>（.NET 程式，埠 5080）：Controller、Service、EF Core 三格合起來，就是 API。</li>
+        <li><strong>灰框＝資料庫</strong>（PostgreSQL）。</li>
+      </ol>
+      <p>前端和後端 API 是兩個分開的程式，中間用 HTTP 溝通。像餐廳：前端是外場，API 是廚房，外場只能從出菜口把點單遞進廚房。</p>
+      <figure class="wide"><img src="images/v5/b2-8a-life.jpg" alt="請求的一生：前端、後端 API、資料庫三個框"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>① 請求的一生：藍框是前端，紫框是後端 API，灰框是資料庫。兩框交界的「HTTP 請求」，就是前端把請求送給後端的地方。</figcaption></figure>
+      <p>再往下捲到「② 分層架構」。這張圖畫的幾層，全都在紫框（後端 API）裡面。</p>
       <p style="font-size:16px;color:var(--ink-soft)">開得了的話也看「POST 循序」那張：一筆新增從進來到存進資料庫，經過哪幾層。</p>
       <figure class="wide"><img src="images/v5/b2-8-arch.jpg" alt="分層架構圖"><p class="swipe-note">← 手機可左右滑看整張圖 →</p><figcaption>請求從 Controller 進來，交給 Service 做事，再經過 EF Core 寫進 PostgreSQL。Controller 只收件、回狀態碼；商業邏輯都在 Service。Step 3 的新模組也照這個分層做。</figcaption></figure>
       <details><summary>範本的資料夾各做什麼</summary>

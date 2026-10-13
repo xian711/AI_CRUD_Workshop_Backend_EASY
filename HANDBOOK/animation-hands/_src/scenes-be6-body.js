@@ -131,7 +131,24 @@ chapter('Step 2', '範本 API', C.teal)
 //@OLD 11 12
 //@OLD 12 13
 //@OLD 13 14
-//@OLD 14 15
+
+// 第 15 段（2026-10-13 改）：網頁打開最上面是 ① 請求的一生（教材圖加了前端／後端 API／資料庫三個框），先講前後端分離，再往下看 ② 分層架構
+sc3(15, () => {
+  const r = {}; hd(15, 'step2')
+  r.k = cmdCard(120, 300, 1360, ['start ..\\..\\2.4_architecture_db\\ARCHITECTURE_DB.html'], '第二個終端機（目前在 sample-api）', { size: 30 })
+  r.bw = bwin(['be02-arch-life', 'be02-arch-layers'], 'ARCHITECTURE_DB.html'); r.B = r.bw.S
+  r.l1 = hl(r, r.B[0], [56, 158, 378, 264], '藍框：前端（Nuxt 程式）', { col: OR, below: true, size: 26 })
+  r.l2 = hl(r, r.B[0], [440, 158, 589, 264], '紫框：後端 API（.NET 程式，5080）', { col: OR, below: true, size: 26 })
+  r.a1 = hl(r, r.B[1], [59, 174, 1122, 108], 'Controller → Service → EF Core → PostgreSQL', { col: OR, above: true, size: 26 })
+  r.b1 = hl(r, r.B[1], [59, 347, 545, 140], 'Controller：收件、回狀態碼', { col: OR, below: true, size: 26 })
+  r.b2 = hl(r, r.B[1], [636, 347, 545, 140], 'Service：商業邏輯', { col: OR, below: true, size: 26 })
+  return r
+}, [
+  r => { show(r.k); glow(r.k) },
+  r => { hide(r.k); show(r.bw.g); show(r.B[0]); later(300, () => only(r, r.l1)); later(5000, () => only(r, r.l2)) },
+  r => { swap(r.B, r.B[1]); only(r, r.a1) },
+  r => { only(r, r.b1, r.b2) },
+])
 
 sc3(16, () => {
   const r = {}; hd(16, 'step2 ・ 檢查點')
